@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>無限単語帳</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:system-ui,-apple-system,sans-serif;background:#f9fafb;color:#111;line-height:1.6;padding:15px;max-width:100vw;overflow-x:hidden;touch-action:manipulation}
+        @media(prefers-color-scheme:dark){body{background:#1a1a1a;color:#eee}}
+        .header{text-align:center;margin:25px 0 20px;padding:25px;background:#fff;border-radius:20px;box-shadow:0 8px 25px rgba(0,0,0,0.1);border:1px solid rgba(0,0,0,0.1)}
+        @media(prefers-color-scheme:dark){.header{background:#2a2a2a;box-shadow:0 8px 25px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1)}}
+        h1{font-size:clamp(24px,5vw,32px);color:#0ea5e9;margin-bottom:8px}
+        .tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:25px}
+        .tab{padding:14px 20px;background:#fff;border:2px solid #e5e7eb;border-radius:12px;cursor:pointer;font-weight:600;font-size:15px;user-select:none;transition:all 0.2s;touch-action:manipulation}
+        @media(prefers-color-scheme:dark){.tab{background:#2a2a2a;border-color:#4b5563}}
+        .tab.active,.tab:active{background:#0ea5e9;color:#fff;border-color:#0ea5e9;transform:scale(0.98)}
+        .tab:active{transform:scale(0.95)}
+        .content{display:none;background:#fff;padding:30px 20px;border-radius:20px;box-shadow:0 8px 25px rgba(0,0,0,0.1);border:1px solid rgba(0,0,0,0.1);margin-bottom:20px}
+        @media(prefers-color-scheme:dark){.content{background:#2a2a2a;box-shadow:0 8px 25px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1)}}
+        .content.active{display:block}
+        .btn{display:block;width:100%;padding:16px;margin:10px 0;background:#10b981;color:#fff;border:none;border-radius:12px;font-size:17px;font-weight:600;cursor:pointer;transition:all 0.2s;touch-action:manipulation}
+        .btn:active{background:#059669;transform:scale(0.98)}
+        .btn-secondary{background:#6b7280;color:#fff}
+        .btn-secondary:active{background:#4b5563}
+        .flashcard{position:relative;width:100%;max-width:500px;margin:30px auto;height:400px;background:linear-gradient(135deg,#fff,#f8fafc);border:3px solid #0ea5e9;border-radius:24px;padding:40px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;cursor:pointer;transition:all 0.4s;perspective:1000px;box-shadow:0 20px 40px rgba(14,165,233,0.2)}
+        @media(prefers-color-scheme:dark){.flashcard{background:linear-gradient(135deg,#2a2a2a,#1e293b)}}
+        .flashcard.flipped{transform:rotateY(180deg);background:linear-gradient(135deg,#0ea5e9,#0284c7)}
+        .flashcard-content{font-size:clamp(20px,6vw,28px);font-weight:700;margin-bottom:20px;line-height:1.4;min-height:80px;display:flex;align-items:center;justify-content:center}
+        .flashcard.flipped .flashcard-content{color:#fff}
+        .media{max-width:90%;max-height:180px;margin:15px 0;border-radius:12px}
+        .controls{position:absolute;top:20px;left:50%;transform:translateX(-50%);display:flex;gap:12px}
+        .speak-btn,.flag-btn{width:52px;height:52px;border-radius:50%;border:none;font-size:20px;cursor:pointer;transition:all 0.2s;flex-shrink:0;touch-action:manipulation}
+        .speak-btn{background:#10b981;color:#fff;box-shadow:0 4px 12px rgba(16,185,129,0.4)}
+        .speak-btn:active{transform:scale(0.9)}
+        .flag-btn.flag-a{color:#ef4444;border:2px solid #ef4444}
+        .flag-btn.flag-b{color:#10b981;border:2px solid #10b981}
+        .flag-btn.flag-c{color:#3b82f6;border:2px solid #3b82f6}
+        .flag-btn.flag-d{color:#f59e0b;border:2px solid #f59e0b}
+        .flag-btn.active{background:currentColor;color:#fff;transform:scale(1.1)}
+        .nav{display:flex;justify-content:center;gap:20px;align-items:center;margin-top:30px;flex-wrap:wrap}
+        .nav-btn{width:auto;padding:16px 28px;font-size:18px}
+        .counter{font-size:20px;font-weight:600;min-width:100px;text-align:center}
+        .form-group{margin-bottom:20px}
+        label{display:block;margin-bottom:8px;font-weight:600;color:#374151;font-size:16px}
+        input,textarea,select{width:100%;padding:16px;border:2px solid #e5e7eb;border-radius:12px;font-size:16px;background:#fff;color:#111;font-family:inherit;transition:border-color 0.2s}
+        @media(prefers-color-scheme:dark){input,textarea,select{background:#374151;color:#eee;border-color:#4b5563}}
+        input:focus,textarea:focus,select:focus{outline:none;border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,0.1)}
+        textarea{min-height:100px;resize:vertical}
+        .search-box{position:relative;margin-bottom:25px}
+        input[type="search"]{padding-left:45px}
+        .search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:18px}
+        .filter-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+        .filter-tag{padding:10px 16px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:25px;cursor:pointer;font-size:14px;font-weight:500;user-select:none;transition:all 0.2s}
+        @media(prefers-color-scheme:dark){.filter-tag{background:#374151;border-color:#4b5563}}
+        .filter-tag.active{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
+        .filter-tag:active{transform:scale(0.95)}
+        .list-item{background:#fff;padding:20px;border-radius:16px;margin-bottom:12px;border:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 12px rgba(0,0,0,0.05)}
+        @media(prefers-color-scheme:dark){.list-item{background:#2a2a2a;border-color:#4b5563;box-shadow:0 4px 12px rgba(0,0,0,0.3)}}
+        .list-actions{display:flex;gap:8px}
+        .icon-btn{padding:12px;border-radius:10px;border:none;background:#6b7280;color:#fff;font-size:16px;cursor:pointer;transition:all 0.2s;width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+        .icon-btn.edit{background:#3b82f6}
+        .icon-btn.delete{background:#ef4444}
+        .icon-btn:active{transform:scale(0.9)}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:1000;justify-content:center;align-items:center;padding:20px}
+        .modal.active{display:flex}
+        .modal-content{background:#fff;padding:35px;border-radius:24px;max-width:95%;max-height:90%;overflow-y:auto;box-shadow:0 25px 50px rgba(0,0,0,0.3);position:relative}
+        @media(prefers-color-scheme:dark){.modal-content{background:#1f2937}}
+        .modal-close{position:absolute;top:20px;right:20px;background:none;border:none;font-size:28px;cursor:pointer;color:#6b7280;padding:0;width:40px;height:40px;display:flex;align-items:center;justify-content:center}
+        .modal-close:active{color:#111}
+        @media print{body *{color:#000!important;background:#fff!important}body{padding:0}.content{display:block!important}.no-print{display:none!important}.flashcard{page-break-inside:avoid;margin-bottom:30px;border:1px solid #000}}
+        .empty-state{text-align:center;padding:60px 20px;color:#6b7280}
+        .swipe-hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-size:14px;color:#9ca3af;text-align:center;background:rgba(255,255,255,0.9);padding:8px 16px;border-radius:20px}
+        @media(prefers-color-scheme:dark){.swipe-hint{background:rgba(0,0,0,0.8);color:#d1d5db}}
+        .theme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:20px}
+        .theme-card{background:#fff;padding:25px;border-radius:20px;border:1px solid #e5e7eb;cursor:pointer;transition:all 0.2s;box-shadow:0 8px 20px rgba(0,0,0,0.08)}
+        .theme-card:hover{transform:translateY(-4px);box-shadow:0 16px 35px rgba(0,0,0,0.15)}
+        .theme-card h3{font-size:20px;color:#0ea5e9;margin-bottom:10px}
+        .theme-card p{color:#6b7280;margin-bottom:15px}
+        @media(max-width:480px){.content{padding:20px 15px}.flashcard{padding:25px 20px;height:350px}.flashcard-content{font-size:22px}}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>📚 無限単語帳</h1>
+        <p>タップ・スワイプで簡単学習！</p>
+    </header>
+
+    <nav class="tabs" id="tabs">
+        <div class="tab active" data-tab="study">📖 学習</div>
+        <div class="tab" data-tab="manage">✏️ 管理</div>
+        <div class="tab" data-tab="themes">📁 テーマ</div>
+        <div class="tab" data-tab="import">📥 取り込み</div>
+        <div class="tab" data-tab="export">📤 出力</div>
+    </nav>
+
+    <main>
+        <section id="study" class="content active">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="search" id="searchInput" placeholder="単語・意味を検索..." results="0">
+            </div>
+            <div class="filter-tags">
+                <span class="filter-tag" data-flag="A">🚩 A</span>
+                <span class="filter-tag" data-flag="B">🚩 B</span>
+                <span class="filter-tag" data-flag="C">🚩 C</span>
+                <span class="filter-tag" data-flag="D">🚩 D</span>
+            </div>
+            <div class="flashcard" id="flashcard">
+                <div class="controls">
+                    <button class="flag-btn flag-a" data-flag="A">A</button>
+                    <button class="flag-btn flag-b" data-flag="B">B</button>
+                    <button class="flag-btn flag-c" data-flag="C">C</button>
+                    <button class="flag-btn flag-d" data-flag="D">D</button>
+                </div>
+                <button class="speak-btn" id="speakBtn">🔊</button>
+                <div class="flashcard-content" id="cardContent">カードを追加しよう！</div>
+                <div id="cardMedia"></div>
+                <div class="swipe-hint">←スワイプ：前へ　→スワイプ：次へ　タップ：反転</div>
+            </div>
+            <div class="nav no-print">
+                <button class="nav-btn" id="prevBtn">← 前</button>
+                <div class="counter" id="counter">0 / 0</div>
+                <button class="nav-btn" id="nextBtn">次 →</button>
+            </div>
+        </section>
+
+        <section id="manage" class="content">
+            <div class="form-group">
+                <label>テーマ選択</label>
+                <select id="editTheme"></select>
+            </div>
+            <button class="btn" id="addCardBtn">➕ 新しいカード</button>
+            <button class="btn btn-secondary" id="refreshBtn">🔄 更新</button>
+            <div id="cardList" class="empty-state">テーマを選択してください</div>
+        </section>
+
+        <section id="themes" class="content">
+            <button class="btn" id="addThemeBtn">➕ 新しいテーマ</button>
+            <div id="themeList" class="theme-grid empty-state">テーマを追加しよう！</div>
+        </section>
+
+        <section id="import" class="content">
+            <div class="form-group">
+                <label class="file-label" for="importFile">📁 JSONファイルを選択</label>
+                <input type="file" id="importFile" accept=".json">
+            </div>
+            <button class="btn" id="downloadTemplate">📥 テンプレートDL</button>
+            <div style="margin-top:25px;padding:20px;background:#f3f4f6;border-radius:12px;font-family:monospace;font-size:13px;max-height:200px;overflow:auto">
+{"themes":[{"id":"sample","name":"サンプル","description":"テスト用"}],"cards":[{"id":"1","themeId":"sample","front":"hello","back":"こんにちは","flags":[]}]}
+            </div>
+        </section>
+
+        <section id="export" class="content">
+            <button class="btn" id="exportBtn">💾 全データ保存(JSON)</button>
+            <button class="btn btn-secondary" onclick="window.print()">🖨️ A4印刷</button>
+        </section>
+    </main>
+
+    <div id="cardModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeCardModal">×</button>
+            <h2>カード編集</h2>
+            <div class="form-group">
+                <label>テーマ</label>
+                <select id="modalTheme"></select>
+            </div>
+            <div class="form-group">
+                <label>表面（問題）</label>
+                <input type="text" id="modalFront" placeholder="例：apple">
+            </div>
+            <div class="form-group">
+                <label>裏面（答え）</label>
+                <textarea id="modalBack" placeholder="例：りんご"></textarea>
+            </div>
+            <div class="form-group">
+                <label>画像URL</label>
+                <input type="url" id="modalImage" placeholder="https://...">
+            </div>
+            <button class="btn" id="saveCardBtn">💾 保存</button>
+        </div>
+    </div>
+
+    <div id="themeModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeThemeModal">×</button>
+            <h2>テーマ編集</h2>
+            <div class="form-group">
+                <label>テーマ名</label>
+                <input type="text" id="modalThemeName">
+            </div>
+            <div class="form-group">
+                <label>説明</label>
+                <textarea id="modalThemeDesc"></textarea>
+            </div>
+            <button class="btn" id="saveThemeBtn">💾 保存</button>
+        </div>
+    </div>
+
+    <script>
+        class FlashcardApp{
+            constructor(){
+                this.data={themes:[],cards:[]};
+                this.filteredCards=[];
+                this.currentIndex=0;
+                this.isFlipped=false;
+                this.activeFilters=new Set();
+                this.init();
+            }
+            init(){
+                this.loadData();
+                this.bindEvents();
+                this.renderThemes();
+                this.updateSelects();
+                this.filterCards();
+                this.showCard();
+            }
+            loadData(){
+                try{
+                    const saved=localStorage.getItem('flashcard_v2');
+                    if(saved)this.data=JSON.parse(saved);
+                }catch(e){
+                    console.error('データ読み込み失敗',e);
+                }
+            }
+            saveData(){
+                localStorage.setItem('flashcard_v2',JSON.stringify(this.data));
+            }
+            bindEvents(){
+                document.getElementById('tabs').addEventListener('click',e=>{
+                    if(e.target.dataset.tab){
+                        this.switchTab(e.target.dataset.tab);
+                    }
+                });
+                document.getElementById('searchInput').addEventListener('input',()=>this.filterCards());
+                document.querySelectorAll('.filter-tag').forEach(tag=>tag.addEventListener('click',e=>this.toggleFilter(e.target.dataset.flag)));
+                document.getElementById('flashcard').addEventListener('click',()=>this.flipCard());
+                document.getElementById('prevBtn').addEventListener('click',()=>this.prevCard());
+                document.getElementById('nextBtn').addEventListener('click',()=>this.nextCard());
+                document.getElementById('speakBtn').addEventListener('click',e=>{e.stopPropagation();this.speak()});
+                document.querySelectorAll('.flag-btn').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();this.toggleFlag(e.target.dataset.flag)}));
+                document.getElementById('addCardBtn').addEventListener('click',()=>this.showCardModal());
+                document.getElementById('addThemeBtn').addEventListener('click',()=>this.showThemeModal());
+                document.getElementById('refreshBtn').addEventListener('click',()=>this.refresh());
+                document.getElementById('exportBtn').addEventListener('click',()=>this.exportData());
+                document.getElementById('downloadTemplate').addEventListener('click',()=>this.downloadTemplate());
+                document.getElementById('importFile').addEventListener('change',e=>this.importFile(e.target.files[0]));
+                document.getElementById('editTheme').addEventListener('change',()=>this.loadCardsForEdit());
+                document.getElementById('saveCardBtn').addEventListener('click',()=>this.saveCard());
+                document.getElementById('saveThemeBtn').addEventListener('click',()=>this.saveTheme());
+                document.getElementById('closeCardModal').addEventListener('click',()=>this.hideModal('cardModal'));
+                document.getElementById('closeThemeModal').addEventListener('click',()=>this.hideModal('themeModal'));
+                document.addEventListener('keydown',e=>{
+                    if(e.key==='ArrowLeft')this.prevCard();
+                    if(e.key==='ArrowRight')this.nextCard();
+                    if(e.key===' ') {e.preventDefault();this.flipCard();}
+                });
+                let touchStartX=0,touchEndX=0;
+                document.getElementById('flashcard').addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX}, {passive:true});
+                document.getElementById('flashcard').addEventListener('touchend',e=>{touchEndX=e.changedTouches[0].clientX; this.handleSwipe(touchStartX,touchEndX)}, {passive:true});
+            }
+            handleSwipe(startX,endX){
+                const diff=endX-startX;
+                if(Math.abs(diff)>50){
+                    if(diff>0)this.prevCard();
+                    else this.nextCard();
+                }
+            }
+            switchTab(tab){
+                document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+                document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+                event.target.classList.add('active');
+                document.getElementById(tab).classList.add('active');
+                if(tab==='themes')this.renderThemes();
+                if(tab==='manage')this.loadCardsForEdit();
+            }
+            updateSelects(){
+                ['editTheme','modalTheme'].forEach(id=>{
+                    const select=document.getElementById(id);
+                    select.innerHTML='<option value="">選択...</option>';
+                    this.data.themes.forEach(t=>{
+                        const opt=document.createElement('option');
+                        opt.value=t.id;
+                        opt.textContent=t.name;
+                        select.appendChild(opt);
+                    });
+                });
+            }
+            renderThemes(){
+                const container=document.getElementById('themeList');
+                if(!this.data.themes.length){
+                    container.innerHTML='<div class="empty-state">テーマを追加しよう！<br><small>➕ボタンから作成</small></div>';
+                    return;
+                }
+                container.innerHTML='';
+                this.data.themes.forEach(t=>{
+                    const count=this.data.cards.filter(c=>c.themeId===t.id).length;
+                    const div=document.createElement('div');
+                    div.className='theme-card';
+                    div.innerHTML=`
+                        <h3>${t.name}</h3>
+                        <p>${t.description||''}</p>
+                        <p style="color:#6b7280;font-size:14px">📊 ${count}枚</p>
+                        <div style="margin-top:15px;display:flex;gap:10px">
+                            <button class="icon-btn edit" onclick="app.editTheme('${t.id}')">✏️</button>
+                            <button class="icon-btn delete" onclick="app.deleteTheme('${t.id}')">🗑️</button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            showThemeModal(editId){
+                this.editingThemeId=editId||null;
+                document.getElementById('modalThemeName').value='';
+                document.getElementById('modalThemeDesc').value='';
+                if(editId){
+                    const theme=this.data.themes.find(t=>t.id===editId);
+                    if(theme){
+                        document.getElementById('modalThemeName').value=theme.name;
+                        document.getElementById('modalThemeDesc').value=theme.description||'';
+                    }
+                }
+                document.getElementById('themeModal').classList.add('active');
+            }
+            saveTheme(){
+                const name=document.getElementById('modalThemeName').value.trim();
+                if(!name)return alert('⚠️ テーマ名を入力');
+                if(this.editingThemeId){
+                    const theme=this.data.themes.find(t=>t.id===this.editingThemeId);
+                    if(theme){
+                        theme.name=name;
+                        theme.description=document.getElementById('modalThemeDesc').value.trim();
+                    }
+                }else{
+                    this.data.themes.push({
+                        id:'t'+Date.now(),
+                        name,
+                        description:document.getElementById('modalThemeDesc').value.trim()
+                    });
+                }
+                this.saveData();
+                this.updateSelects();
+                this.renderThemes();
+                this.hideModal('themeModal');
+                alert('✅ 保存完了！');
+            }
+            deleteTheme(id){
+                if(confirm('テーマとカードを削除しますか？')){
+                    this.data.themes=this.data.themes.filter(t=>t.id!==id);
+                    this.data.cards=this.data.cards.filter(c=>c.themeId!==id);
+                    this.saveData();
+                    this.updateSelects();
+                    this.renderThemes();
+                    this.filterCards();
+                    alert('✅ 削除完了');
+                }
+            }
+            showCardModal(){
+                const theme=document.getElementById('editTheme');
+                if(!theme.value)return alert('⚠️ テーマを選択');
+                this.editingCardId=null;
+                document.getElementById('modalFront').value='';
+                document.getElementById('modalBack').value='';
+                document.getElementById('modalImage').value='';
+                document.getElementById('modalTheme').value=theme.value;
+                document.getElementById('cardModal').classList.add('active');
+            }
+            saveCard(){
+                const themeId=document.getElementById('modalTheme').value;
+                const front=document.getElementById('modalFront').value.trim();
+                const back=document.getElementById('modalBack').value.trim();
+                if(!themeId||!front||!back)return alert('⚠️ 必須項目を入力');
+                if(this.editingCardId){
+                    const card=this.data.cards.find(c=>c.id===this.editingCardId);
+                    if(card){
+                        card.themeId=themeId;
+                        card.front=front;
+                        card.back=back;
+                        card.image=document.getElementById('modalImage').value.trim();
+                    }
+                }else{
+                    this.data.cards.push({
+                        id:'c'+Date.now(),
+                        themeId,
+                        front,
+                        back,
+                        image:document.getElementById('modalImage').value.trim(),
+                        flags:[]
+                    });
+                }
+                this.saveData();
+                this.filterCards();
+                this.loadCardsForEdit();
+                this.hideModal('cardModal');
+                alert('✅ 保存完了！');
+            }
+            loadCardsForEdit(){
+                const themeId=document.getElementById('editTheme').value;
+                const container=document.getElementById('cardList');
+                if(!themeId){
+                    container.innerHTML='<div class="empty-state">テーマを選択</div>';
+                    return;
+                }
+                const cards=this.data.cards.filter(c=>c.themeId===themeId);
+                if(!cards.length){
+                    container.innerHTML='<div class="empty-state">カードなし<br><small>➕で追加</small></div>';
+                    return;
+                }
+                container.innerHTML='';
+                cards.forEach(c=>{
+                    const flags=c.flags?.length?`[${c.flags.join(',')}]`:'';  
+                    const div=document.createElement('div');
+                    div.className='list-item';
+                    div.innerHTML=`
+                        <div>
+                            <strong>${c.front}</strong><br>
+                            <span style="color:#6b7280">${c.back}</span>
+                            ${flags?`<br><small style="color:#ef4444">${flags}</small>`:''}
+                        </div>
+                        <div class="list-actions">
+                            <button class="icon-btn edit" onclick="app.editCard('${c.id}')">✏️</button>
+                            <button class="icon-btn delete" onclick="app.deleteCard('${c.id}')">🗑️</button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            editCard(id){
+                const card=this.data.cards.find(c=>c.id===id);
+                if(card){
+                    document.getElementById('modalTheme').value=card.themeId;
+                    document.getElementById('modalFront').value=card.front;
+                    document.getElementById('modalBack').value=card.back;
+                    document.getElementById('modalImage').value=card.image||'';
+                    this.editingCardId=id;
+                    document.getElementById('cardModal').classList.add('active');
+                }
+            }
+            deleteCard(id){
+                if(confirm('削除しますか？')){
+                    this.data.cards=this.data.cards.filter(c=>c.id!==id);
+                    this.saveData();
+                    this.loadCardsForEdit();
+                    this.filterCards();
+                    alert('✅ 削除完了');
+                }
+            }
+            filterCards(){
+                const q=document.getElementById('searchInput').value.toLowerCase();
+                const theme=document.getElementById('theme-filter')?.value||'';
+                this.filteredCards=this.data.cards.filter(c=>{
+                    const matchQ=!q||c.front.toLowerCase().includes(q)||c.back.toLowerCase().includes(q);
+                    const matchTheme=!theme||c.themeId===theme;
+                    const matchFlag=!this.activeFilters.size||c.flags?.some(f=>this.activeFilters.has(f));
+                    return matchQ&&matchTheme&&matchFlag;
+                });
+                this.currentIndex=0;
+                this.showCard();
+            }
+            toggleFilter(flag){
+                if(this.activeFilters.has(flag)){
+                    this.activeFilters.delete(flag);
+                    event.target.classList.remove('active');
+                }else{
+                    this.activeFilters.add(flag);
+                    event.target.classList.add('active');
+                }
+                this.filterCards();
+            }
+            showCard(){
+                const card=this.filteredCards[this.currentIndex];
+                const contentEl=document.getElementById('cardContent');
+                const mediaEl=document.getElementById('cardMedia');
+                const counterEl=document.getElementById('counter');
+                const prevBtn=document.getElementById('prevBtn');
+                const nextBtn=document.getElementById('nextBtn');
+                const speakBtn=document.getElementById('speakBtn');
+                
+                this.isFlipped=false;
+                document.getElementById('flashcard').classList.remove('flipped');
+                
+                if(!card){
+                    contentEl.textContent='カードがありません\n➕ボタンで追加！';
+                    mediaEl.innerHTML='';
+                    counterEl.textContent='0 / 0';
+                    prevBtn.disabled=nextBtn.disabled=true;
+                    speakBtn.style.display='none';
+                    return;
+                }
+                
+                contentEl.textContent=card.front;
+                mediaEl.innerHTML='';
+                if(card.image){
+                    const img=new Image();
+                    img.src=card.image;
+                    img.className='media';
+                    img.onerror=()=>mediaEl.innerHTML='';
+                    mediaEl.appendChild(img);
+                }
+                
+                counterEl.textContent=`${this.currentIndex+1}/${this.filteredCards.length}`;
+                prevBtn.disabled=this.currentIndex===0;
+                nextBtn.disabled=this.currentIndex===this.filteredCards.length-1;
+                speakBtn.style.display='block';
+                
+                document.querySelectorAll('.flag-btn').forEach(btn=>{
+                    const f=btn.dataset.flag;
+                    btn.classList.toggle('active',card.flags?.includes(f));
+                });
+            }
+            flipCard(){
+                if(!this.filteredCards[this.currentIndex])return;
+                this.isFlipped=!this.isFlipped;
+                const el=document.getElementById('flashcard');
+                const content=document.getElementById('cardContent');
+                const card=this.filteredCards[this.currentIndex];
+                el.classList.toggle('flipped');
+                content.textContent=this.isFlipped?card.back:card.front;
+            }
+            nextCard(){if(this.currentIndex<this.filteredCards.length-1){this.currentIndex++;this.showCard()}}
+            prevCard(){if(this.currentIndex>0){this.currentIndex--;this.showCard()}}
+            speak(){
+                const card=this.filteredCards[this.currentIndex];
+                if(!card||!('speechSynthesis'in window))return;
+                const text=this.isFlipped?card.back:card.front;
+                const utterance=new SpeechSynthesisUtterance(text);
+                utterance.lang='ja-JP';
+                speechSynthesis.speak(utterance);
+            }
+            toggleFlag(flag){
+                const card=this.data.cards.find(c=>c.id===this.filteredCards[this.currentIndex]?.id);
+                if(!card)return;
+                if(!card.flags)card.flags=[];
+                const i=card.flags.indexOf(flag);
+                if(i>-1)card.flags.splice(i,1);
+                else card.flags.push(flag);
+                this.saveData();
+                this.showCard();
+            }
+            refresh(){
+                this.loadData();
+                this.updateSelects();
+                this.renderThemes();
+                this.filterCards();
+                this.loadCardsForEdit();
+                alert('✅ 最新データに更新！');
+            }
+            exportData(){
+                const blob=new Blob([JSON.stringify(this.data,null,2)],{type:'application/json'});
+                const url=URL.createObjectURL(blob);
+                const a=document.createElement('a');
+                a.href=url;
+                a.download=`単語帳_${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+            downloadTemplate(){
+                const template={themes:[{id:'sample',name:'サンプル',description:'テスト用'}],cards:[{id:'1',themeId:'sample',front:'hello',back:'こんにちは',flags:[]}]};
+                const blob=new Blob([JSON.stringify(template,null,2)],{type:'application/json'});
+                const url=URL.createObjectURL(blob);
+                const a=document.createElement('a');
+                a.href=url;
+                a.download='単語帳テンプレート.json';
+                a.click();
+            }
+            importFile(file){
+                if(!file)return;
+                const reader=new FileReader();
+                reader.onload=e=>{
+                    try{
+                        const data=JSON.parse(e.target.result);
+                        if(confirm('データを追加しますか？')){
+                            if(data.themes)this.data.themes.push(...data.themes.filter(t=>!this.data.themes.find(et=>et.id===t.id)));
+                            if(data.cards)this.data.cards.push(...data.cards.filter(c=>!this.data.cards.find(ec=>ec.id===c.id)));
+                            this.saveData();
+                            this.refresh();
+                            alert('✅ インポート完了！');
+                        }
+                    }catch{alert('❌ ファイル形式エラー')}
+                };
+                reader.readAsText(file);
+            }
+            hideModal(id){document.getElementById(id).classList.remove('active')}
+            editTheme(id){this.showThemeModal(id)}
+            editCard(id){/* 既存のeditCardを使用 */}
+        }
+        const app=new FlashcardApp();
+    </script>
+</body>
+</html>
