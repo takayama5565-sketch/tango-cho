@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>無限単語帳 勇者の記憶</title>
+    <title>無限単語帳 真・勇者の記憶</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
 
@@ -14,57 +14,49 @@
             --dq-yellow: #f8e45c;
             --dq-red: #e04006;
             --dq-blue: #4da6ff;
-            --primary: #1976d2;
         }
         
         body { 
-            font-family: 'DotGothic16', sans-serif; /* 全体をドットフォントに統一 */
-            background: var(--dq-bg); 
-            color: var(--dq-text); 
-            margin: 0; 
-            padding-bottom: 80px; 
-            overflow-x: hidden;
-            user-select: none;
-            -webkit-user-select: none;
+            font-family: 'DotGothic16', sans-serif; 
+            background: var(--dq-bg); color: var(--dq-text); 
+            margin: 0; padding-bottom: 80px; overflow-x: hidden;
+            user-select: none; -webkit-user-select: none;
         }
         
         .container { max-width: 600px; margin: 0 auto; padding: 10px; }
         
         /* 🗡️ ドラクエ風ウィンドウ */
         .dq-window { 
-            background: var(--dq-bg); 
-            color: var(--dq-text); 
-            border: 3px solid var(--dq-border); 
-            border-radius: 8px; 
-            padding: 12px; 
-            margin-bottom: 12px; 
-            position: relative;
-            box-shadow: inset 0 0 0 2px var(--dq-bg), inset 0 0 0 4px var(--dq-border); /* 内側の二重枠 */
+            background: var(--dq-bg); color: var(--dq-text); 
+            border: 3px solid var(--dq-border); border-radius: 8px; 
+            padding: 12px; margin-bottom: 12px; position: relative;
+            box-shadow: inset 0 0 0 2px var(--dq-bg), inset 0 0 0 4px var(--dq-border); 
         }
         
         .rpg-status { display: flex; justify-content: space-between; font-size: 1.1rem; border-bottom: 2px dashed #888; padding-bottom: 8px; margin-bottom: 10px; }
         .exp-bar { width: 100%; height: 6px; background: #333; margin-top: 5px; }
         .exp-fill { height: 100%; background: var(--dq-blue); width: 0%; transition: width 0.3s; }
 
-        /* モンスター表示 */
-        .rpg-monster { text-align: center; margin: 20px 0; transition: transform 0.1s; }
-        .monster-sprite { font-size: 4rem; display: block; margin-bottom: 5px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); }
-        .rpg-monster-name { font-size: 1.3rem; color: var(--dq-yellow); }
+        /* CSSピクセルアートモンスター */
+        .rpg-monster { text-align: center; margin: 20px 0 30px 0; transition: transform 0.1s; }
+        .pixel-art-container { display: flex; justify-content: center; align-items: center; margin-bottom: 15px; }
+        #monster-sprite-pixel { background: transparent; }
+        .rpg-monster-name { font-size: 1.3rem; color: var(--dq-yellow); margin-top: 15px;}
         .rpg-monster-hp-bar { width: 60%; height: 8px; background: #333; border: 1px solid #fff; margin: 5px auto; }
         .rpg-monster-hp-fill { height: 100%; background: var(--dq-red); width: 100%; transition: width 0.3s; }
 
         /* メッセージログ */
-        .rpg-log { font-size: 1.1rem; min-height: 4rem; line-height: 1.5; padding: 5px; }
+        .rpg-log { font-size: 1.1rem; min-height: 4.5rem; line-height: 1.5; padding: 5px; }
         .typing-cursor::after { content: '▼'; animation: blink 1s infinite; margin-left: 5px; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        /* 揺れ・フラッシュエフェクト */
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
-        .shake-effect { animation: shake 0.1s 2; }
+        /* エフェクト */
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-15px); } 75% { transform: translateX(15px); } }
+        .shake-effect { animation: shake 0.1s 3; }
         @keyframes damageFlash { 0% { background: #800000; } 100% { background: var(--dq-bg); } }
         .flash-red { animation: damageFlash 0.3s forwards; }
 
-        /* カード（フラッシュカード）もドラクエウィンドウ風に */
+        /* フラッシュカード */
         .scene { perspective: 1000px; margin-bottom: 15px; }
         .card-inner { width: 100%; min-height: 220px; position: relative; transition: transform 0.5s; transform-style: preserve-3d; cursor: pointer; }
         .card-inner.is-flipped { transform: rotateY(180deg); }
@@ -75,7 +67,6 @@
             text-align: center; padding: 10px; box-sizing: border-box;
         }
         .card-back { transform: rotateY(180deg); }
-        
         .rubi-text b { color: var(--dq-yellow); }
         .front-ex { font-size: 1rem; margin-top: 15px; color: #aaa; }
 
@@ -91,7 +82,6 @@
         .cmd-btn:active::before { opacity: 1; }
         .cmd-desc { display: block; font-size: 0.8rem; color: #aaa; margin-top: 5px; padding-left: 20px;}
 
-        /* その他のUI */
         .tab-bar { position: fixed; bottom: 0; width: 100%; background: #111; border-top: 2px solid #fff; display: flex; padding: 5px 0; z-index: 100; }
         .tab-bar button { flex: 1; background: none; border: none; color: #fff; font-family: 'DotGothic16', sans-serif; font-size: 1rem; cursor: pointer; padding: 10px; }
         .view { display: none; }
@@ -104,16 +94,14 @@
         .btn-normal { text-align: center; cursor: pointer; }
         .btn-normal:active { background: #444; }
 
-        /* ポケットモード */
         #pocket-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; color: #fff; flex-direction: column; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
 
-<div id="start-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:10000; display:flex; justify-content:center; align-items:center; flex-direction:column; color:#fff;" onclick="initAudioAndStart()">
-    <h1 style="color:var(--dq-yellow); font-size:2rem;">無限単語帳</h1>
-    <p>〜 勇者の記憶 〜</p>
-    <p style="margin-top:40px; animation: blink 1s infinite;">▶ 画面をタップして冒険へ</p>
+<div id="start-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:10000; display:flex; justify-content:center; align-items:center; flex-direction:column; color:#fff;" onclick="initGame()">
+    <h1 style="color:var(--dq-yellow); font-size:2rem; text-align:center;">無限単語帳<br>〜 真・勇者の記憶 〜</h1>
+    <p style="margin-top:40px; animation: blink 1s infinite;">▶ 画面をタップして ぼうけんへ</p>
     <p style="font-size:0.8rem; color:#888; margin-top:20px;">※マナーモードを解除してください</p>
 </div>
 
@@ -123,7 +111,7 @@
             <div class="rpg-status">
                 <span id="rpg-lv">LV: 1</span>
                 <span id="rpg-hp" style="color:var(--dq-red);">HP: 20/20</span>
-                <span id="rpg-weapon">武器: ひのきのぼう</span>
+                <span id="rpg-weapon">ぶき: ひのきのぼう</span>
             </div>
             <div style="font-size:0.8rem; display:flex; justify-content:space-between;">
                 <span>つぎのレベルまで: <span id="rpg-next-exp">10</span></span>
@@ -132,11 +120,11 @@
             <div class="exp-bar"><div class="exp-fill" id="exp-fill"></div></div>
 
             <div class="rpg-monster" id="monster-ui">
-                <span class="monster-sprite" id="monster-img">💧</span>
+                <div class="pixel-art-container" id="pixel-container"><div id="monster-sprite-pixel"></div></div>
                 <div class="rpg-monster-name" id="monster-name">スライム</div>
                 <div class="rpg-monster-hp-bar"><div class="rpg-monster-hp-fill" id="monster-hp-fill"></div></div>
             </div>
-            <div class="rpg-log dq-window" id="rpg-log" style="border-width:2px; margin-bottom:0; font-size:1.2rem;"></div>
+            <div class="rpg-log dq-window" id="rpg-log" style="border-width:2px; margin-bottom:0;"></div>
         </div>
 
         <select id="study-grade" onchange="loadStudyQueue()">
@@ -167,13 +155,13 @@
             </div>
 
             <div style="display:flex; gap:10px; margin-top:10px;">
-                <button class="btn-normal" onclick="playWordAudio()">🔊 じゅもん(英単語)</button>
-                <button class="btn-normal" onclick="playExAudio()">🔊 えいしょう(例文)</button>
+                <button class="btn-normal" onclick="playWordAudio()">🔊 英単語</button>
+                <button class="btn-normal" onclick="playExAudio()">🔊 例文</button>
             </div>
             
             <div class="command-grid" id="srs-controls">
-                <div class="cmd-btn" onclick="answerSrs(0)">にげる<span class="cmd-desc">忘れた(1分)</span></div>
-                <div class="cmd-btn" onclick="answerSrs(1)">ぼうぎょ<span class="cmd-desc">難しい(10分)</span></div>
+                <div class="cmd-btn" onclick="answerSrs(0)">にげる<span class="cmd-desc">忘れた(1分後)</span></div>
+                <div class="cmd-btn" onclick="answerSrs(1)">ぼうぎょ<span class="cmd-desc">難しい(10分後)</span></div>
                 <div class="cmd-btn" onclick="answerSrs(2)">たたかう<span class="cmd-desc">普通(明日)</span></div>
                 <div class="cmd-btn" onclick="answerSrs(3)">かいしん<span class="cmd-desc">簡単(3日後)</span></div>
             </div>
@@ -182,7 +170,7 @@
         <div id="all-done" class="dq-window" style="display: none; text-align: center; padding: 40px 10px;">
             <h2 style="color: var(--dq-yellow);">まものは いっそう された！</h2>
             <p>へいわな じかんが ながれている。</p>
-            <button class="btn-normal" style="margin-top:20px;" onclick="forceReviewAll()">▶ まものを さがす(全復習)</button>
+            <button class="btn-normal" style="margin-top:20px;" onclick="forceReviewAll()">▶ まものを さがす(無視して全復習)</button>
         </div>
     </div>
 
@@ -190,14 +178,11 @@
         <div class="dq-window">
             <h3 style="color: var(--dq-yellow); text-align:center;">ルイーダの酒場 (自動再生)</h3>
             <p style="font-size:0.9rem; color:#aaa;">スマホをポケットに入れても、魔物の声が聞こえ続ける「集中モード」に移行します。</p>
-            
             <select id="com-grade-filter">
                 <option value="all">全ての級</option><option value="5級">5級のみ</option><option value="4級">4級のみ</option><option value="3級">3級のみ</option>
             </select>
-            
             <button class="btn-normal" onclick="startCommute(false)">▶ ぼうけんのつづきから</button>
             <button class="btn-normal" onclick="startCommute(true)">▶ はじめから ぼうけんする</button>
-            
             <div style="margin-top: 20px; text-align: center; border: 1px dashed #666; padding: 10px;">
                 <p style="margin: 0; color: #aaa;">現在 対峙している魔物</p>
                 <h3 id="com-playing" style="margin: 10px 0; color: var(--dq-yellow);">やすみ中</h3>
@@ -214,10 +199,7 @@
     <div id="view-data" class="view">
         <div class="dq-window">
             <h3 style="color:var(--dq-yellow);">ぼうけんの書 (データ追加)</h3>
-            <p style="font-size:0.8rem; color:#aaa;">
-                現在の収録状況：<br>
-                <span id="count-board"></span>
-            </p>
+            <p style="font-size:0.8rem; color:#aaa;">現在の収録状況：<br><span id="count-board"></span></p>
             <textarea id="import-csv" rows="5" placeholder="エクセルのデータをここに貼り付けます。"></textarea>
             <button class="btn-normal" onclick="importCSV()">▶ データを きろくする</button>
             <hr style="border:1px dashed #666; margin:20px 0;">
@@ -234,44 +216,124 @@
 
 <script>
     // ==========================================
-    // 🎵 8bit レトロサウンドジェネレーター (Web Audio API)
+    // 🎵 8bit レトロサウンド（完全再現版）
     // ==========================================
     let audioCtx;
-    function initAudioAndStart() {
+    function initGame() {
         document.getElementById('start-screen').style.display = 'none';
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         audioCtx = new AudioContext();
         if (audioCtx.state === 'suspended') audioCtx.resume();
-        initVoice(); 
-        updateRpgUI(); 
-        loadStudyQueue();
+        initVoice(); updateRpgUI(); loadStudyQueue();
     }
 
-    // 基本の発信関数
-    function playTone(freq, type, duration, vol=0.1, slideFreq=null) {
+    function playToneAt(freq, type, startTime, duration, vol, slideFreq=null) {
         if(!audioCtx) return;
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.type = type; // 'square', 'sawtooth', 'triangle'
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        if(slideFreq) osc.frequency.exponentialRampToValueAtTime(slideFreq, audioCtx.currentTime + duration);
-        
-        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-        
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, startTime);
+        if(slideFreq) osc.frequency.exponentialRampToValueAtTime(slideFreq, startTime + duration);
+        gain.gain.setValueAtTime(vol, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
         osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + duration);
+        osc.start(startTime); osc.stop(startTime + duration);
     }
 
-    // 各種SE
-    function seAttack() { playTone(800, 'square', 0.1, 0.1, 400); setTimeout(()=>playTone(600, 'square', 0.1, 0.1, 200), 50); }
-    function seCritical() { seAttack(); setTimeout(seAttack, 80); setTimeout(seAttack, 160); }
-    function seDamage() { playTone(150, 'sawtooth', 0.3, 0.2, 50); }
-    function seKill() { playTone(400, 'square', 0.1, 0.1, 800); setTimeout(()=>playTone(800, 'square', 0.2, 0.1, 1200), 100); }
+    // 攻撃音 (ピュッ)
+    function seAttack() { 
+        if(!audioCtx) return;
+        let t = audioCtx.currentTime;
+        playToneAt(800, 'square', t, 0.1, 0.1, 400); 
+    }
+    // 【ご要望】会心の一撃音 (ドラクエ風 ピロピロピロ…ドゴォ！)
+    function seCritical() {
+        if(!audioCtx) return;
+        let t = audioCtx.currentTime;
+        // ピロピロピロ
+        for(let i=0; i<6; i++) {
+            playToneAt(1000 + (i%2)*400, 'square', t + i*0.04, 0.04, 0.1);
+        }
+        // ドゴォ！(重い音)
+        playToneAt(400, 'sawtooth', t + 0.24, 0.4, 0.3, 50);
+    }
+    // ダメージ音 (ザシュッ)
+    function seDamage() { 
+        if(!audioCtx) return;
+        let t = audioCtx.currentTime;
+        playToneAt(150, 'sawtooth', t, 0.2, 0.2, 50); 
+    }
+    // 討伐音
+    function seKill() { 
+        if(!audioCtx) return;
+        let t = audioCtx.currentTime;
+        playToneAt(400, 'square', t, 0.1, 0.1, 800); 
+        playToneAt(800, 'square', t+0.1, 0.2, 0.1, 1200); 
+    }
+    // レベルアップ音 (タラララッタッター♪)
     function seLevelUp() {
-        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-        notes.forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.15, 0.1), i * 150));
-        setTimeout(() => playTone(1046.50, 'square', 0.4, 0.1), 600);
+        if(!audioCtx) return;
+        let t = audioCtx.currentTime;
+        playToneAt(523.25, 'square', t, 0.12, 0.1); // C
+        playToneAt(523.25, 'square', t+0.15, 0.12, 0.1); // C
+        playToneAt(523.25, 'square', t+0.3, 0.12, 0.1); // C
+        playToneAt(523.25, 'square', t+0.45, 0.3, 0.1); // C
+        playToneAt(659.25, 'square', t+0.45, 0.4, 0.1); // E
+    }
+
+    // ==========================================
+    // 👾 CSS ドット絵ジェネレーター
+    // ==========================================
+    const pixelArts = {
+        "5級": [ // スライム
+            "   bbbb   ",
+            "  bbbbbb  ",
+            " bbwbwbbb ",
+            " bbbbbbbb ",
+            "  bbbbbb  "
+        ],
+        "4級": [ // ゴーレム
+            "   oooo   ",
+            "  ookwoo  ",
+            "  oooooo  ",
+            " oooooooo ",
+            " ooo  ooo ",
+            " oo    oo "
+        ],
+        "3級": [ // ドラゴン
+            "   gg     ",
+            "  gggg    ",
+            " ggkwg    ",
+            " gggggggg ",
+            "  gggggg  ",
+            "   g  g   "
+        ],
+        "default": [ // ゴースト
+            "   www    ",
+            "  wkwww   ",
+            " wwwwwww  ",
+            "  w w w   "
+        ]
+    };
+
+    function renderMonsterPixel(grade) {
+        const art = pixelArts[grade] || pixelArts["default"];
+        const colors = { 'b': '#4da6ff', 'w': '#fff', 'k': '#000', 'o': '#e67e22', 'g': '#2ecc71', ' ': 'transparent' };
+        let shadows = [];
+        const scale = 8; // ピクセルの大きさ
+        for(let y=0; y<art.length; y++) {
+            for(let x=0; x<art[y].length; x++) {
+                const char = art[y][x];
+                if(char !== ' ') shadows.push(`${x*scale}px ${y*scale}px 0 ${colors[char]}`);
+            }
+        }
+        const monsterDiv = document.getElementById('monster-sprite-pixel');
+        monsterDiv.style.width = `${scale}px`;
+        monsterDiv.style.height = `${scale}px`;
+        monsterDiv.style.boxShadow = shadows.join(', ');
+        monsterDiv.style.margin = '0 auto';
+        document.getElementById('pixel-container').style.height = `${art.length * scale}px`;
+        document.getElementById('pixel-container').style.width = `${art[0].length * scale}px`;
     }
 
     // ==========================================
@@ -285,7 +347,6 @@
         el.classList.remove('typing-cursor');
         
         let i = 0;
-        // 改行を判定しながら1文字ずつ出力
         typeInterval = setInterval(() => {
             if(text[i] === '\n') el.innerHTML += '<br>';
             else el.innerHTML += text[i];
@@ -294,26 +355,59 @@
                 clearInterval(typeInterval);
                 if(isBlinking) el.classList.add('typing-cursor');
             }
-        }, 30); // 文字の表示スピード
+        }, 40); // タイピング速度
     }
 
     // ==========================================
-    // 🗡️ RPG システム
+    // 🗡️ RPG ＆ 単語システム
     // ==========================================
+    // 【バグ修正】初期データ「Apple」だけだとすぐ終わるため、RPGテーマの単語10個を初期収録
+    const defaultWords = [
+        { id: 1, en: 'hero', jp: '勇者', rubi: '[ヒ]ーロウ', exEn: 'A brave hero.', exJp: '勇敢な勇者。', grade: '5級', box: 0, nextReview: 0 },
+        { id: 2, en: 'sword', jp: '剣', rubi: '[ソ]ード', exEn: 'A sharp sword.', exJp: '鋭い剣。', grade: '5級', box: 0, nextReview: 0 },
+        { id: 3, en: 'magic', jp: '魔法', rubi: '[マ]ジック', exEn: 'Use magic.', exJp: '魔法を使う。', grade: '5級', box: 0, nextReview: 0 },
+        { id: 4, en: 'monster', jp: '魔物', rubi: '[モ]ンスター', exEn: 'Defeat the monster.', exJp: '魔物を倒す。', grade: '5級', box: 0, nextReview: 0 },
+        { id: 5, en: 'dragon', jp: '竜', rubi: '[ド]ラゴン', exEn: 'A huge dragon.', exJp: '巨大な竜。', grade: '4級', box: 0, nextReview: 0 },
+        { id: 6, en: 'castle', jp: '城', rubi: '[カ]ッスル', exEn: 'The king\'s castle.', exJp: '王の城。', grade: '4級', box: 0, nextReview: 0 },
+        { id: 7, en: 'level', jp: 'レベル', rubi: '[レ]ヴェル', exEn: 'Level up.', exJp: 'レベルが上がる。', grade: '5級', box: 0, nextReview: 0 },
+        { id: 8, en: 'world', jp: '世界', rubi: '[ワ]ールド', exEn: 'Save the world.', exJp: '世界を救う。', grade: '4級', box: 0, nextReview: 0 },
+        { id: 9, en: 'journey', jp: '旅', rubi: '[ジャ]ーニー', exEn: 'A long journey.', exJp: '長い旅。', grade: '3級', box: 0, nextReview: 0 },
+        { id: 10, en: 'peace', jp: '平和', rubi: '[ピ]ース', exEn: 'World peace.', exJp: '世界平和。', grade: '3級', box: 0, nextReview: 0 }
+    ];
+
+    let words = JSON.parse(localStorage.getItem('vocab_srs_data'));
+    if(!words || words.length === 0) words = defaultWords;
+
     let rpg = JSON.parse(localStorage.getItem('vocab_rpg_v6')) || { lv: 1, exp: 0, hp: 20, maxHp: 20 };
     const weapons = [
         { lv: 1, name: "ひのきのぼう", atk: 3 }, { lv: 5, name: "どうのつるぎ", atk: 8 },
-        { lv: 10, name: "はがねのつるぎ", atk: 15 }, { lv: 20, name: "ドラゴンキラー", atk: 35 },
-        { lv: 35, name: "ロトのつるぎ", atk: 60 }
+        { lv: 10, name: "はがねのつるぎ", atk: 15 }, { lv: 20, name: "ドラゴンキラー", atk: 35 }, { lv: 35, name: "ロトのつるぎ", atk: 60 }
     ];
     
     const monsters = {
-        "5級": { name: "スライム", img: "💧", hp: 15 },
-        "4級": { name: "ゴーレム", img: "🗿", hp: 40 },
-        "3級": { name: "ドラゴン", img: "🐲", hp: 100 },
-        "default": { name: "なぞのまもの", img: "👻", hp: 20 }
+        "5級": { name: "スライム", hp: 15 },
+        "4級": { name: "ゴーレム", hp: 40 },
+        "3級": { name: "ドラゴン", hp: 100 },
+        "default": { name: "なぞのまもの", hp: 20 }
     };
+    
     let currentEnemy = null;
+    let reviewQueue = [];
+    let currentWord = null;
+    let synth = window.speechSynthesis;
+    let bestVoice = null;
+    let wakeLock = null;
+
+    function initVoice() {
+        const vs = synth.getVoices();
+        bestVoice = vs.find(v => v.lang === 'en-US' && (v.name.includes('Premium') || v.name.includes('Samantha'))) || vs.find(v => v.lang.startsWith('en'));
+    }
+
+    function showTab(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(id === 'view-study') loadStudyQueue();
+    }
 
     function getNextExp() { return rpg.lv * 20; }
 
@@ -326,7 +420,7 @@
         document.getElementById('rpg-weapon').innerText = `ぶき: ${weapon.name}`;
         
         const nextExp = getNextExp();
-        document.getElementById('rpg-next-exp').innerText = `${nextExp - rpg.exp}`;
+        document.getElementById('rpg-next-exp').innerText = `${Math.max(0, nextExp - rpg.exp)}`;
         document.getElementById('exp-fill').style.width = `${(rpg.exp / nextExp) * 100}%`;
 
         if(currentEnemy) {
@@ -346,95 +440,8 @@
         document.getElementById('count-board').innerHTML = `ぜんぶで: ${counts.total} こ<br>5級: ${counts.g5} / 4級: ${counts.g4} / 3級: ${counts.g3}`;
     }
 
-    function spawnMonsterByGrade(grade) {
-        const mBase = monsters[grade] || monsters["default"];
-        currentEnemy = { ...mBase, hp: mBase.hp + (rpg.lv * 2), maxHp: mBase.hp + (rpg.lv * 2) };
-        document.getElementById('monster-name').innerText = currentEnemy.name;
-        document.getElementById('monster-img').innerText = currentEnemy.img;
-        updateRpgUI();
-        showMessage(`${currentEnemy.name}が あらわれた！\nコマンド？`, true);
-    }
-
-    function doBattle(quality) {
-        let weapon = weapons[0];
-        for (let w of weapons) { if (rpg.lv >= w.lv) weapon = w; }
-        
-        const monsterUI = document.getElementById('monster-ui');
-        let dmg = 0; let log = "";
-
-        if (quality >= 2) { 
-            // 攻撃成功
-            dmg = quality === 3 ? weapon.atk * 2 : weapon.atk;
-            currentEnemy.hp -= dmg;
-            log = quality === 3 ? "かいしんの いちげき！\n" : "ゆうしゃの こうげき！\n";
-            log += `${currentEnemy.name}に ${dmg} のダメージ！`;
-            
-            if(quality === 3) seCritical(); else seAttack();
-            
-            monsterUI.classList.add('shake-effect');
-            setTimeout(() => monsterUI.classList.remove('shake-effect'), 200);
-
-        } else { 
-            // ダメージ受ける
-            const mAtk = Math.floor(rpg.lv / 2) + 2;
-            rpg.hp -= mAtk;
-            log = `${currentEnemy.name}の こうげき！\nゆうしゃは ${mAtk} のダメージ！`;
-            seDamage();
-            document.body.classList.add('flash-red');
-            setTimeout(() => document.body.classList.remove('flash-red'), 300);
-            
-            if(rpg.hp <= 0) { 
-                rpg.hp = rpg.maxHp; 
-                log += "\nゆうしゃは ちからつきた！\nしかし きせきで ふっかつした！"; 
-            }
-        }
-
-        if (currentEnemy.hp <= 0) {
-            log += `\n${currentEnemy.name}を たおした！`;
-            seKill();
-            rpg.exp += 15;
-            if(rpg.exp >= getNextExp()) { 
-                rpg.lv++; rpg.maxHp += 5; rpg.hp = rpg.maxHp; rpg.exp = 0;
-                log += `\nレベルが ${rpg.lv} に あがった！`; 
-                setTimeout(seLevelUp, 500);
-            }
-            showMessage(log);
-            updateRpgUI();
-            setTimeout(() => spawnMonsterByGrade(currentWord.grade), 2500); // 2.5秒後に次
-        } else {
-            showMessage(log);
-            updateRpgUI();
-            setTimeout(() => showMessage("コマンド？", true), 1500);
-        }
-    }
-
-    // ==========================================
-    // 🧠 システム・データ管理 (バグ修正済)
-    // ==========================================
-    // 初回起動時の空データによるエラーを防ぐため、サンプルのスライム(apple)を入れておく
-    const defaultWords = [{ id: 1, en: 'apple', jp: 'りんご', rubi: '[ア]ップル', exEn: 'An apple.', exJp: 'りんご。', grade: '5級', box: 0, nextReview: 0 }];
-    let words = JSON.parse(localStorage.getItem('vocab_srs_data'));
-    if(!words || words.length === 0) words = defaultWords;
-    
-    let reviewQueue = [];
-    let currentWord = null;
-    let synth = window.speechSynthesis;
-    let bestVoice = null;
-    let wakeLock = null;
-
-    function initVoice() {
-        const vs = synth.getVoices();
-        bestVoice = vs.find(v => v.lang === 'en-US' && (v.name.includes('Premium') || v.name.includes('Samantha'))) || vs.find(v => v.lang.startsWith('en'));
-    }
-
-    function showTab(id) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        if(id === 'view-study') loadStudyQueue();
-    }
-
     function loadStudyQueue(forceAll = false) {
-        if(words.length === 0) return; // データ空対策
+        if(words.length === 0) return;
         const grade = document.getElementById('study-grade').value;
         const now = Date.now();
         reviewQueue = words.filter(w => (grade === 'all' || w.grade === grade) && (forceAll || !w.nextReview || w.nextReview <= now));
@@ -457,13 +464,22 @@
 
     function forceReviewAll() { loadStudyQueue(true); }
 
+    function spawnMonsterByGrade(grade) {
+        const mBase = monsters[grade] || monsters["default"];
+        currentEnemy = { ...mBase, hp: mBase.hp + (rpg.lv * 2), maxHp: mBase.hp + (rpg.lv * 2) };
+        document.getElementById('monster-name').innerText = currentEnemy.name;
+        renderMonsterPixel(grade); // ピクセルアート描画
+        updateRpgUI();
+        showMessage(`${currentEnemy.name}が あらわれた！\nコマンド？`, true);
+    }
+
     function showNextCard() {
         if(reviewQueue.length === 0) { loadStudyQueue(); return; }
         currentWord = reviewQueue[0];
         document.getElementById('flashcard').classList.remove('is-flipped');
         document.getElementById('srs-controls').style.display = 'none';
         
-        document.getElementById('sc-grade').innerText = currentWord.grade;
+        document.getElementById('sc-grade').innerText = `【${currentWord.grade}】`;
         document.getElementById('sc-en').innerText = currentWord.en;
         document.getElementById('sc-rubi').innerHTML = currentWord.rubi ? currentWord.rubi.replace(/\[(.*?)\]/g, "<b>$1</b>") : "";
         document.getElementById('sc-front-ex').innerText = currentWord.exEn || "";
@@ -471,13 +487,16 @@
         document.getElementById('sc-ex-en').innerText = currentWord.exEn || "";
         document.getElementById('sc-ex-jp').innerText = currentWord.exJp || "";
         
-        // 敵が切り替わるタイミングで再生成
         if(!currentEnemy || currentEnemy.hp <= 0) spawnMonsterByGrade(currentWord.grade);
     }
 
     function flipCard() {
         document.getElementById('flashcard').classList.toggle('is-flipped');
-        document.getElementById('srs-controls').style.display = 'grid'; // gridで表示
+        document.getElementById('srs-controls').style.display = 'grid';
+        // めくった瞬間に英語を自動再生（学習効果UP）
+        if(document.getElementById('flashcard').classList.contains('is-flipped')) {
+            playWordAudio();
+        }
     }
 
     function answerSrs(q) {
@@ -489,23 +508,65 @@
             currentWord.nextReview = now + (intervals[Math.min(currentWord.box, intervals.length-1)]);
         }
         
-        // バトルの演出（非同期で敵のHPチェックが入るので一旦ここで保存）
         localStorage.setItem('vocab_srs_data', JSON.stringify(words));
         doBattle(q);
-        
         reviewQueue.shift();
         document.getElementById('queue-count').innerText = `のこり魔物: ${reviewQueue.length}匹`;
         
-        // 次のカードへ (敵が倒れた場合は2.5秒のディレイがdoBattle内で入るが、カードはすぐめくる)
+        // カードをすぐ隠して次へ（敵が倒れた場合は少し待つ）
+        document.getElementById('flashcard').classList.remove('is-flipped');
+        document.getElementById('srs-controls').style.display = 'none';
+        
         if(currentEnemy.hp > 0) {
             if(reviewQueue.length > 0) showNextCard(); else loadStudyQueue();
         } else {
-            // 敵が倒れた場合はアニメーションを待つ
-            document.getElementById('study-area').style.display = 'none'; // 一瞬隠す
+            // 敵が死んだときはアニメーションを待つ
+            document.getElementById('study-area').style.display = 'none'; 
             setTimeout(() => {
                 document.getElementById('study-area').style.display = 'block';
                 if(reviewQueue.length > 0) showNextCard(); else loadStudyQueue();
             }, 2500);
+        }
+    }
+
+    function doBattle(quality) {
+        let weapon = weapons[0];
+        for (let w of weapons) { if (rpg.lv >= w.lv) weapon = w; }
+        
+        const monsterUI = document.getElementById('monster-ui');
+        let dmg = 0; let log = "";
+
+        if (quality >= 2) { 
+            dmg = quality === 3 ? weapon.atk * 2 : weapon.atk;
+            currentEnemy.hp -= dmg;
+            log = quality === 3 ? "かいしんの いちげき！\n" : "ゆうしゃの こうげき！\n";
+            log += `${currentEnemy.name}に ${dmg} のダメージ！`;
+            if(quality === 3) seCritical(); else seAttack();
+            monsterUI.classList.add('shake-effect');
+            setTimeout(() => monsterUI.classList.remove('shake-effect'), 200);
+        } else { 
+            const mAtk = Math.floor(rpg.lv / 2) + 2;
+            rpg.hp -= mAtk;
+            log = `${currentEnemy.name}の こうげき！\nゆうしゃは ${mAtk} のダメージ！`;
+            seDamage();
+            document.body.classList.add('flash-red');
+            setTimeout(() => document.body.classList.remove('flash-red'), 300);
+            if(rpg.hp <= 0) { rpg.hp = rpg.maxHp; log += "\nゆうしゃは ちからつきた！\nしかし きせきで ふっかつした！"; }
+        }
+
+        if (currentEnemy.hp <= 0) {
+            log += `\n${currentEnemy.name}を たおした！`;
+            seKill();
+            rpg.exp += 15;
+            if(rpg.exp >= getNextExp()) { 
+                rpg.lv++; rpg.maxHp += 5; rpg.hp = rpg.maxHp; rpg.exp = 0;
+                log += `\nレベルが ${rpg.lv} に あがった！`; 
+                setTimeout(seLevelUp, 500);
+            }
+            showMessage(log); updateRpgUI();
+        } else {
+            showMessage(log); updateRpgUI();
+            setTimeout(() => showMessage("コマンド？", true), 1500);
         }
     }
 
@@ -571,8 +632,8 @@
         const text = document.getElementById('import-csv').value.trim();
         if(!text) { alert("テキストが ありません。"); return; }
         
-        // デフォルトのスライムだけなら消して上書きする
-        if(words.length === 1 && words[0].en === 'apple') words = [];
+        // デフォルトデータを消して上書き
+        if(words.length === 10 && words[0].en === 'hero') words = [];
 
         const lines = text.split('\n');
         lines.forEach(line => {
@@ -591,7 +652,6 @@
             localStorage.clear(); location.reload(); 
         } 
     }
-
 </script>
 </body>
 </html>
