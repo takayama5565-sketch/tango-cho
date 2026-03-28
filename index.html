@@ -39,6 +39,8 @@
 </head>
 <body>
 
+<audio id="silent-audio" loop playsinline src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"></audio>
+
 <div class="container">
     <h2 style="text-align: center; margin-top: 5px;">無限単語帳 SRS</h2>
 
@@ -60,7 +62,7 @@
                         <p id="sc-grade" style="color: gray; margin: 0;"></p>
                         <h1 id="sc-en" style="font-size: 2.8rem; margin: 5px 0;"></h1>
                         <p id="sc-rubi" class="rubi-text" style="color: gray; font-size: 1.2rem; margin: 0 0 15px 0;"></p>
-                        <p style="color: gray; font-size: 0.9rem;">👆 タップで解答を見る</p>
+                        <p style="color: gray; font-size: 0.9rem;">👆 タップで表裏を切り替え</p>
                     </div>
                     <div class="card-face card-back">
                         <h2 id="sc-jp" style="margin: 0 0 15px 0;"></h2>
@@ -95,7 +97,7 @@
     <div id="view-commute" class="view">
         <div style="background: var(--card-bg); padding: 20px; border-radius: 15px;">
             <h3 style="margin-top: 0;">🎧 通勤音声モード</h3>
-            <p>復習が必要な単語だけを自動再生します。</p>
+            <p style="font-size:0.9rem; color:gray;">復習が必要な単語だけを自動再生します。<br>※画面が暗くなっても再生を維持する機能が作動します。</p>
             <button class="btn" id="btn-com-start" style="width: 100%; padding: 20px;" onclick="toggleCommute()">▶ 再生スタート</button>
             <h3 id="com-playing" style="text-align: center; margin-top: 20px; color: var(--primary);">停止中</h3>
         </div>
@@ -136,21 +138,17 @@
 </nav>
 
 <script>
-    // --- 初期データ (代表例 約30語) ---
     const defaultWords = [
-        // 5級
         { id: 1, en: 'always', jp: 'いつも', rubi: '[オー]ルウェイズ', exEn: 'I always study.', exJp: 'いつも勉強する。', grade: '5級', box: 0, nextReview: 0 },
         { id: 2, en: 'breakfast', jp: '朝食', rubi: '[ブ]レックファースト', exEn: 'I eat breakfast.', exJp: '朝食を食べる。', grade: '5級', box: 0, nextReview: 0 },
         { id: 3, en: 'dictionary', jp: '辞書', rubi: '[ディ]クショナリー', exEn: 'Use a dictionary.', exJp: '辞書を使う。', grade: '5級', box: 0, nextReview: 0 },
         { id: 4, en: 'family', jp: '家族', rubi: '[ファ]ミリー', exEn: 'My family is kind.', exJp: '家族は優しい。', grade: '5級', box: 0, nextReview: 0 },
         { id: 5, en: 'music', jp: '音楽', rubi: '[ミュー]ジック', exEn: 'I like music.', exJp: '音楽が好きだ。', grade: '5級', box: 0, nextReview: 0 },
-        // 4級
         { id: 6, en: 'popular', jp: '人気のある', rubi: '[ポ]ピュラー', exEn: 'Soccer is popular.', exJp: 'サッカーは人気だ。', grade: '4級', box: 0, nextReview: 0 },
         { id: 7, en: 'useful', jp: '役に立つ', rubi: '[ユー]スフル', exEn: 'This is useful.', exJp: 'これは役立つ。', grade: '4級', box: 0, nextReview: 0 },
         { id: 8, en: 'experience', jp: '経験', rubi: 'イクス[ピ]アリエンス', exEn: 'Good experience.', exJp: '良い経験。', grade: '4級', box: 0, nextReview: 0 },
         { id: 9, en: 'environment', jp: '環境', rubi: 'エン[ヴァイ]ロメント', exEn: 'Protect environment.', exJp: '環境を守る。', grade: '4級', box: 0, nextReview: 0 },
         { id: 10, en: 'language', jp: '言語', rubi: '[ラ]ングウィッジ', exEn: 'English is a language.', exJp: '英語は言語だ。', grade: '4級', box: 0, nextReview: 0 },
-        // 3級
         { id: 11, en: 'comfortable', jp: '快適な', rubi: '[カ]ンフォタブル', exEn: 'This chair is comfortable.', exJp: 'この椅子は快適だ。', grade: '3級', box: 0, nextReview: 0 },
         { id: 12, en: 'knowledge', jp: '知識', rubi: '[ナ]レッジ', exEn: 'Knowledge is power.', exJp: '知識は力なり。', grade: '3級', box: 0, nextReview: 0 },
         { id: 13, en: 'temperature', jp: '温度、体温', rubi: '[テ]ンパラチャー', exEn: 'Take your temperature.', exJp: '体温を測りなさい。', grade: '3級', box: 0, nextReview: 0 },
@@ -161,19 +159,16 @@
     let words = JSON.parse(localStorage.getItem('vocab_srs_data')) || defaultWords;
     let reviewQueue = [];
     let currentWord = null;
-
-    // --- 音声エンジンの初期化 (よりクリアな音声を探す) ---
     let synth = window.speechSynthesis;
     let bestVoice = null;
+
     function initVoice() {
         const voices = synth.getVoices();
-        // Alex, Samantha, Premium など高品質ボイスを優先
         bestVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Alex') || v.name.includes('Samantha') || v.name.includes('Premium'))) 
                  || voices.find(v => v.lang.startsWith('en'));
     }
     if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = initVoice;
 
-    // --- UI 制御 ---
     function showTab(id) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
@@ -185,15 +180,13 @@
         return text.replace(/\[(.*?)\]/g, "<b>$1</b>");
     }
 
-    // --- エビングハウス (SRS) ロジック ---
-    // box: 0(新規/ミス), 1(10分), 2(1日), 3(3日), 4(7日), 5(14日)
     const intervals = [
-        10 * 60 * 1000,           // Box 0 -> 1: 10分後
-        24 * 60 * 60 * 1000,      // Box 1 -> 2: 1日後
-        3 * 24 * 60 * 60 * 1000,  // Box 2 -> 3: 3日後
-        7 * 24 * 60 * 60 * 1000,  // Box 3 -> 4: 7日後
-        14 * 24 * 60 * 60 * 1000, // Box 4 -> 5: 14日後
-        30 * 24 * 60 * 60 * 1000  // Box 5 -> 6: 30日後 (以降ループ)
+        10 * 60 * 1000,           // 10分後
+        24 * 60 * 60 * 1000,      // 1日後
+        3 * 24 * 60 * 60 * 1000,  // 3日後
+        7 * 24 * 60 * 60 * 1000,  // 7日後
+        14 * 24 * 60 * 60 * 1000, // 14日後
+        30 * 24 * 60 * 60 * 1000  // 30日後
     ];
 
     function loadStudyQueue(forceAll = false) {
@@ -206,9 +199,7 @@
             return gradeMatch && dueMatch;
         });
 
-        // シャッフル
         reviewQueue.sort(() => Math.random() - 0.5);
-        
         document.getElementById('queue-count').innerText = `復習: ${reviewQueue.length}語`;
         
         if(reviewQueue.length === 0) {
@@ -225,12 +216,12 @@
 
     function showNextCard() {
         if (reviewQueue.length === 0) {
-            loadStudyQueue(); // 再計算
+            loadStudyQueue();
             return;
         }
         currentWord = reviewQueue[0];
         document.getElementById('flashcard').classList.remove('is-flipped');
-        document.getElementById('srs-controls').style.display = 'none'; // 裏返すまで隠す
+        document.getElementById('srs-controls').style.display = 'none';
 
         document.getElementById('sc-grade').innerText = `英検 ${currentWord.grade}`;
         document.getElementById('sc-en').innerText = currentWord.en;
@@ -240,24 +231,22 @@
         document.getElementById('sc-ex-jp').innerText = currentWord.exJp;
     }
 
+    // 【修正箇所】何度でも表裏が切り替わるように toggle に変更
     function flipCard() {
         const card = document.getElementById('flashcard');
-        if (!card.classList.contains('is-flipped')) {
-            card.classList.add('is-flipped');
-            document.getElementById('srs-controls').style.display = 'flex'; // 判定ボタン表示
-        }
+        card.classList.toggle('is-flipped');
+        // 一度でも裏を見たら判定ボタンを表示したままにする
+        document.getElementById('srs-controls').style.display = 'flex';
     }
 
     function answerSrs(quality) {
-        // quality: 0(忘れた), 1(難しい), 2(普通), 3(簡単)
         const now = Date.now();
-        
         if (quality === 0) {
             currentWord.box = 0;
-            currentWord.nextReview = now + (60 * 1000); // 1分後
+            currentWord.nextReview = now + (60 * 1000);
         } else if (quality === 1) {
             currentWord.box = Math.max(0, currentWord.box - 1);
-            currentWord.nextReview = now + intervals[0]; // 10分後
+            currentWord.nextReview = now + intervals[0];
         } else if (quality === 2) {
             currentWord.box++;
             const step = Math.min(currentWord.box - 1, intervals.length - 1);
@@ -268,7 +257,6 @@
             currentWord.nextReview = now + intervals[step];
         }
 
-        // 保存してキューから削除
         localStorage.setItem('vocab_srs_data', JSON.stringify(words));
         reviewQueue.shift();
         
@@ -276,13 +264,12 @@
         showNextCard();
     }
 
-    // --- 音声 (0.55のスピード・クリア化) ---
     async function speak(txt, lang, rate = 1.0) {
         return new Promise(res => {
             const u = new SpeechSynthesisUtterance(txt);
             u.lang = lang;
-            u.rate = rate; // 指定されたスピード(0.55など)
-            u.pitch = 1.1; // 少し高くしてこもりを軽減
+            u.rate = rate;
+            u.pitch = 1.1;
             if (lang.startsWith('en') && bestVoice) u.voice = bestVoice;
             u.onend = res; u.onerror = res;
             synth.speak(u);
@@ -294,7 +281,8 @@
         wClick++; clearTimeout(wTimer);
         wTimer = setTimeout(() => {
             const txt = currentWord.en;
-            speak(txt, 'en-US', wClick > 1 ? 0.55 : 1.0); // 2回で 0.55
+            // 【修正箇所】遅いスピードを 0.3 (30%) に変更
+            speak(txt, 'en-US', wClick > 1 ? 0.3 : 1.0);
             wClick = 0;
         }, 300);
     }
@@ -305,16 +293,26 @@
     let comIdx = 0;
     async function toggleCommute() {
         const btn = document.getElementById('btn-com-start');
+        const bgAudio = document.getElementById('silent-audio'); // バックグラウンド再生維持用
+
         if (comActive) {
-            comActive = false; btn.innerText = '▶ 再生スタート'; synth.cancel();
+            comActive = false; 
+            btn.innerText = '▶ 再生スタート'; 
+            synth.cancel();
+            bgAudio.pause(); // 無音オーディオ停止
             document.getElementById('com-playing').innerText = '停止中';
             return;
         }
-        comActive = true; btn.innerText = '■ 停止';
-        // 復習が必要な単語だけを抽出
+        
+        comActive = true; 
+        btn.innerText = '■ 停止';
+        
+        // ユーザーのタップを検知して無音オーディオを再生（iOSの制限回避）
+        bgAudio.play().catch(e => console.log("無音オーディオの再生に失敗しました"));
+
         const now = Date.now();
         let queue = words.filter(w => !w.nextReview || w.nextReview <= now);
-        if(queue.length === 0) queue = words; // 復習ゼロなら全部
+        if(queue.length === 0) queue = words;
         
         comIdx = 0;
         while (comActive && comIdx < queue.length) {
@@ -322,10 +320,12 @@
             document.getElementById('com-playing').innerText = `${w.en} (${w.jp})`;
             await speak(w.jp, 'ja-JP', 1.0); if (!comActive) break;
             await speak(w.en, 'en-US', 1.0); if (!comActive) break;
-            await speak(w.en, 'en-US', 0.55); if (!comActive) break;
+            // 【修正箇所】通勤モードの遅いスピードを 0.3 (30%) に変更
+            await speak(w.en, 'en-US', 0.3); if (!comActive) break;
             await speak(w.exJp, 'ja-JP', 1.0); if (!comActive) break;
             await speak(w.exEn, 'en-US', 1.0); if (!comActive) break;
-            await speak(w.exEn, 'en-US', 0.55); if (!comActive) break;
+            // 【修正箇所】例文の遅いスピードも 0.3 (30%) に変更
+            await speak(w.exEn, 'en-US', 0.3); if (!comActive) break;
             await new Promise(r => setTimeout(r, 1500));
             comIdx++; if(comIdx >= queue.length) comIdx = 0;
         }
@@ -353,7 +353,6 @@
         const lines = text.split('\n');
         let count = 0;
         lines.forEach(line => {
-            // タブ または カンマで分割
             const cols = line.split(/\t|,/); 
             if(cols.length >= 2) {
                 words.push({
@@ -383,7 +382,6 @@
         }
     }
 
-    // 初期化
     initVoice();
     loadStudyQueue();
 </script>
