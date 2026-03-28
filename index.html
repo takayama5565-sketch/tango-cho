@@ -3,580 +3,389 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>無限単語帳 PRO</title>
+    <title>無限単語帳 SRS</title>
     <style>
-        /* =========================================
-           🎨 カラーパレット（色弱対応・ダークモード対応）
-           ========================================= */
         :root {
-            --bg-color: #f4f7f6;
-            --text-color: #333333;
-            --card-bg: #ffffff;
-            --primary: #1976d2;
-            --flag-A: #d81b60; /* 苦手：濃いピンク系赤 */
-            --flag-B: #fbc02d; /* 微妙：視認性の高い黄 */
-            --flag-C: #1976d2; /* 普通：青 */
-            --flag-D: #388e3c; /* 完璧：濃い緑 */
+            --bg-color: #f4f7f6; --text-color: #333; --card-bg: #fff; --primary: #1976d2;
+            --btn-forget: #d32f2f; --btn-hard: #f57c00; --btn-good: #388e3c; --btn-easy: #0288d1;
         }
         @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #121212;
-                --text-color: #e0e0e0;
-                --card-bg: #1e1e1e;
-                --primary: #4da6ff;
-            }
+            :root { --bg-color: #121212; --text-color: #e0e0e0; --card-bg: #1e1e1e; --primary: #4da6ff; }
         }
-
-        /* =========================================
-           📱 全体レイアウト
-           ========================================= */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0 0 80px 0; /* 下部タブの余白 */
-        }
+        body { font-family: -apple-system, sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; padding-bottom: 80px; }
         .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+        .btn { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 25px; font-size: 16px; cursor: pointer; font-weight: bold; margin: 5px; }
+        input, select, textarea { padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; width: 100%; box-sizing: border-box; margin-bottom: 10px; background: var(--card-bg); color: var(--text-color); }
         
-        /* ボタン共通スタイル */
-        .btn {
-            background: var(--primary); color: white; border: none;
-            padding: 12px 20px; border-radius: 25px; font-size: 16px;
-            cursor: pointer; font-weight: bold; margin: 5px;
-        }
-
-        /* 入力フォーム共通スタイル */
-        select, input[type="text"] {
-            padding: 12px; border-radius: 8px; border: 1px solid #ccc;
-            font-size: 16px; width: 100%; box-sizing: border-box;
-            margin-bottom: 10px; background: var(--card-bg); color: var(--text-color);
-        }
-
-        /* =========================================
-           📖 単語帳（3Dフリップカード）
-           ========================================= */
+        /* 3Dカード */
         .scene { perspective: 1000px; margin-bottom: 20px; }
-        .card-inner {
-            width: 100%; min-height: 280px; position: relative;
-            transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer;
-        }
-        /* 裏返るアクション */
+        .card-inner { width: 100%; min-height: 280px; position: relative; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
         .card-inner.is-flipped { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 15px; background: var(--card-bg); box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; text-align: center; }
+        .card-back { transform: rotateY(180deg); border: 3px solid var(--primary); }
         
-        .card-face {
-            position: absolute; width: 100%; height: 100%;
-            backface-visibility: hidden; /* 裏面の反転を防ぐ */
-            -webkit-backface-visibility: hidden; /* Safari対応 */
-            border-radius: 15px; background: var(--card-bg);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 20px; box-sizing: border-box; text-align: center;
-        }
-        .card-back {
-            transform: rotateY(180deg); border: 3px solid var(--primary);
-        }
-
-        /* フラグボタン */
-        .flags { display: flex; width: 100%; gap: 5px; margin-top: 10px; }
-        .flag-btn {
-            padding: 10px; border-radius: 8px; border: 2px solid transparent;
-            font-weight: bold; flex: 1; cursor: pointer; color: white;
-        }
-        .flag-btn[data-flag="A"] { background: var(--flag-A); }
-        .flag-btn[data-flag="B"] { background: var(--flag-B); color: black; }
-        .flag-btn[data-flag="C"] { background: var(--flag-C); }
-        .flag-btn[data-flag="D"] { background: var(--flag-D); }
-
-        /* 進捗バー */
-        .stats-bar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; margin: 10px 0; }
-        .stat-fill { height: 100%; transition: width 0.3s; }
-
-        /* =========================================
-           🕹️ タブナビゲーション
-           ========================================= */
-        .tab-bar {
-            position: fixed; bottom: 0; width: 100%; background: var(--card-bg);
-            display: flex; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 100;
-        }
-        .tab-bar button { flex: 1; background: none; border: none; color: var(--text-color); font-size: 14px; cursor: pointer; font-weight: bold; }
+        /* SRSボタン */
+        .srs-btns { display: flex; width: 100%; gap: 5px; margin-top: 10px; }
+        .srs-btn { padding: 10px 5px; border-radius: 8px; border: none; font-weight: bold; flex: 1; cursor: pointer; color: white; font-size: 0.9rem; }
         
+        /* ルビ太字強調 */
+        .rubi-text b { font-size: 1.2em; color: var(--primary); }
+        
+        .tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--card-bg); display: flex; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 100; }
+        .tab-bar button { flex: 1; background: none; border: none; color: var(--text-color); font-size: 12px; font-weight: bold; cursor: pointer; }
         .view { display: none; }
         .view.active { display: block; }
-        
-        /* テスト画面用 */
-        .test-card {
-            background: var(--card-bg); border-radius: 15px; padding: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 style="text-align: center; margin-top: 5px;">無限単語帳 PRO</h2>
+    <h2 style="text-align: center; margin-top: 5px;">無限単語帳 SRS</h2>
 
     <div id="view-study" class="view active">
-        <div>
-            <select id="study-grade" onchange="filterStudy()">
-                <option value="all">出題範囲: 全ての級</option>
-                <option value="5級">英検5級のみ</option>
-                <option value="4級">英検4級のみ</option>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <select id="study-grade" onchange="loadStudyQueue()" style="width: 60%; margin: 0;">
+                <option value="all">全ての級</option>
+                <option value="5級">5級</option>
+                <option value="4級">4級</option>
+                <option value="3級">3級</option>
             </select>
+            <span id="queue-count" style="font-weight: bold; color: var(--primary);">復習: 0語</span>
         </div>
-        
-        <div class="stats-bar" id="stats-bar"></div>
-        <p style="text-align: center; font-size: 12px; margin-top: 0; color: gray;" id="stats-text"></p>
 
-        <div class="scene">
-            <div class="card-inner" id="flashcard" onclick="flipCard()">
-                <div class="card-face card-front">
-                    <p id="sc-grade" style="color: gray; margin: 0; font-weight: bold;"></p>
-                    <h1 id="sc-en" style="font-size: 3rem; margin: 10px 0; word-wrap: break-word;"></h1>
-                    <p style="color: gray; font-size: 0.9rem;">👆 タップで意味と例文を確認</p>
-                </div>
-                <div class="card-face card-back">
-                    <h2 id="sc-jp" style="margin: 0 0 15px 0;"></h2>
-                    <div style="background: rgba(128,128,128,0.1); padding: 15px; border-radius: 8px; width: 100%; box-sizing: border-box;">
-                        <p id="sc-ex-en" style="font-style: italic; margin: 0 0 5px 0; font-weight: bold;"></p>
-                        <p id="sc-ex-jp" style="font-size: 0.9rem; margin: 0;"></p>
+        <div id="study-area">
+            <div class="scene">
+                <div class="card-inner" id="flashcard" onclick="flipCard()">
+                    <div class="card-face card-front">
+                        <p id="sc-grade" style="color: gray; margin: 0;"></p>
+                        <h1 id="sc-en" style="font-size: 2.8rem; margin: 5px 0;"></h1>
+                        <p id="sc-rubi" class="rubi-text" style="color: gray; font-size: 1.2rem; margin: 0 0 15px 0;"></p>
+                        <p style="color: gray; font-size: 0.9rem;">👆 タップで解答を見る</p>
+                    </div>
+                    <div class="card-face card-back">
+                        <h2 id="sc-jp" style="margin: 0 0 15px 0;"></h2>
+                        <div style="background: rgba(128,128,128,0.1); padding: 15px; border-radius: 8px; width: 100%; box-sizing: border-box;">
+                            <p id="sc-ex-en" style="font-style: italic; margin: 0 0 5px 0; font-weight: bold;"></p>
+                            <p id="sc-ex-jp" style="font-size: 0.9rem; margin: 0;"></p>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <div style="text-align: center;">
+                <button class="btn" onclick="playWordAudio()">🔊 発音 (2回で遅く)</button>
+                <button class="btn" style="background: #666;" onclick="playExAudio()">🔊 例文</button>
+            </div>
+            
+            <div class="srs-btns" id="srs-controls" style="display: none; transition: opacity 0.3s;">
+                <button class="srs-btn" style="background: var(--btn-forget);" onclick="answerSrs(0)">忘れた<br><small>1分</small></button>
+                <button class="srs-btn" style="background: var(--btn-hard);" onclick="answerSrs(1)">難しい<br><small>10分</small></button>
+                <button class="srs-btn" style="background: var(--btn-good);" onclick="answerSrs(2)">普通<br><small>明日</small></button>
+                <button class="srs-btn" style="background: var(--btn-easy);" onclick="answerSrs(3)">簡単<br><small>3日後</small></button>
+            </div>
         </div>
 
-        <div style="text-align: center;">
-            <button class="btn" onclick="playCurrentWordAudio()">🔊 単語発音 (2回で遅く)</button>
-            <button class="btn" style="background: #666;" onclick="playCurrentExAudio()">🔊 例文発音</button>
-        </div>
-        
-        <div class="flags">
-            <button class="flag-btn" data-flag="A" onclick="setFlag('A')">A(苦手)</button>
-            <button class="flag-btn" data-flag="B" onclick="setFlag('B')">B(微妙)</button>
-            <button class="flag-btn" data-flag="C" onclick="setFlag('C')">C(普通)</button>
-            <button class="flag-btn" data-flag="D" onclick="setFlag('D')">D(完璧)</button>
-        </div>
-
-        <div style="display: flex; margin-top: 15px; gap: 10px;">
-            <button class="btn" style="flex: 1; background: gray;" onclick="moveWord(-1)">◀ 前へ</button>
-            <button class="btn" style="flex: 1;" onclick="moveWord(1)">次へ ▶</button>
+        <div id="all-done" style="display: none; text-align: center; padding: 40px 20px; background: var(--card-bg); border-radius: 15px; margin-top: 20px;">
+            <h2 style="color: var(--btn-good);">🎉 素晴らしい！</h2>
+            <p>今のところ復習する単語はありません。<br>時間をおいて再度確認するか、新しい単語を追加しましょう。</p>
+            <button class="btn" onclick="forceReviewAll()">強制的に全単語を復習する</button>
         </div>
     </div>
 
     <div id="view-commute" class="view">
-        <div class="test-card">
-            <h3 style="margin-top: 0; color: var(--primary);">🎧 全自動 音声学習モード</h3>
-            <p style="font-size: 0.9rem; color: gray;">日本語 → 英語 → (遅) → 例文日本語 → 例文英語 → (遅) の順で無限ループします。</p>
-            
-            <select id="com-grade">
-                <option value="all">出題範囲: 全ての級</option>
-                <option value="5級">5級のみ</option>
-                <option value="4級">4級のみ</option>
-            </select>
-            <select id="com-rank">
-                <option value="all">ランク: 全て</option>
-                <option value="A">A(苦手)のみ</option>
-                <option value="B">B(微妙)のみ</option>
-                <option value="C">C(普通)のみ</option>
-                <option value="D">D(完璧)のみ</option>
-            </select>
-
-            <button class="btn" id="btn-com-start" style="width: 100%; padding: 20px; font-size: 1.2rem; margin: 15px 0;" onclick="toggleCommute()">▶ 再生スタート (続きから)</button>
-            
-            <div style="background: rgba(128,128,128,0.1); padding: 15px; border-radius: 8px; text-align: center;">
-                <p style="margin: 0; font-weight: bold;">現在再生中の単語:</p>
-                <h2 id="com-playing" style="margin: 10px 0; color: var(--primary);">停止中</h2>
-                <p id="com-progress" style="font-size: 0.9rem; color: gray; margin: 0;"></p>
-            </div>
+        <div style="background: var(--card-bg); padding: 20px; border-radius: 15px;">
+            <h3 style="margin-top: 0;">🎧 通勤音声モード</h3>
+            <p>復習が必要な単語だけを自動再生します。</p>
+            <button class="btn" id="btn-com-start" style="width: 100%; padding: 20px;" onclick="toggleCommute()">▶ 再生スタート</button>
+            <h3 id="com-playing" style="text-align: center; margin-top: 20px; color: var(--primary);">停止中</h3>
         </div>
     </div>
 
-    <div id="view-test" class="view">
-        <div class="test-card">
-            <h3 style="margin-top: 0; color: var(--primary);">✍️ 実力テスト</h3>
+    <div id="view-data" class="view">
+        <div style="background: var(--card-bg); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+            <h3>➕ 1件ずつ追加</h3>
+            <input type="text" id="add-en" placeholder="英語 (例: water)">
+            <input type="text" id="add-rubi" placeholder="カタカナ ※強く読む所は[]で囲む (例: [ウォ]ーター)">
+            <input type="text" id="add-jp" placeholder="日本語 (例: 水)">
+            <input type="text" id="add-exen" placeholder="例文英語">
+            <input type="text" id="add-exjp" placeholder="例文日本語">
+            <select id="add-grade"><option value="5級">5級</option><option value="4級">4級</option><option value="3級">3級</option></select>
+            <button class="btn" style="width: 100%;" onclick="addSingleWord()">追加する</button>
+        </div>
+
+        <div style="background: var(--card-bg); padding: 20px; border-radius: 15px;">
+            <h3>📥 Excel一括インポート</h3>
+            <p style="font-size: 0.85rem; color: gray;">
+                エクセル等で以下の順に列を作り、コピーして下の枠に貼り付けてください。<br>
+                <b>英語, 日本語, カタカナ([強調]), 例文英, 例文日, 級</b><br>
+                ※各項目は「タブ」か「カンマ」で区切られている必要があります。
+            </p>
+            <textarea id="import-csv" rows="5" placeholder="apple	りんご	[ア]ップル	I eat an apple.	りんごを食べる	5級"></textarea>
+            <button class="btn" style="width: 100%; background: var(--btn-good);" onclick="importCSV()">一括インポート実行</button>
             
-            <select id="test-grade">
-                <option value="all">出題範囲: 全ての級</option>
-                <option value="5級">5級のみ</option>
-                <option value="4級">4級のみ</option>
-            </select>
-            <select id="test-rank">
-                <option value="all">ランク: 全て</option>
-                <option value="A">A(苦手)のみ</option>
-                <option value="B">B(微妙)のみ</option>
-                <option value="C">C(普通)のみ</option>
-                <option value="D">D(完璧)のみ</option>
-            </select>
-            <select id="test-mode">
-                <option value="type">タイピング (日本語を見て英語を打つ)</option>
-                <option value="read">読み取り (英語を見て意味を答える)</option>
-            </select>
-
-            <button class="btn" style="width: 100%; margin-bottom: 20px;" onclick="startTest()">テストを開始する</button>
-
-            <div id="test-area" style="display: none; width: 100%;">
-                <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
-                <p style="text-align: center; color: gray; font-size: 0.9rem; margin: 0;" id="t-counter"></p>
-                <h2 id="t-q" style="text-align: center; margin-bottom: 20px;"></h2>
-                
-                <input type="text" id="t-input" placeholder="ここにスペルを入力..." onkeypress="if(event.key === 'Enter') checkTest()"> 
-                
-                <button class="btn" id="t-btn-check" style="width: 100%; margin: 0;" onclick="checkTest()">判定する</button>
-                <h2 id="t-res" style="text-align: center; margin: 15px 0;"></h2>
-                <button class="btn" id="t-btn-next" style="width: 100%; display: none; background: #555; margin: 0;" onclick="nextTest()">次の問題へ</button>
-            </div>
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+            <button class="btn" style="width: 100%; background: #666;" onclick="clearAllData()">⚠️ 全データ初期化 (友人に渡す時用)</button>
         </div>
     </div>
 </div>
 
 <nav class="tab-bar">
-    <button onclick="showTab('view-study')">📖<br>単語帳</button>
+    <button onclick="showTab('view-study')">📖<br>忘却曲線学習</button>
     <button onclick="showTab('view-commute')">🎧<br>通勤音声</button>
-    <button onclick="showTab('view-test')">✍️<br>テスト</button>
+    <button onclick="showTab('view-data')">⚙️<br>追加/管理</button>
 </nav>
 
 <script>
-    /* ==============================================================
-       1. 初期データ (英検5級・4級厳選20単語)
-       ============================================================== */
-    const initWords = [
-        // --- 英検5級 (10単語) ---
-        { id: 1, grade: '5級', en: 'always', jp: 'いつも、常に', exEn: 'I always get up early.', exJp: '私はいつも早起きします。', flag: 'C' },
-        { id: 2, grade: '5級', en: 'breakfast', jp: '朝食', exEn: 'I eat breakfast every day.', exJp: '私は毎日朝食を食べます。', flag: 'C' },
-        { id: 3, grade: '5級', en: 'dictionary', jp: '辞書', exEn: 'I use a dictionary for English.', exJp: '私は英語のために辞書を使います。', flag: 'B' },
-        { id: 4, grade: '5級', en: 'evening', jp: '夕方、晩', exEn: 'Good evening.', exJp: 'こんばんは。', flag: 'D' },
-        { id: 5, grade: '5級', en: 'friend', jp: '友達', exEn: 'He is my best friend.', exJp: '彼は私の親友です。', flag: 'D' },
-        { id: 6, grade: '5級', en: 'guitar', jp: 'ギター', exEn: 'She plays the guitar well.', exJp: '彼女はギターを上手に弾きます。', flag: 'C' },
-        { id: 7, grade: '5級', en: 'library', jp: '図書館', exEn: 'Let\'s go to the library.', exJp: '図書館へ行きましょう。', flag: 'B' },
-        { id: 8, grade: '5級', en: 'music', jp: '音楽', exEn: 'I like listening to music.', exJp: '私は音楽を聴くのが好きです。', flag: 'C' },
-        { id: 9, grade: '5級', en: 'parent', jp: '親', exEn: 'My parents are kind.', exJp: '私の両親は優しいです。', flag: 'B' },
-        { id: 10, grade: '5級', en: 'usually', jp: 'たいてい、ふつうは', exEn: 'I usually study after dinner.', exJp: '私はたいてい夕食後に勉強します。', flag: 'A' },
-
-        // --- 英検4級 (10単語) ---
-        { id: 11, grade: '4級', en: 'popular', jp: '人気のある', exEn: 'Soccer is popular in Japan.', exJp: 'サッカーは日本で人気があります。', flag: 'B' },
-        { id: 12, grade: '4級', en: 'useful', jp: '役に立つ', exEn: 'This book is very useful.', exJp: 'この本はとても役に立ちます。', flag: 'B' },
-        { id: 13, grade: '4級', en: 'experience', jp: '経験', exEn: 'It was a great experience.', exJp: 'それは素晴らしい経験でした。', flag: 'A' },
-        { id: 14, grade: '4級', en: 'environment', jp: '環境', exEn: 'We must protect the environment.', exJp: '私たちは環境を守らなければならない。', flag: 'A' },
-        { id: 15, grade: '4級', en: 'necessary', jp: '必要な', exEn: 'Water is necessary for life.', exJp: '水は生命にとって必要です。', flag: 'B' },
-        { id: 16, grade: '4級', en: 'future', jp: '未来、将来', exEn: 'I want to be a doctor in the future.', exJp: '私は将来医者になりたいです。', flag: 'C' },
-        { id: 17, grade: '4級', en: 'improve', jp: '向上させる、改善する', exEn: 'I want to improve my English.', exJp: '私は英語を上達させたいです。', flag: 'A' },
-        { id: 18, grade: '4級', en: 'language', jp: '言語', exEn: 'English is a global language.', exJp: '英語は世界的な言語です。', flag: 'C' },
-        { id: 19, grade: '4級', en: 'volunteer', jp: 'ボランティア', exEn: 'She works as a volunteer.', exJp: '彼女はボランティアとして働いています。', flag: 'C' },
-        { id: 20, grade: '4級', en: 'weather', jp: '天気', exEn: 'The weather is fine today.', exJp: '今日は天気が良いです。', flag: 'D' }
+    // --- 初期データ (代表例 約30語) ---
+    const defaultWords = [
+        // 5級
+        { id: 1, en: 'always', jp: 'いつも', rubi: '[オー]ルウェイズ', exEn: 'I always study.', exJp: 'いつも勉強する。', grade: '5級', box: 0, nextReview: 0 },
+        { id: 2, en: 'breakfast', jp: '朝食', rubi: '[ブ]レックファースト', exEn: 'I eat breakfast.', exJp: '朝食を食べる。', grade: '5級', box: 0, nextReview: 0 },
+        { id: 3, en: 'dictionary', jp: '辞書', rubi: '[ディ]クショナリー', exEn: 'Use a dictionary.', exJp: '辞書を使う。', grade: '5級', box: 0, nextReview: 0 },
+        { id: 4, en: 'family', jp: '家族', rubi: '[ファ]ミリー', exEn: 'My family is kind.', exJp: '家族は優しい。', grade: '5級', box: 0, nextReview: 0 },
+        { id: 5, en: 'music', jp: '音楽', rubi: '[ミュー]ジック', exEn: 'I like music.', exJp: '音楽が好きだ。', grade: '5級', box: 0, nextReview: 0 },
+        // 4級
+        { id: 6, en: 'popular', jp: '人気のある', rubi: '[ポ]ピュラー', exEn: 'Soccer is popular.', exJp: 'サッカーは人気だ。', grade: '4級', box: 0, nextReview: 0 },
+        { id: 7, en: 'useful', jp: '役に立つ', rubi: '[ユー]スフル', exEn: 'This is useful.', exJp: 'これは役立つ。', grade: '4級', box: 0, nextReview: 0 },
+        { id: 8, en: 'experience', jp: '経験', rubi: 'イクス[ピ]アリエンス', exEn: 'Good experience.', exJp: '良い経験。', grade: '4級', box: 0, nextReview: 0 },
+        { id: 9, en: 'environment', jp: '環境', rubi: 'エン[ヴァイ]ロメント', exEn: 'Protect environment.', exJp: '環境を守る。', grade: '4級', box: 0, nextReview: 0 },
+        { id: 10, en: 'language', jp: '言語', rubi: '[ラ]ングウィッジ', exEn: 'English is a language.', exJp: '英語は言語だ。', grade: '4級', box: 0, nextReview: 0 },
+        // 3級
+        { id: 11, en: 'comfortable', jp: '快適な', rubi: '[カ]ンフォタブル', exEn: 'This chair is comfortable.', exJp: 'この椅子は快適だ。', grade: '3級', box: 0, nextReview: 0 },
+        { id: 12, en: 'knowledge', jp: '知識', rubi: '[ナ]レッジ', exEn: 'Knowledge is power.', exJp: '知識は力なり。', grade: '3級', box: 0, nextReview: 0 },
+        { id: 13, en: 'temperature', jp: '温度、体温', rubi: '[テ]ンパラチャー', exEn: 'Take your temperature.', exJp: '体温を測りなさい。', grade: '3級', box: 0, nextReview: 0 },
+        { id: 14, en: 'probably', jp: 'おそらく', rubi: '[プ]ロバブリー', exEn: 'He will probably come.', exJp: '彼はおそらく来る。', grade: '3級', box: 0, nextReview: 0 },
+        { id: 15, en: 'actually', jp: '実は', rubi: '[ア]クチュアリー', exEn: 'Actually, I don\'t know.', exJp: '実は、私は知らない。', grade: '3級', box: 0, nextReview: 0 }
     ];
 
-    // ローカルストレージからデータを読み込む（なければ初期データ）
-    let words = JSON.parse(localStorage.getItem('vocab_v_pro')) || initWords;
-    let fw = []; // フィルターされた単語リスト
-    let cIdx = 0; // 現在の単語インデックス
+    let words = JSON.parse(localStorage.getItem('vocab_srs_data')) || defaultWords;
+    let reviewQueue = [];
+    let currentWord = null;
 
-    /* ==============================================================
-       2. 音声設定 (ネイティブ発音の取得)
-       ============================================================== */
+    // --- 音声エンジンの初期化 (よりクリアな音声を探す) ---
     let synth = window.speechSynthesis;
-    let nativeVoice = null;
-
+    let bestVoice = null;
     function initVoice() {
-        const vs = synth.getVoices();
-        // プレミアムまたはGoogleの高音質英語ボイスを優先して探す
-        nativeVoice = vs.find(v => v.lang === 'en-US' && (v.name.includes('Premium') || v.name.includes('Google') || v.name.includes('Enhanced'))) 
-                   || vs.find(v => v.lang.startsWith('en')) || null;
+        const voices = synth.getVoices();
+        // Alex, Samantha, Premium など高品質ボイスを優先
+        bestVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Alex') || v.name.includes('Samantha') || v.name.includes('Premium'))) 
+                 || voices.find(v => v.lang.startsWith('en'));
     }
-    // ボイスがロードされたら初期化
-    if (speechSynthesis.onvoiceschanged !== undefined) {
-        speechSynthesis.onvoiceschanged = initVoice;
-    }
+    if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = initVoice;
 
-    /* ==============================================================
-       3. 学習画面 (単語帳) の制御
-       ============================================================== */
-    function save() {
-        localStorage.setItem('vocab_v_pro', JSON.stringify(words));
-        renderStats();
-    }
-
+    // --- UI 制御 ---
     function showTab(id) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        if (id === 'view-study') filterStudy();
+        if(id === 'view-study') loadStudyQueue();
     }
 
-    // 級で絞り込み
-    function filterStudy() {
-        const g = document.getElementById('study-grade').value;
-        fw = g === 'all' ? words : words.filter(w => w.grade === g);
-        cIdx = 0;
-        renderStats();
-        updateCard();
-        document.getElementById('flashcard').classList.remove('is-flipped');
+    function formatRubi(text) {
+        if(!text) return "";
+        return text.replace(/\[(.*?)\]/g, "<b>$1</b>");
     }
 
-    // 進捗バー（ダッシュボード）の描画
-    function renderStats() {
-        const total = fw.length;
-        if (!total) {
-            document.getElementById('stats-text').innerText = "データがありません";
-            document.getElementById('stats-bar').innerHTML = "";
-            return;
-        }
-        const c = { A: 0, B: 0, C: 0, D: 0 };
-        fw.forEach(w => c[w.flag]++);
-        document.getElementById('stats-text').innerText = `A: ${c.A}語 / B: ${c.B}語 / C: ${c.C}語 / D: ${c.D}語 (計${total}語)`;
+    // --- エビングハウス (SRS) ロジック ---
+    // box: 0(新規/ミス), 1(10分), 2(1日), 3(3日), 4(7日), 5(14日)
+    const intervals = [
+        10 * 60 * 1000,           // Box 0 -> 1: 10分後
+        24 * 60 * 60 * 1000,      // Box 1 -> 2: 1日後
+        3 * 24 * 60 * 60 * 1000,  // Box 2 -> 3: 3日後
+        7 * 24 * 60 * 60 * 1000,  // Box 3 -> 4: 7日後
+        14 * 24 * 60 * 60 * 1000, // Box 4 -> 5: 14日後
+        30 * 24 * 60 * 60 * 1000  // Box 5 -> 6: 30日後 (以降ループ)
+    ];
+
+    function loadStudyQueue(forceAll = false) {
+        const grade = document.getElementById('study-grade').value;
+        const now = Date.now();
         
-        let h = '';
-        const cols = { A: 'var(--flag-A)', B: 'var(--flag-B)', C: 'var(--flag-C)', D: 'var(--flag-D)' };
-        ['A', 'B', 'C', 'D'].forEach(f => {
-            if (c[f] > 0) h += `<div class="stat-fill" style="width: ${(c[f] / total) * 100}%; background: ${cols[f]}"></div>`;
+        reviewQueue = words.filter(w => {
+            const gradeMatch = (grade === 'all' || w.grade === grade);
+            const dueMatch = forceAll ? true : (!w.nextReview || w.nextReview <= now);
+            return gradeMatch && dueMatch;
         });
-        document.getElementById('stats-bar').innerHTML = h;
+
+        // シャッフル
+        reviewQueue.sort(() => Math.random() - 0.5);
+        
+        document.getElementById('queue-count').innerText = `復習: ${reviewQueue.length}語`;
+        
+        if(reviewQueue.length === 0) {
+            document.getElementById('study-area').style.display = 'none';
+            document.getElementById('all-done').style.display = 'block';
+        } else {
+            document.getElementById('study-area').style.display = 'block';
+            document.getElementById('all-done').style.display = 'none';
+            showNextCard();
+        }
     }
 
-    // カード内容の更新
-    function updateCard() {
-        if (!fw.length) {
-            document.getElementById('sc-en').innerText = '該当なし';
+    function forceReviewAll() { loadStudyQueue(true); }
+
+    function showNextCard() {
+        if (reviewQueue.length === 0) {
+            loadStudyQueue(); // 再計算
             return;
         }
-        const w = fw[cIdx];
-        document.getElementById('sc-grade').innerText = `英検 ${w.grade}`;
-        document.getElementById('sc-en').innerText = w.en;
-        document.getElementById('sc-jp').innerText = w.jp;
-        document.getElementById('sc-ex-en').innerText = w.exEn;
-        document.getElementById('sc-ex-jp').innerText = w.exJp;
-        
-        // フラグボタンの選択状態（枠線）を更新
-        document.querySelectorAll('.flag-btn').forEach(b => b.style.border = '2px solid transparent');
-        const fb = document.querySelector(`.flag-btn[data-flag="${w.flag}"]`);
-        if (fb) fb.style.border = '2px solid var(--text-color)';
-    }
-
-    // カードを裏返す
-    function flipCard() {
-        document.getElementById('flashcard').classList.toggle('is-flipped');
-    }
-
-    // 前後の単語へ移動
-    function moveWord(d) {
-        if (!fw.length) return;
-        cIdx = (cIdx + d + fw.length) % fw.length;
+        currentWord = reviewQueue[0];
         document.getElementById('flashcard').classList.remove('is-flipped');
-        updateCard();
+        document.getElementById('srs-controls').style.display = 'none'; // 裏返すまで隠す
+
+        document.getElementById('sc-grade').innerText = `英検 ${currentWord.grade}`;
+        document.getElementById('sc-en').innerText = currentWord.en;
+        document.getElementById('sc-rubi').innerHTML = formatRubi(currentWord.rubi);
+        document.getElementById('sc-jp').innerText = currentWord.jp;
+        document.getElementById('sc-ex-en').innerText = currentWord.exEn;
+        document.getElementById('sc-ex-jp').innerText = currentWord.exJp;
     }
 
-    // 習熟度フラグを設定して次へ
-    function setFlag(f) {
-        if (!fw.length) return;
-        const targetId = fw[cIdx].id;
-        const target = words.find(w => w.id === targetId);
-        if (target) {
-            target.flag = f;
-            save(); // 保存してプログレスバー更新
-            moveWord(1); // 自動的に次へ
+    function flipCard() {
+        const card = document.getElementById('flashcard');
+        if (!card.classList.contains('is-flipped')) {
+            card.classList.add('is-flipped');
+            document.getElementById('srs-controls').style.display = 'flex'; // 判定ボタン表示
         }
     }
 
-    /* ==============================================================
-       4. 音声発音処理
-       ============================================================== */
-    // 非同期で音声を再生する関数（通勤モード用）
+    function answerSrs(quality) {
+        // quality: 0(忘れた), 1(難しい), 2(普通), 3(簡単)
+        const now = Date.now();
+        
+        if (quality === 0) {
+            currentWord.box = 0;
+            currentWord.nextReview = now + (60 * 1000); // 1分後
+        } else if (quality === 1) {
+            currentWord.box = Math.max(0, currentWord.box - 1);
+            currentWord.nextReview = now + intervals[0]; // 10分後
+        } else if (quality === 2) {
+            currentWord.box++;
+            const step = Math.min(currentWord.box - 1, intervals.length - 1);
+            currentWord.nextReview = now + intervals[step];
+        } else if (quality === 3) {
+            currentWord.box += 2;
+            const step = Math.min(currentWord.box - 1, intervals.length - 1);
+            currentWord.nextReview = now + intervals[step];
+        }
+
+        // 保存してキューから削除
+        localStorage.setItem('vocab_srs_data', JSON.stringify(words));
+        reviewQueue.shift();
+        
+        document.getElementById('queue-count').innerText = `復習: ${reviewQueue.length}語`;
+        showNextCard();
+    }
+
+    // --- 音声 (0.55のスピード・クリア化) ---
     async function speak(txt, lang, rate = 1.0) {
         return new Promise(res => {
             const u = new SpeechSynthesisUtterance(txt);
             u.lang = lang;
-            u.rate = rate;
-            if (lang.startsWith('en') && nativeVoice) u.voice = nativeVoice;
-            u.onend = res;
-            u.onerror = res; // エラー時もPromiseを解決してループを止めない
+            u.rate = rate; // 指定されたスピード(0.55など)
+            u.pitch = 1.1; // 少し高くしてこもりを軽減
+            if (lang.startsWith('en') && bestVoice) u.voice = bestVoice;
+            u.onend = res; u.onerror = res;
             synth.speak(u);
         });
     }
 
-    let wClick = 0;
-    let wTimer;
-    // 単語発音（ダブルクリック判定付き）
-    function playCurrentWordAudio() {
-        wClick++;
-        clearTimeout(wTimer);
+    let wClick = 0; let wTimer;
+    function playWordAudio() {
+        wClick++; clearTimeout(wTimer);
         wTimer = setTimeout(() => {
-            const txt = fw[cIdx].en;
-            speak(txt, 'en-US', wClick > 1 ? 0.5 : 1.0); // 2回クリックなら遅く
+            const txt = currentWord.en;
+            speak(txt, 'en-US', wClick > 1 ? 0.55 : 1.0); // 2回で 0.55
             wClick = 0;
         }, 300);
     }
+    function playExAudio() { speak(currentWord.exEn, 'en-US', 1.0); }
 
-    // 例文発音
-    function playCurrentExAudio() {
-        speak(fw[cIdx].exEn, 'en-US', 1.0);
-    }
-
-    /* ==============================================================
-       5. 通勤モード（最強の全自動ループ）
-       ============================================================== */
+    // --- 通勤モード ---
     let comActive = false;
-    let comQ = [];
     let comIdx = 0;
-
     async function toggleCommute() {
         const btn = document.getElementById('btn-com-start');
-        
-        // 停止処理
         if (comActive) {
-            comActive = false;
-            btn.innerText = '▶ 再生スタート (続きから)';
-            btn.style.background = 'var(--primary)';
-            synth.cancel();
+            comActive = false; btn.innerText = '▶ 再生スタート'; synth.cancel();
             document.getElementById('com-playing').innerText = '停止中';
             return;
         }
-
-        // 開始処理
-        comActive = true;
-        btn.innerText = '■ 停止する';
-        btn.style.background = 'var(--flag-A)';
+        comActive = true; btn.innerText = '■ 停止';
+        // 復習が必要な単語だけを抽出
+        const now = Date.now();
+        let queue = words.filter(w => !w.nextReview || w.nextReview <= now);
+        if(queue.length === 0) queue = words; // 復習ゼロなら全部
         
-        const g = document.getElementById('com-grade').value;
-        const r = document.getElementById('com-rank').value;
-        comQ = words.filter(w => (g === 'all' || w.grade === g) && (r === 'all' || w.flag === r));
-        
-        if (!comQ.length) {
-            alert('指定した条件の単語がありません');
-            toggleCommute();
-            return;
-        }
-
-        // レジューム（続きから）機能
-        let savedId = localStorage.getItem('com_last_id');
-        if (savedId) {
-            const found = comQ.findIndex(w => w.id == savedId);
-            if (found !== -1) comIdx = found;
-            else comIdx = 0;
-        } else {
-            comIdx = 0;
-        }
-
-        runCommute();
-    }
-
-    // 全自動ループ本体 (awaitで直列実行)
-    async function runCommute() {
-        while (comActive && comIdx < comQ.length) {
-            const w = comQ[comIdx];
-            document.getElementById('com-playing').innerText = `${w.en}\n(${w.jp})`;
-            document.getElementById('com-progress').innerText = `${comIdx + 1} / ${comQ.length} 語`;
-            
-            // どこまで聞いたかを保存
-            localStorage.setItem('com_last_id', w.id);
-
-            // ① 日本語で意味
+        comIdx = 0;
+        while (comActive && comIdx < queue.length) {
+            const w = queue[comIdx];
+            document.getElementById('com-playing').innerText = `${w.en} (${w.jp})`;
             await speak(w.jp, 'ja-JP', 1.0); if (!comActive) break;
-            // ② 英語ネイティブ
             await speak(w.en, 'en-US', 1.0); if (!comActive) break;
-            // ③ 英語ネイティブ(ゆっくり)
-            await speak(w.en, 'en-US', 0.5); if (!comActive) break;
-            // ④ 例文日本語
+            await speak(w.en, 'en-US', 0.55); if (!comActive) break;
             await speak(w.exJp, 'ja-JP', 1.0); if (!comActive) break;
-            // ⑤ 例文英語ネイティブ
             await speak(w.exEn, 'en-US', 1.0); if (!comActive) break;
-            // ⑥ 例文英語ネイティブ(ゆっくり)
-            await speak(w.exEn, 'en-US', 0.5); if (!comActive) break;
-
-            // 次の単語へ行く前に1.5秒ポーズ
+            await speak(w.exEn, 'en-US', 0.55); if (!comActive) break;
             await new Promise(r => setTimeout(r, 1500));
-            
-            comIdx++;
-            if (comIdx >= comQ.length) comIdx = 0; // 最後までいったら最初から
+            comIdx++; if(comIdx >= queue.length) comIdx = 0;
         }
     }
 
-    /* ==============================================================
-       6. テスト機能
-       ============================================================== */
-    let tQ = [];
-    let tIdx = 0;
-    let tW = null;
-    let tMode = 'type';
-
-    function startTest() {
-        const g = document.getElementById('test-grade').value;
-        const r = document.getElementById('test-rank').value;
-        tMode = document.getElementById('test-mode').value;
+    // --- データ追加・インポート ---
+    function addSingleWord() {
+        const en = document.getElementById('add-en').value;
+        const rubi = document.getElementById('add-rubi').value;
+        const jp = document.getElementById('add-jp').value;
+        const exen = document.getElementById('add-exen').value;
+        const exjp = document.getElementById('add-exjp').value;
+        const grade = document.getElementById('add-grade').value;
         
-        tQ = words.filter(w => (g === 'all' || w.grade === g) && (r === 'all' || w.flag === r));
-        
-        if (!tQ.length) {
-            alert('指定した条件の単語がありません');
-            return;
-        }
-        
-        // 問題をシャッフル
-        tQ.sort(() => Math.random() - 0.5);
-        tIdx = 0;
-        
-        document.getElementById('test-area').style.display = 'block';
-        nextTest();
+        if(!en || !jp) return alert("英語と日本語は必須です");
+        words.push({ id: Date.now(), en, rubi, jp, exEn: exen, exJp: exjp, grade, box: 0, nextReview: 0 });
+        localStorage.setItem('vocab_srs_data', JSON.stringify(words));
+        alert("追加しました！");
+        ['add-en','add-rubi','add-jp','add-exen','add-exjp'].forEach(id => document.getElementById(id).value = '');
     }
 
-    function nextTest() {
-        tW = tQ[tIdx];
-        document.getElementById('t-res').innerText = '';
-        document.getElementById('t-input').value = '';
-        document.getElementById('t-btn-next').style.display = 'none';
-        document.getElementById('t-btn-check').style.display = 'block';
-        document.getElementById('t-counter').innerText = `第 ${tIdx + 1} 問 / 全 ${tQ.length} 問`;
-        
-        if (tMode === 'type') {
-            // タイピングモード
-            document.getElementById('t-input').style.display = 'block';
-            document.getElementById('t-q').innerText = tW.jp;
-            document.getElementById('t-btn-check').innerText = '判定する';
-            document.getElementById('t-input').focus();
-        } else {
-            // 読み取りモード
-            document.getElementById('t-input').style.display = 'none';
-            document.getElementById('t-q').innerText = tW.en;
-            document.getElementById('t-btn-check').innerText = '意味を確認する';
-        }
-    }
-
-    function checkTest() {
-        const res = document.getElementById('t-res');
-        const checkBtn = document.getElementById('t-btn-check');
-        const nextBtn = document.getElementById('t-btn-next');
-        
-        if (tMode === 'type') {
-            const ans = document.getElementById('t-input').value.trim().toLowerCase();
-            if (ans === tW.en.toLowerCase()) {
-                res.innerText = '〇 正解！';
-                res.style.color = 'var(--flag-D)';
-                // 正解の音声を流す
-                speak(tW.en, 'en-US', 1.0);
-            } else {
-                res.innerText = `× 不正解\n正解は: ${tW.en}`;
-                res.style.color = 'var(--flag-A)';
-                speak(tW.en, 'en-US', 1.0);
+    function importCSV() {
+        const text = document.getElementById('import-csv').value.trim();
+        if(!text) return;
+        const lines = text.split('\n');
+        let count = 0;
+        lines.forEach(line => {
+            // タブ または カンマで分割
+            const cols = line.split(/\t|,/); 
+            if(cols.length >= 2) {
+                words.push({
+                    id: Date.now() + count,
+                    en: cols[0]?.trim(),
+                    jp: cols[1]?.trim(),
+                    rubi: cols[2]?.trim() || "",
+                    exEn: cols[3]?.trim() || "",
+                    exJp: cols[4]?.trim() || "",
+                    grade: cols[5]?.trim() || "5級",
+                    box: 0, nextReview: 0
+                });
+                count++;
             }
-        } else {
-            res.innerText = `意味: ${tW.jp}`;
-            res.style.color = 'var(--text-color)';
-            speak(tW.en, 'en-US', 1.0);
-        }
-        
-        checkBtn.style.display = 'none';
-        nextBtn.style.display = 'block';
-        
-        tIdx++;
-        if (tIdx >= tQ.length) {
-            nextBtn.innerText = 'テスト終了 (最初からやり直す)';
-            tIdx = 0;
-        } else {
-            nextBtn.innerText = '次の問題へ';
+        });
+        localStorage.setItem('vocab_srs_data', JSON.stringify(words));
+        alert(`${count}件の単語をインポートしました！`);
+        document.getElementById('import-csv').value = '';
+    }
+
+    function clearAllData() {
+        if(confirm("本当に全てのデータを削除しますか？ (友人に渡す前に実行してください)")) {
+            localStorage.removeItem('vocab_srs_data');
+            words = [];
+            alert("初期化完了しました。画面をリロードしてください。");
+            location.reload();
         }
     }
 
-    // アプリ起動時の初期化
+    // 初期化
     initVoice();
-    filterStudy();
-
+    loadStudyQueue();
 </script>
 </body>
 </html>
