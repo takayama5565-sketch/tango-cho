@@ -3,41 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>無限単語帳 SRS</title>
+    <title>無限単語帳 RPG</title>
     <style>
         :root {
             --bg-color: #f4f7f6; --text-color: #333; --card-bg: #fff; --primary: #1976d2;
             --btn-forget: #d32f2f; --btn-hard: #f57c00; --btn-good: #388e3c; --btn-easy: #0288d1;
+            --rpg-bg: #222; --rpg-border: #fff; --rpg-text: #fff;
         }
         @media (prefers-color-scheme: dark) {
             :root { --bg-color: #121212; --text-color: #e0e0e0; --card-bg: #1e1e1e; --primary: #4da6ff; }
         }
-        body { font-family: -apple-system, sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; padding-bottom: 80px; transition: background 0.3s; }
-        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; padding-bottom: 80px; }
+        .container { max-width: 600px; margin: 0 auto; padding: 10px; }
         .btn { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 25px; font-size: 16px; cursor: pointer; font-weight: bold; margin: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         input, select, textarea { padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; width: 100%; box-sizing: border-box; margin-bottom: 10px; background: var(--card-bg); color: var(--text-color); }
         
+        /* 🗡️ RPG UIスタイル */
+        .rpg-window { background: var(--rpg-bg); color: var(--rpg-text); border: 3px solid var(--rpg-border); border-radius: 8px; padding: 10px; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); font-family: "Courier New", monospace; }
+        .rpg-status { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px; border-bottom: 1px dashed #666; padding-bottom: 5px;}
+        .rpg-monster { text-align: center; margin: 10px 0; }
+        .rpg-monster-name { font-size: 1.2rem; font-weight: bold; color: #ffeb3b; }
+        .rpg-monster-hp-bar { width: 100%; height: 10px; background: #555; border-radius: 5px; margin-top: 5px; overflow: hidden; }
+        .rpg-monster-hp-fill { height: 100%; background: #ff4d4d; width: 100%; transition: width 0.3s; }
+        .rpg-log { font-size: 0.9rem; line-height: 1.4; height: 3.5rem; overflow: hidden; color: #4da6ff; }
+
         /* 3Dカード */
-        .scene { perspective: 1000px; margin-bottom: 20px; }
-        .card-inner { width: 100%; min-height: 280px; position: relative; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
+        .scene { perspective: 1000px; margin-bottom: 15px; }
+        .card-inner { width: 100%; min-height: 250px; position: relative; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
         .card-inner.is-flipped { transform: rotateY(180deg); }
-        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 15px; background: var(--card-bg); box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; text-align: center; }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 10px; background: var(--card-bg); box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; text-align: center; }
         .card-back { transform: rotateY(180deg); border: 3px solid var(--primary); }
         
-        .srs-btns { display: flex; width: 100%; gap: 5px; margin-top: 10px; }
-        .srs-btn { padding: 10px 5px; border-radius: 8px; border: none; font-weight: bold; flex: 1; cursor: pointer; color: white; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .srs-btns { display: flex; width: 100%; gap: 5px; margin-top: 5px; }
+        .srs-btn { padding: 10px 2px; border-radius: 8px; border: none; font-weight: bold; flex: 1; cursor: pointer; color: white; font-size: 0.85rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         
         .rubi-text b { font-size: 1.2em; color: var(--primary); }
-        .front-ex { font-style: italic; color: #666; font-size: 1rem; margin: 10px 0 15px 0; background: rgba(128,128,128,0.05); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; }
+        .front-ex { font-style: italic; color: #666; font-size: 0.9rem; margin: 10px 0; background: rgba(128,128,128,0.05); padding: 8px; border-radius: 8px; width: 100%; box-sizing: border-box; }
         
         .tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--card-bg); display: flex; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 100; }
         .tab-bar button { flex: 1; background: none; border: none; color: var(--text-color); font-size: 12px; font-weight: bold; cursor: pointer; }
         .view { display: none; }
         .view.active { display: block; }
-
-        /* プログレスバー */
-        .progress-container { width: 100%; background: #ddd; border-radius: 5px; margin-top: 15px; height: 10px; overflow: hidden; }
-        .progress-bar { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
 
         /* ポケットモード（節電・誤操作防止・画面維持） */
         #pocket-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; color: #333; flex-direction: column; justify-content: center; align-items: center; }
@@ -48,42 +54,53 @@
 <body>
 
 <div class="container">
-    <h2 style="text-align: center; margin-top: 5px;">無限単語帳 SRS</h2>
-
     <div id="view-study" class="view active">
+        <div class="rpg-window" id="rpg-ui" style="display: none;">
+            <div class="rpg-status">
+                <span id="rpg-lv">LV: 1</span>
+                <span id="rpg-hp">HP: 20/20</span>
+                <span id="rpg-weapon">武器: ひのきのぼう</span>
+            </div>
+            <div class="rpg-monster">
+                <div class="rpg-monster-name" id="monster-name">スライム</div>
+                <div class="rpg-monster-hp-bar"><div class="rpg-monster-hp-fill" id="monster-hp-fill"></div></div>
+            </div>
+            <div class="rpg-log" id="rpg-log">スライムがあらわれた！<br>コマンド？</div>
+        </div>
+
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <select id="study-grade" onchange="loadStudyQueue()" style="width: 60%; margin: 0;">
+            <select id="study-grade" onchange="loadStudyQueue()" style="width: 60%; margin: 0; padding: 8px;">
                 <option value="all">全ての級</option>
                 <option value="5級">5級</option>
                 <option value="4級">4級</option>
                 <option value="3級">3級</option>
             </select>
-            <span id="queue-count" style="font-weight: bold; color: var(--primary);">復習: 0語</span>
+            <span id="queue-count" style="font-weight: bold; color: var(--primary); font-size: 0.9rem;">復習: 0語</span>
         </div>
 
         <div id="study-area">
             <div class="scene">
                 <div class="card-inner" id="flashcard" onclick="flipCard()">
                     <div class="card-face card-front">
-                        <p id="sc-grade" style="color: gray; margin: 0; font-size: 0.9rem;"></p>
-                        <h1 id="sc-en" style="font-size: 2.8rem; margin: 5px 0;"></h1>
-                        <p id="sc-rubi" class="rubi-text" style="color: gray; font-size: 1.2rem; margin: 0;"></p>
+                        <p id="sc-grade" style="color: gray; margin: 0; font-size: 0.8rem;"></p>
+                        <h1 id="sc-en" style="font-size: 2.5rem; margin: 5px 0;"></h1>
+                        <p id="sc-rubi" class="rubi-text" style="color: gray; font-size: 1.1rem; margin: 0;"></p>
                         <p id="sc-front-ex" class="front-ex"></p>
-                        <p style="color: gray; font-size: 0.85rem; margin: 0;">👆 タップで表裏を切り替え</p>
+                        <p style="color: gray; font-size: 0.8rem; margin: 0;">👆 タップで表裏切り替え</p>
                     </div>
                     <div class="card-face card-back">
-                        <h2 id="sc-jp" style="margin: 0 0 15px 0; font-size: 2rem;"></h2>
-                        <div style="background: rgba(128,128,128,0.1); padding: 15px; border-radius: 8px; width: 100%; box-sizing: border-box;">
-                            <p id="sc-ex-en" style="font-style: italic; margin: 0 0 5px 0; font-weight: bold; font-size: 1.1rem;"></p>
-                            <p id="sc-ex-jp" style="font-size: 1rem; margin: 0; color: #555;"></p>
+                        <h2 id="sc-jp" style="margin: 0 0 10px 0; font-size: 1.8rem;"></h2>
+                        <div style="background: rgba(128,128,128,0.1); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;">
+                            <p id="sc-ex-en" style="font-style: italic; margin: 0 0 5px 0; font-weight: bold; font-size: 1rem;"></p>
+                            <p id="sc-ex-jp" style="font-size: 0.9rem; margin: 0; color: #555;"></p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div style="text-align: center;">
-                <button class="btn" onclick="playWordAudio()">🔊 発音 (2回で遅く)</button>
-                <button class="btn" style="background: #666;" onclick="playExAudio()">🔊 例文</button>
+            <div style="text-align: center; margin-bottom: 10px;">
+                <button class="btn" onclick="playWordAudio()" style="padding: 10px;">🔊 発音 (2回で遅く)</button>
+                <button class="btn" style="background: #666; padding: 10px;" onclick="playExAudio()">🔊 例文</button>
             </div>
             
             <div class="srs-btns" id="srs-controls" style="display: none; transition: opacity 0.3s;">
@@ -94,10 +111,10 @@
             </div>
         </div>
 
-        <div id="all-done" style="display: none; text-align: center; padding: 40px 20px; background: var(--card-bg); border-radius: 15px; margin-top: 20px;">
-            <h2 style="color: var(--btn-good);">🎉 素晴らしい！</h2>
-            <p>今のところ復習する単語はありません。</p>
-            <button class="btn" onclick="forceReviewAll()">強制的に全単語を復習する</button>
+        <div id="all-done" style="display: none; text-align: center; padding: 30px 10px; background: var(--card-bg); border-radius: 10px; margin-top: 15px;">
+            <h2 style="color: var(--btn-good);">🎉 討伐完了！</h2>
+            <p>復習する単語はありません。<br>勇者の休息です。</p>
+            <button class="btn" onclick="forceReviewAll()">魔物を探しに行く(全復習)</button>
         </div>
     </div>
 
@@ -108,17 +125,13 @@
                 復習が必要な単語を自動再生します。<br>
                 <b>※再生中は画面が自動で消えない「ポケットモード」になり、暗い画面でバッテリーを節約しつつ音声を維持します。</b>
             </p>
-            
             <div style="display: flex; gap: 10px; margin-top: 15px;">
                 <button class="btn" style="flex: 1; padding: 15px 10px;" onclick="startCommute(false)">▶ 続きから再生</button>
                 <button class="btn" style="flex: 1; padding: 15px 10px; background: #666;" onclick="startCommute(true)">🔄 最初から再生</button>
             </div>
-
             <div style="margin-top: 25px; text-align: center; background: rgba(128,128,128,0.05); padding: 15px; border-radius: 8px;">
                 <p style="margin: 0; font-size: 0.9rem; color: gray;">現在再生中の単語</p>
                 <h3 id="com-playing" style="margin: 10px 0; color: var(--primary);">停止中</h3>
-                <div class="progress-container"><div id="com-progress-bar" class="progress-bar"></div></div>
-                <p id="com-progress-text" style="font-size: 0.8rem; color: gray; margin: 5px 0 0 0;">0 / 0</p>
             </div>
         </div>
     </div>
@@ -130,7 +143,7 @@
     </div>
 
     <div id="view-data" class="view">
-        <div style="background: var(--card-bg); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+        <div style="background: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
             <h3>➕ 1件ずつ追加</h3>
             <input type="text" id="add-en" placeholder="英語 (例: water)">
             <input type="text" id="add-rubi" placeholder="カタカナ ※強調は[]で囲む">
@@ -140,23 +153,125 @@
             <select id="add-grade"><option value="5級">5級</option><option value="4級">4級</option><option value="3級">3級</option></select>
             <button class="btn" style="width: 100%;" onclick="addSingleWord()">追加する</button>
         </div>
-        <div style="background: var(--card-bg); padding: 20px; border-radius: 15px;">
+        <div style="background: var(--card-bg); padding: 15px; border-radius: 10px;">
             <h3>📥 Excel一括インポート</h3>
-            <textarea id="import-csv" rows="4" placeholder="英語	日本語	カタカナ	例文英	例文日	級"></textarea>
+            <textarea id="import-csv" rows="3" placeholder="英語	日本語	カタカナ	例文英	例文日	級"></textarea>
             <button class="btn" style="width: 100%; background: var(--btn-good);" onclick="importCSV()">一括インポート実行</button>
-            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
             <button class="btn" style="width: 100%; background: #666;" onclick="clearAllData()">⚠️ 全データ初期化</button>
         </div>
     </div>
 </div>
 
 <nav class="tab-bar">
-    <button onclick="showTab('view-study')">📖<br>忘却曲線学習</button>
+    <button onclick="showTab('view-study')">⚔️<br>単語RPG</button>
     <button onclick="showTab('view-commute')">🎧<br>通勤音声</button>
     <button onclick="showTab('view-data')">⚙️<br>追加/管理</button>
 </nav>
 
 <script>
+    // --- 🗡️ RPG システム ---
+    let rpg = JSON.parse(localStorage.getItem('vocab_rpg_status')) || { lv: 1, exp: 0, hp: 20, maxHp: 20, kills: 0 };
+    const weapons = [
+        { lv: 1, name: "ひのきのぼう", atk: 2 },
+        { lv: 3, name: "どうのつるぎ", atk: 5 },
+        { lv: 5, name: "はがねのつるぎ", atk: 10 },
+        { lv: 10, name: "まどろみのけん", atk: 20 },
+        { lv: 15, name: "ドラゴンキラー", atk: 35 },
+        { lv: 20, name: "ロトのつるぎ", atk: 50 },
+        { lv: 30, name: "えいごのマスターソード", atk: 99 }
+    ];
+    const monsterList = [
+        { name: "スライム", maxHp: 10 }, { name: "ドラキー", maxHp: 15 },
+        { name: "ゴースト", maxHp: 25 }, { name: "がいこつ", maxHp: 40 },
+        { name: "ゴーレム", maxHp: 80 }, { name: "ドラゴン", maxHp: 150 },
+        { name: "まおう", maxHp: 300 }
+    ];
+    let currentEnemy = { name: "スライム", hp: 10, maxHp: 10 };
+
+    function getWeapon() {
+        let currentW = weapons[0];
+        for (let w of weapons) { if (rpg.lv >= w.lv) currentW = w; }
+        return currentW;
+    }
+
+    function updateRpgUI() {
+        const weapon = getWeapon();
+        document.getElementById('rpg-lv').innerText = `LV: ${rpg.lv}`;
+        document.getElementById('rpg-hp').innerText = `HP: ${rpg.hp}/${rpg.maxHp}`;
+        document.getElementById('rpg-weapon').innerText = `武器: ${weapon.name}`;
+        
+        document.getElementById('monster-name').innerText = currentEnemy.name;
+        const hpPercent = Math.max(0, (currentEnemy.hp / currentEnemy.maxHp) * 100);
+        document.getElementById('monster-hp-fill').style.width = `${hpPercent}%`;
+        
+        localStorage.setItem('vocab_rpg_status', JSON.stringify(rpg));
+    }
+
+    function logRpg(msg) {
+        document.getElementById('rpg-log').innerHTML = msg.replace(/\n/g, '<br>');
+    }
+
+    function spawnMonster() {
+        // レベルに応じてランダムな敵が出現
+        const maxIdx = Math.min(monsterList.length - 1, Math.floor(rpg.lv / 3));
+        const m = monsterList[Math.floor(Math.random() * (maxIdx + 1))];
+        // 敵のHPは勇者のレベルに応じて少し強化される
+        const scaledHp = m.maxHp + (rpg.lv * 2);
+        currentEnemy = { name: m.name, hp: scaledHp, maxHp: scaledHp };
+        logRpg(`${currentEnemy.name}があらわれた！`);
+        updateRpgUI();
+    }
+
+    function attackMonster(quality) {
+        const weapon = getWeapon();
+        let dmg = 0;
+        let msg = "";
+
+        if (quality === 3) { // 簡単
+            dmg = weapon.atk * 2;
+            msg = `かいしんのいちげき！\n${currentEnemy.name}に ${dmg} のダメージ！`;
+        } else if (quality === 2) { // 普通
+            dmg = weapon.atk;
+            msg = `勇者のこうげき！\n${currentEnemy.name}に ${dmg} のダメージ！`;
+        } else if (quality === 1) { // 難しい
+            dmg = Math.floor(weapon.atk * 0.2) + 1;
+            msg = `攻撃がかすった！\n${currentEnemy.name}に ${dmg} のダメージ！`;
+        } else { // 忘れた
+            const damageTaken = Math.floor(rpg.lv / 2) + 1;
+            rpg.hp -= damageTaken;
+            msg = `単語を忘れてしまった！\n勇者は ${damageTaken} のダメージを受けた！`;
+            if(rpg.hp <= 0) {
+                msg += `\n勇者は力尽きた... (HPが全回復しました)`;
+                rpg.hp = rpg.maxHp; // ペナルティなしで全回復
+            }
+        }
+
+        if (dmg > 0) {
+            currentEnemy.hp -= dmg;
+            if (currentEnemy.hp <= 0) {
+                currentEnemy.hp = 0;
+                const expGained = Math.floor(currentEnemy.maxHp / 2);
+                rpg.exp += expGained;
+                msg = `${currentEnemy.name}をたおした！\n${expGained} の経験値を獲得！`;
+                
+                // レベルアップ判定
+                const nextLvExp = rpg.lv * 15;
+                if (rpg.exp >= nextLvExp) {
+                    rpg.lv++;
+                    rpg.maxHp += 5;
+                    rpg.hp = rpg.maxHp;
+                    msg += `\nレベルが ${rpg.lv} に上がった！`;
+                }
+                
+                setTimeout(spawnMonster, 2000); // 2秒後に新しい敵
+            }
+        }
+        logRpg(msg);
+        updateRpgUI();
+    }
+
+    // --- データと音声 ---
     const defaultWords = [
         { id: 1, en: 'always', jp: 'いつも', rubi: '[オー]ルウェイズ', exEn: 'I always study.', exJp: 'いつも勉強する。', grade: '5級', box: 0, nextReview: 0 },
         { id: 2, en: 'breakfast', jp: '朝食', rubi: '[ブ]レックファースト', exEn: 'I eat breakfast.', exJp: '朝食を食べる。', grade: '5級', box: 0, nextReview: 0 },
@@ -172,7 +287,7 @@
     let currentWord = null;
     let synth = window.speechSynthesis;
     let bestVoice = null;
-    let wakeLock = null; // 画面消灯防止用API
+    let wakeLock = null;
 
     function initVoice() {
         const voices = synth.getVoices();
@@ -184,13 +299,15 @@
     function showTab(id) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        if(id === 'view-study') loadStudyQueue();
+        if(id === 'view-study') {
+            document.getElementById('rpg-ui').style.display = 'block';
+            loadStudyQueue();
+        } else {
+            document.getElementById('rpg-ui').style.display = 'none';
+        }
     }
 
-    function formatRubi(text) {
-        if(!text) return "";
-        return text.replace(/\[(.*?)\]/g, "<b>$1</b>");
-    }
+    function formatRubi(text) { return text ? text.replace(/\[(.*?)\]/g, "<b>$1</b>") : ""; }
 
     const intervals = [10*60*1000, 24*60*60*1000, 3*24*60*60*1000, 7*24*60*60*1000, 14*24*60*60*1000, 30*24*60*60*1000];
 
@@ -226,9 +343,7 @@
         document.getElementById('sc-grade').innerText = `英検 ${currentWord.grade}`;
         document.getElementById('sc-en').innerText = currentWord.en;
         document.getElementById('sc-rubi').innerHTML = formatRubi(currentWord.rubi);
-        // 【修正箇所】表面に例文を追加
         document.getElementById('sc-front-ex').innerText = currentWord.exEn ? `"${currentWord.exEn}"` : "";
-        
         document.getElementById('sc-jp').innerText = currentWord.jp;
         document.getElementById('sc-ex-en').innerText = currentWord.exEn;
         document.getElementById('sc-ex-jp').innerText = currentWord.exJp;
@@ -239,14 +354,19 @@
         document.getElementById('srs-controls').style.display = 'flex';
     }
 
+    // SRS判定 ＆ RPG攻撃
     function answerSrs(quality) {
         const now = Date.now();
         if (quality === 0) { currentWord.box = 0; currentWord.nextReview = now + (60 * 1000); }
         else if (quality === 1) { currentWord.box = Math.max(0, currentWord.box - 1); currentWord.nextReview = now + intervals[0]; }
         else if (quality === 2) { currentWord.box++; currentWord.nextReview = now + intervals[Math.min(currentWord.box - 1, intervals.length - 1)]; }
         else if (quality === 3) { currentWord.box += 2; currentWord.nextReview = now + intervals[Math.min(currentWord.box - 1, intervals.length - 1)]; }
+        
         localStorage.setItem('vocab_srs_data', JSON.stringify(words));
         reviewQueue.shift();
+        
+        attackMonster(quality); // RPGの攻撃処理を呼び出す
+        
         document.getElementById('queue-count').innerText = `復習: ${reviewQueue.length}語`;
         showNextCard();
     }
@@ -265,73 +385,56 @@
     function playWordAudio() {
         wClick++; clearTimeout(wTimer);
         wTimer = setTimeout(() => {
-            // 【修正箇所】ゆっくり読むスピードを 0.2 (20%) に変更
-            speak(currentWord.en, 'en-US', wClick > 1 ? 0.2 : 1.0);
+            speak(currentWord.en, 'en-US', wClick > 1 ? 0.2 : 1.0); // 20%スピード
             wClick = 0;
         }, 300);
     }
     function playExAudio() { speak(currentWord.exEn, 'en-US', 1.0); }
 
-    // --- 画面ロック防止 (Wake Lock API) ---
-    async function requestWakeLock() {
-        try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {}
-    }
-    function releaseWakeLock() {
-        if (wakeLock !== null) { wakeLock.release(); wakeLock = null; }
-    }
+    // --- 画面ロック防止 (Wake Lock) ---
+    async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
+    function releaseWakeLock() { if (wakeLock !== null) { wakeLock.release(); wakeLock = null; } }
 
-    // --- 通勤モード (続きから/最初から対応) ---
+    // --- 通勤モード ---
     let comActive = false;
-    let comIdx = parseInt(localStorage.getItem('com_idx')) || 0; // 保存されたインデックス
+    let comIdx = parseInt(localStorage.getItem('com_idx')) || 0;
     
     async function startCommute(restart = false) {
         if (comActive) return;
         comActive = true;
-        requestWakeLock(); // 画面ロックを防止
-        
-        // ポケットモード（黒画面）表示
+        requestWakeLock();
         document.getElementById('pocket-overlay').style.display = 'flex';
 
         const now = Date.now();
         let queue = words.filter(w => !w.nextReview || w.nextReview <= now);
-        if(queue.length === 0) queue = words; // 復習ゼロなら全部
+        if(queue.length === 0) queue = words;
         
-        // 最初からの場合はインデックスをリセット
         if (restart || comIdx >= queue.length) comIdx = 0;
         
         while (comActive && comIdx < queue.length) {
             const w = queue[comIdx];
-            const progress = Math.round(((comIdx + 1) / queue.length) * 100);
-            
-            // 画面更新
             const displayStr = `${w.en} (${w.jp})`;
             document.getElementById('com-playing').innerText = displayStr;
             document.getElementById('pocket-word').innerText = displayStr;
-            document.getElementById('com-progress-bar').style.width = `${progress}%`;
-            document.getElementById('com-progress-text').innerText = `${comIdx + 1} / ${queue.length}`;
-            
-            // 現在地を保存 (途中で閉じてもOK)
             localStorage.setItem('com_idx', comIdx);
 
             await speak(w.jp, 'ja-JP', 1.0); if (!comActive) break;
             await speak(w.en, 'en-US', 1.0); if (!comActive) break;
-            // 【修正箇所】通勤モードの遅いスピードを 0.2 (20%) に変更
-            await speak(w.en, 'en-US', 0.2); if (!comActive) break;
+            await speak(w.en, 'en-US', 0.2); if (!comActive) break; // 20%スピード
             await speak(w.exJp, 'ja-JP', 1.0); if (!comActive) break;
             await speak(w.exEn, 'en-US', 1.0); if (!comActive) break;
-            // 【修正箇所】例文の遅いスピードも 0.2 (20%) に変更
-            await speak(w.exEn, 'en-US', 0.2); if (!comActive) break;
+            await speak(w.exEn, 'en-US', 0.2); if (!comActive) break; // 20%スピード
             
             await new Promise(r => setTimeout(r, 1500));
             comIdx++; 
-            if(comIdx >= queue.length) { comIdx = 0; localStorage.setItem('com_idx', 0); } // 1周したらリセット
+            if(comIdx >= queue.length) { comIdx = 0; localStorage.setItem('com_idx', 0); }
         }
     }
 
     function stopCommute() {
         comActive = false;
         synth.cancel();
-        releaseWakeLock(); // 画面ロック防止を解除
+        releaseWakeLock();
         document.getElementById('pocket-overlay').style.display = 'none';
         document.getElementById('com-playing').innerText = '停止中';
     }
@@ -358,10 +461,12 @@
         localStorage.setItem('vocab_srs_data', JSON.stringify(words)); alert(`${count}件インポートしました！`); document.getElementById('import-csv').value = '';
     }
     function clearAllData() {
-        if(confirm("全データを削除しますか？")) { localStorage.removeItem('vocab_srs_data'); localStorage.removeItem('com_idx'); location.reload(); }
+        if(confirm("全データを削除しますか？")) { localStorage.removeItem('vocab_srs_data'); localStorage.removeItem('vocab_rpg_status'); localStorage.removeItem('com_idx'); location.reload(); }
     }
 
-    initVoice(); loadStudyQueue();
+    initVoice(); 
+    spawnMonster();
+    showTab('view-study'); // 最初はRPG画面を開く
 </script>
 </body>
 </html>
