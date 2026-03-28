@@ -2,589 +2,581 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>無限単語帳</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>無限単語帳 PRO</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:system-ui,-apple-system,sans-serif;background:#f9fafb;color:#111;line-height:1.6;padding:15px;max-width:100vw;overflow-x:hidden;touch-action:manipulation}
-        @media(prefers-color-scheme:dark){body{background:#1a1a1a;color:#eee}}
-        .header{text-align:center;margin:25px 0 20px;padding:25px;background:#fff;border-radius:20px;box-shadow:0 8px 25px rgba(0,0,0,0.1);border:1px solid rgba(0,0,0,0.1)}
-        @media(prefers-color-scheme:dark){.header{background:#2a2a2a;box-shadow:0 8px 25px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1)}}
-        h1{font-size:clamp(24px,5vw,32px);color:#0ea5e9;margin-bottom:8px}
-        .tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:25px}
-        .tab{padding:14px 20px;background:#fff;border:2px solid #e5e7eb;border-radius:12px;cursor:pointer;font-weight:600;font-size:15px;user-select:none;transition:all 0.2s;touch-action:manipulation}
-        @media(prefers-color-scheme:dark){.tab{background:#2a2a2a;border-color:#4b5563}}
-        .tab.active,.tab:active{background:#0ea5e9;color:#fff;border-color:#0ea5e9;transform:scale(0.98)}
-        .tab:active{transform:scale(0.95)}
-        .content{display:none;background:#fff;padding:30px 20px;border-radius:20px;box-shadow:0 8px 25px rgba(0,0,0,0.1);border:1px solid rgba(0,0,0,0.1);margin-bottom:20px}
-        @media(prefers-color-scheme:dark){.content{background:#2a2a2a;box-shadow:0 8px 25px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1)}}
-        .content.active{display:block}
-        .btn{display:block;width:100%;padding:16px;margin:10px 0;background:#10b981;color:#fff;border:none;border-radius:12px;font-size:17px;font-weight:600;cursor:pointer;transition:all 0.2s;touch-action:manipulation}
-        .btn:active{background:#059669;transform:scale(0.98)}
-        .btn-secondary{background:#6b7280;color:#fff}
-        .btn-secondary:active{background:#4b5563}
-        .flashcard{position:relative;width:100%;max-width:500px;margin:30px auto;height:400px;background:linear-gradient(135deg,#fff,#f8fafc);border:3px solid #0ea5e9;border-radius:24px;padding:40px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;cursor:pointer;transition:all 0.4s;perspective:1000px;box-shadow:0 20px 40px rgba(14,165,233,0.2)}
-        @media(prefers-color-scheme:dark){.flashcard{background:linear-gradient(135deg,#2a2a2a,#1e293b)}}
-        .flashcard.flipped{transform:rotateY(180deg);background:linear-gradient(135deg,#0ea5e9,#0284c7)}
-        .flashcard-content{font-size:clamp(20px,6vw,28px);font-weight:700;margin-bottom:20px;line-height:1.4;min-height:80px;display:flex;align-items:center;justify-content:center}
-        .flashcard.flipped .flashcard-content{color:#fff}
-        .media{max-width:90%;max-height:180px;margin:15px 0;border-radius:12px}
-        .controls{position:absolute;top:20px;left:50%;transform:translateX(-50%);display:flex;gap:12px}
-        .speak-btn,.flag-btn{width:52px;height:52px;border-radius:50%;border:none;font-size:20px;cursor:pointer;transition:all 0.2s;flex-shrink:0;touch-action:manipulation}
-        .speak-btn{background:#10b981;color:#fff;box-shadow:0 4px 12px rgba(16,185,129,0.4)}
-        .speak-btn:active{transform:scale(0.9)}
-        .flag-btn.flag-a{color:#ef4444;border:2px solid #ef4444}
-        .flag-btn.flag-b{color:#10b981;border:2px solid #10b981}
-        .flag-btn.flag-c{color:#3b82f6;border:2px solid #3b82f6}
-        .flag-btn.flag-d{color:#f59e0b;border:2px solid #f59e0b}
-        .flag-btn.active{background:currentColor;color:#fff;transform:scale(1.1)}
-        .nav{display:flex;justify-content:center;gap:20px;align-items:center;margin-top:30px;flex-wrap:wrap}
-        .nav-btn{width:auto;padding:16px 28px;font-size:18px}
-        .counter{font-size:20px;font-weight:600;min-width:100px;text-align:center}
-        .form-group{margin-bottom:20px}
-        label{display:block;margin-bottom:8px;font-weight:600;color:#374151;font-size:16px}
-        input,textarea,select{width:100%;padding:16px;border:2px solid #e5e7eb;border-radius:12px;font-size:16px;background:#fff;color:#111;font-family:inherit;transition:border-color 0.2s}
-        @media(prefers-color-scheme:dark){input,textarea,select{background:#374151;color:#eee;border-color:#4b5563}}
-        input:focus,textarea:focus,select:focus{outline:none;border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,0.1)}
-        textarea{min-height:100px;resize:vertical}
-        .search-box{position:relative;margin-bottom:25px}
-        input[type="search"]{padding-left:45px}
-        .search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:18px}
-        .filter-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
-        .filter-tag{padding:10px 16px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:25px;cursor:pointer;font-size:14px;font-weight:500;user-select:none;transition:all 0.2s}
-        @media(prefers-color-scheme:dark){.filter-tag{background:#374151;border-color:#4b5563}}
-        .filter-tag.active{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
-        .filter-tag:active{transform:scale(0.95)}
-        .list-item{background:#fff;padding:20px;border-radius:16px;margin-bottom:12px;border:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 12px rgba(0,0,0,0.05)}
-        @media(prefers-color-scheme:dark){.list-item{background:#2a2a2a;border-color:#4b5563;box-shadow:0 4px 12px rgba(0,0,0,0.3)}}
-        .list-actions{display:flex;gap:8px}
-        .icon-btn{padding:12px;border-radius:10px;border:none;background:#6b7280;color:#fff;font-size:16px;cursor:pointer;transition:all 0.2s;width:44px;height:44px;display:flex;align-items:center;justify-content:center}
-        .icon-btn.edit{background:#3b82f6}
-        .icon-btn.delete{background:#ef4444}
-        .icon-btn:active{transform:scale(0.9)}
-        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:1000;justify-content:center;align-items:center;padding:20px}
-        .modal.active{display:flex}
-        .modal-content{background:#fff;padding:35px;border-radius:24px;max-width:95%;max-height:90%;overflow-y:auto;box-shadow:0 25px 50px rgba(0,0,0,0.3);position:relative}
-        @media(prefers-color-scheme:dark){.modal-content{background:#1f2937}}
-        .modal-close{position:absolute;top:20px;right:20px;background:none;border:none;font-size:28px;cursor:pointer;color:#6b7280;padding:0;width:40px;height:40px;display:flex;align-items:center;justify-content:center}
-        .modal-close:active{color:#111}
-        @media print{body *{color:#000!important;background:#fff!important}body{padding:0}.content{display:block!important}.no-print{display:none!important}.flashcard{page-break-inside:avoid;margin-bottom:30px;border:1px solid #000}}
-        .empty-state{text-align:center;padding:60px 20px;color:#6b7280}
-        .swipe-hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-size:14px;color:#9ca3af;text-align:center;background:rgba(255,255,255,0.9);padding:8px 16px;border-radius:20px}
-        @media(prefers-color-scheme:dark){.swipe-hint{background:rgba(0,0,0,0.8);color:#d1d5db}}
-        .theme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:20px}
-        .theme-card{background:#fff;padding:25px;border-radius:20px;border:1px solid #e5e7eb;cursor:pointer;transition:all 0.2s;box-shadow:0 8px 20px rgba(0,0,0,0.08)}
-        .theme-card:hover{transform:translateY(-4px);box-shadow:0 16px 35px rgba(0,0,0,0.15)}
-        .theme-card h3{font-size:20px;color:#0ea5e9;margin-bottom:10px}
-        .theme-card p{color:#6b7280;margin-bottom:15px}
-        @media(max-width:480px){.content{padding:20px 15px}.flashcard{padding:25px 20px;height:350px}.flashcard-content{font-size:22px}}
+        /* =========================================
+           🎨 カラーパレット（色弱対応・ダークモード対応）
+           ========================================= */
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #333333;
+            --card-bg: #ffffff;
+            --primary: #1976d2;
+            --flag-A: #d81b60; /* 苦手：濃いピンク系赤 */
+            --flag-B: #fbc02d; /* 微妙：視認性の高い黄 */
+            --flag-C: #1976d2; /* 普通：青 */
+            --flag-D: #388e3c; /* 完璧：濃い緑 */
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --text-color: #e0e0e0;
+                --card-bg: #1e1e1e;
+                --primary: #4da6ff;
+            }
+        }
+
+        /* =========================================
+           📱 全体レイアウト
+           ========================================= */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0 0 80px 0; /* 下部タブの余白 */
+        }
+        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+        
+        /* ボタン共通スタイル */
+        .btn {
+            background: var(--primary); color: white; border: none;
+            padding: 12px 20px; border-radius: 25px; font-size: 16px;
+            cursor: pointer; font-weight: bold; margin: 5px;
+        }
+
+        /* 入力フォーム共通スタイル */
+        select, input[type="text"] {
+            padding: 12px; border-radius: 8px; border: 1px solid #ccc;
+            font-size: 16px; width: 100%; box-sizing: border-box;
+            margin-bottom: 10px; background: var(--card-bg); color: var(--text-color);
+        }
+
+        /* =========================================
+           📖 単語帳（3Dフリップカード）
+           ========================================= */
+        .scene { perspective: 1000px; margin-bottom: 20px; }
+        .card-inner {
+            width: 100%; min-height: 280px; position: relative;
+            transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer;
+        }
+        /* 裏返るアクション */
+        .card-inner.is-flipped { transform: rotateY(180deg); }
+        
+        .card-face {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; /* 裏面の反転を防ぐ */
+            -webkit-backface-visibility: hidden; /* Safari対応 */
+            border-radius: 15px; background: var(--card-bg);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 20px; box-sizing: border-box; text-align: center;
+        }
+        .card-back {
+            transform: rotateY(180deg); border: 3px solid var(--primary);
+        }
+
+        /* フラグボタン */
+        .flags { display: flex; width: 100%; gap: 5px; margin-top: 10px; }
+        .flag-btn {
+            padding: 10px; border-radius: 8px; border: 2px solid transparent;
+            font-weight: bold; flex: 1; cursor: pointer; color: white;
+        }
+        .flag-btn[data-flag="A"] { background: var(--flag-A); }
+        .flag-btn[data-flag="B"] { background: var(--flag-B); color: black; }
+        .flag-btn[data-flag="C"] { background: var(--flag-C); }
+        .flag-btn[data-flag="D"] { background: var(--flag-D); }
+
+        /* 進捗バー */
+        .stats-bar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; margin: 10px 0; }
+        .stat-fill { height: 100%; transition: width 0.3s; }
+
+        /* =========================================
+           🕹️ タブナビゲーション
+           ========================================= */
+        .tab-bar {
+            position: fixed; bottom: 0; width: 100%; background: var(--card-bg);
+            display: flex; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 100;
+        }
+        .tab-bar button { flex: 1; background: none; border: none; color: var(--text-color); font-size: 14px; cursor: pointer; font-weight: bold; }
+        
+        .view { display: none; }
+        .view.active { display: block; }
+        
+        /* テスト画面用 */
+        .test-card {
+            background: var(--card-bg); border-radius: 15px; padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
-    <header class="header">
-        <h1>📚 無限単語帳</h1>
-        <p>タップ・スワイプで簡単学習！</p>
-    </header>
 
-    <nav class="tabs" id="tabs">
-        <div class="tab active" data-tab="study">📖 学習</div>
-        <div class="tab" data-tab="manage">✏️ 管理</div>
-        <div class="tab" data-tab="themes">📁 テーマ</div>
-        <div class="tab" data-tab="import">📥 取り込み</div>
-        <div class="tab" data-tab="export">📤 出力</div>
-    </nav>
+<div class="container">
+    <h2 style="text-align: center; margin-top: 5px;">無限単語帳 PRO</h2>
 
-    <main>
-        <section id="study" class="content active">
-            <div class="search-box">
-                <span class="search-icon">🔍</span>
-                <input type="search" id="searchInput" placeholder="単語・意味を検索..." results="0">
-            </div>
-            <div class="filter-tags">
-                <span class="filter-tag" data-flag="A">🚩 A</span>
-                <span class="filter-tag" data-flag="B">🚩 B</span>
-                <span class="filter-tag" data-flag="C">🚩 C</span>
-                <span class="filter-tag" data-flag="D">🚩 D</span>
-            </div>
-            <div class="flashcard" id="flashcard">
-                <div class="controls">
-                    <button class="flag-btn flag-a" data-flag="A">A</button>
-                    <button class="flag-btn flag-b" data-flag="B">B</button>
-                    <button class="flag-btn flag-c" data-flag="C">C</button>
-                    <button class="flag-btn flag-d" data-flag="D">D</button>
+    <div id="view-study" class="view active">
+        <div>
+            <select id="study-grade" onchange="filterStudy()">
+                <option value="all">出題範囲: 全ての級</option>
+                <option value="5級">英検5級のみ</option>
+                <option value="4級">英検4級のみ</option>
+            </select>
+        </div>
+        
+        <div class="stats-bar" id="stats-bar"></div>
+        <p style="text-align: center; font-size: 12px; margin-top: 0; color: gray;" id="stats-text"></p>
+
+        <div class="scene">
+            <div class="card-inner" id="flashcard" onclick="flipCard()">
+                <div class="card-face card-front">
+                    <p id="sc-grade" style="color: gray; margin: 0; font-weight: bold;"></p>
+                    <h1 id="sc-en" style="font-size: 3rem; margin: 10px 0; word-wrap: break-word;"></h1>
+                    <p style="color: gray; font-size: 0.9rem;">👆 タップで意味と例文を確認</p>
                 </div>
-                <button class="speak-btn" id="speakBtn">🔊</button>
-                <div class="flashcard-content" id="cardContent">カードを追加しよう！</div>
-                <div id="cardMedia"></div>
-                <div class="swipe-hint">←スワイプ：前へ　→スワイプ：次へ　タップ：反転</div>
+                <div class="card-face card-back">
+                    <h2 id="sc-jp" style="margin: 0 0 15px 0;"></h2>
+                    <div style="background: rgba(128,128,128,0.1); padding: 15px; border-radius: 8px; width: 100%; box-sizing: border-box;">
+                        <p id="sc-ex-en" style="font-style: italic; margin: 0 0 5px 0; font-weight: bold;"></p>
+                        <p id="sc-ex-jp" style="font-size: 0.9rem; margin: 0;"></p>
+                    </div>
+                </div>
             </div>
-            <div class="nav no-print">
-                <button class="nav-btn" id="prevBtn">← 前</button>
-                <div class="counter" id="counter">0 / 0</div>
-                <button class="nav-btn" id="nextBtn">次 →</button>
-            </div>
-        </section>
+        </div>
 
-        <section id="manage" class="content">
-            <div class="form-group">
-                <label>テーマ選択</label>
-                <select id="editTheme"></select>
-            </div>
-            <button class="btn" id="addCardBtn">➕ 新しいカード</button>
-            <button class="btn btn-secondary" id="refreshBtn">🔄 更新</button>
-            <div id="cardList" class="empty-state">テーマを選択してください</div>
-        </section>
+        <div style="text-align: center;">
+            <button class="btn" onclick="playCurrentWordAudio()">🔊 単語発音 (2回で遅く)</button>
+            <button class="btn" style="background: #666;" onclick="playCurrentExAudio()">🔊 例文発音</button>
+        </div>
+        
+        <div class="flags">
+            <button class="flag-btn" data-flag="A" onclick="setFlag('A')">A(苦手)</button>
+            <button class="flag-btn" data-flag="B" onclick="setFlag('B')">B(微妙)</button>
+            <button class="flag-btn" data-flag="C" onclick="setFlag('C')">C(普通)</button>
+            <button class="flag-btn" data-flag="D" onclick="setFlag('D')">D(完璧)</button>
+        </div>
 
-        <section id="themes" class="content">
-            <button class="btn" id="addThemeBtn">➕ 新しいテーマ</button>
-            <div id="themeList" class="theme-grid empty-state">テーマを追加しよう！</div>
-        </section>
-
-        <section id="import" class="content">
-            <div class="form-group">
-                <label class="file-label" for="importFile">📁 JSONファイルを選択</label>
-                <input type="file" id="importFile" accept=".json">
-            </div>
-            <button class="btn" id="downloadTemplate">📥 テンプレートDL</button>
-            <div style="margin-top:25px;padding:20px;background:#f3f4f6;border-radius:12px;font-family:monospace;font-size:13px;max-height:200px;overflow:auto">
-{"themes":[{"id":"sample","name":"サンプル","description":"テスト用"}],"cards":[{"id":"1","themeId":"sample","front":"hello","back":"こんにちは","flags":[]}]}
-            </div>
-        </section>
-
-        <section id="export" class="content">
-            <button class="btn" id="exportBtn">💾 全データ保存(JSON)</button>
-            <button class="btn btn-secondary" onclick="window.print()">🖨️ A4印刷</button>
-        </section>
-    </main>
-
-    <div id="cardModal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close" id="closeCardModal">×</button>
-            <h2>カード編集</h2>
-            <div class="form-group">
-                <label>テーマ</label>
-                <select id="modalTheme"></select>
-            </div>
-            <div class="form-group">
-                <label>表面（問題）</label>
-                <input type="text" id="modalFront" placeholder="例：apple">
-            </div>
-            <div class="form-group">
-                <label>裏面（答え）</label>
-                <textarea id="modalBack" placeholder="例：りんご"></textarea>
-            </div>
-            <div class="form-group">
-                <label>画像URL</label>
-                <input type="url" id="modalImage" placeholder="https://...">
-            </div>
-            <button class="btn" id="saveCardBtn">💾 保存</button>
+        <div style="display: flex; margin-top: 15px; gap: 10px;">
+            <button class="btn" style="flex: 1; background: gray;" onclick="moveWord(-1)">◀ 前へ</button>
+            <button class="btn" style="flex: 1;" onclick="moveWord(1)">次へ ▶</button>
         </div>
     </div>
 
-    <div id="themeModal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close" id="closeThemeModal">×</button>
-            <h2>テーマ編集</h2>
-            <div class="form-group">
-                <label>テーマ名</label>
-                <input type="text" id="modalThemeName">
+    <div id="view-commute" class="view">
+        <div class="test-card">
+            <h3 style="margin-top: 0; color: var(--primary);">🎧 全自動 音声学習モード</h3>
+            <p style="font-size: 0.9rem; color: gray;">日本語 → 英語 → (遅) → 例文日本語 → 例文英語 → (遅) の順で無限ループします。</p>
+            
+            <select id="com-grade">
+                <option value="all">出題範囲: 全ての級</option>
+                <option value="5級">5級のみ</option>
+                <option value="4級">4級のみ</option>
+            </select>
+            <select id="com-rank">
+                <option value="all">ランク: 全て</option>
+                <option value="A">A(苦手)のみ</option>
+                <option value="B">B(微妙)のみ</option>
+                <option value="C">C(普通)のみ</option>
+                <option value="D">D(完璧)のみ</option>
+            </select>
+
+            <button class="btn" id="btn-com-start" style="width: 100%; padding: 20px; font-size: 1.2rem; margin: 15px 0;" onclick="toggleCommute()">▶ 再生スタート (続きから)</button>
+            
+            <div style="background: rgba(128,128,128,0.1); padding: 15px; border-radius: 8px; text-align: center;">
+                <p style="margin: 0; font-weight: bold;">現在再生中の単語:</p>
+                <h2 id="com-playing" style="margin: 10px 0; color: var(--primary);">停止中</h2>
+                <p id="com-progress" style="font-size: 0.9rem; color: gray; margin: 0;"></p>
             </div>
-            <div class="form-group">
-                <label>説明</label>
-                <textarea id="modalThemeDesc"></textarea>
-            </div>
-            <button class="btn" id="saveThemeBtn">💾 保存</button>
         </div>
     </div>
 
-    <script>
-        class FlashcardApp{
-            constructor(){
-                this.data={themes:[],cards:[]};
-                this.filteredCards=[];
-                this.currentIndex=0;
-                this.isFlipped=false;
-                this.activeFilters=new Set();
-                this.init();
-            }
-            init(){
-                this.loadData();
-                this.bindEvents();
-                this.renderThemes();
-                this.updateSelects();
-                this.filterCards();
-                this.showCard();
-            }
-            loadData(){
-                try{
-                    const saved=localStorage.getItem('flashcard_v2');
-                    if(saved)this.data=JSON.parse(saved);
-                }catch(e){
-                    console.error('データ読み込み失敗',e);
-                }
-            }
-            saveData(){
-                localStorage.setItem('flashcard_v2',JSON.stringify(this.data));
-            }
-            bindEvents(){
-                document.getElementById('tabs').addEventListener('click',e=>{
-                    if(e.target.dataset.tab){
-                        this.switchTab(e.target.dataset.tab);
-                    }
-                });
-                document.getElementById('searchInput').addEventListener('input',()=>this.filterCards());
-                document.querySelectorAll('.filter-tag').forEach(tag=>tag.addEventListener('click',e=>this.toggleFilter(e.target.dataset.flag)));
-                document.getElementById('flashcard').addEventListener('click',()=>this.flipCard());
-                document.getElementById('prevBtn').addEventListener('click',()=>this.prevCard());
-                document.getElementById('nextBtn').addEventListener('click',()=>this.nextCard());
-                document.getElementById('speakBtn').addEventListener('click',e=>{e.stopPropagation();this.speak()});
-                document.querySelectorAll('.flag-btn').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();this.toggleFlag(e.target.dataset.flag)}));
-                document.getElementById('addCardBtn').addEventListener('click',()=>this.showCardModal());
-                document.getElementById('addThemeBtn').addEventListener('click',()=>this.showThemeModal());
-                document.getElementById('refreshBtn').addEventListener('click',()=>this.refresh());
-                document.getElementById('exportBtn').addEventListener('click',()=>this.exportData());
-                document.getElementById('downloadTemplate').addEventListener('click',()=>this.downloadTemplate());
-                document.getElementById('importFile').addEventListener('change',e=>this.importFile(e.target.files[0]));
-                document.getElementById('editTheme').addEventListener('change',()=>this.loadCardsForEdit());
-                document.getElementById('saveCardBtn').addEventListener('click',()=>this.saveCard());
-                document.getElementById('saveThemeBtn').addEventListener('click',()=>this.saveTheme());
-                document.getElementById('closeCardModal').addEventListener('click',()=>this.hideModal('cardModal'));
-                document.getElementById('closeThemeModal').addEventListener('click',()=>this.hideModal('themeModal'));
-                document.addEventListener('keydown',e=>{
-                    if(e.key==='ArrowLeft')this.prevCard();
-                    if(e.key==='ArrowRight')this.nextCard();
-                    if(e.key===' ') {e.preventDefault();this.flipCard();}
-                });
-                let touchStartX=0,touchEndX=0;
-                document.getElementById('flashcard').addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX}, {passive:true});
-                document.getElementById('flashcard').addEventListener('touchend',e=>{touchEndX=e.changedTouches[0].clientX; this.handleSwipe(touchStartX,touchEndX)}, {passive:true});
-            }
-            handleSwipe(startX,endX){
-                const diff=endX-startX;
-                if(Math.abs(diff)>50){
-                    if(diff>0)this.prevCard();
-                    else this.nextCard();
-                }
-            }
-            switchTab(tab){
-                document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-                document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
-                event.target.classList.add('active');
-                document.getElementById(tab).classList.add('active');
-                if(tab==='themes')this.renderThemes();
-                if(tab==='manage')this.loadCardsForEdit();
-            }
-            updateSelects(){
-                ['editTheme','modalTheme'].forEach(id=>{
-                    const select=document.getElementById(id);
-                    select.innerHTML='<option value="">選択...</option>';
-                    this.data.themes.forEach(t=>{
-                        const opt=document.createElement('option');
-                        opt.value=t.id;
-                        opt.textContent=t.name;
-                        select.appendChild(opt);
-                    });
-                });
-            }
-            renderThemes(){
-                const container=document.getElementById('themeList');
-                if(!this.data.themes.length){
-                    container.innerHTML='<div class="empty-state">テーマを追加しよう！<br><small>➕ボタンから作成</small></div>';
-                    return;
-                }
-                container.innerHTML='';
-                this.data.themes.forEach(t=>{
-                    const count=this.data.cards.filter(c=>c.themeId===t.id).length;
-                    const div=document.createElement('div');
-                    div.className='theme-card';
-                    div.innerHTML=`
-                        <h3>${t.name}</h3>
-                        <p>${t.description||''}</p>
-                        <p style="color:#6b7280;font-size:14px">📊 ${count}枚</p>
-                        <div style="margin-top:15px;display:flex;gap:10px">
-                            <button class="icon-btn edit" onclick="app.editTheme('${t.id}')">✏️</button>
-                            <button class="icon-btn delete" onclick="app.deleteTheme('${t.id}')">🗑️</button>
-                        </div>
-                    `;
-                    container.appendChild(div);
-                });
-            }
-            showThemeModal(editId){
-                this.editingThemeId=editId||null;
-                document.getElementById('modalThemeName').value='';
-                document.getElementById('modalThemeDesc').value='';
-                if(editId){
-                    const theme=this.data.themes.find(t=>t.id===editId);
-                    if(theme){
-                        document.getElementById('modalThemeName').value=theme.name;
-                        document.getElementById('modalThemeDesc').value=theme.description||'';
-                    }
-                }
-                document.getElementById('themeModal').classList.add('active');
-            }
-            saveTheme(){
-                const name=document.getElementById('modalThemeName').value.trim();
-                if(!name)return alert('⚠️ テーマ名を入力');
-                if(this.editingThemeId){
-                    const theme=this.data.themes.find(t=>t.id===this.editingThemeId);
-                    if(theme){
-                        theme.name=name;
-                        theme.description=document.getElementById('modalThemeDesc').value.trim();
-                    }
-                }else{
-                    this.data.themes.push({
-                        id:'t'+Date.now(),
-                        name,
-                        description:document.getElementById('modalThemeDesc').value.trim()
-                    });
-                }
-                this.saveData();
-                this.updateSelects();
-                this.renderThemes();
-                this.hideModal('themeModal');
-                alert('✅ 保存完了！');
-            }
-            deleteTheme(id){
-                if(confirm('テーマとカードを削除しますか？')){
-                    this.data.themes=this.data.themes.filter(t=>t.id!==id);
-                    this.data.cards=this.data.cards.filter(c=>c.themeId!==id);
-                    this.saveData();
-                    this.updateSelects();
-                    this.renderThemes();
-                    this.filterCards();
-                    alert('✅ 削除完了');
-                }
-            }
-            showCardModal(){
-                const theme=document.getElementById('editTheme');
-                if(!theme.value)return alert('⚠️ テーマを選択');
-                this.editingCardId=null;
-                document.getElementById('modalFront').value='';
-                document.getElementById('modalBack').value='';
-                document.getElementById('modalImage').value='';
-                document.getElementById('modalTheme').value=theme.value;
-                document.getElementById('cardModal').classList.add('active');
-            }
-            saveCard(){
-                const themeId=document.getElementById('modalTheme').value;
-                const front=document.getElementById('modalFront').value.trim();
-                const back=document.getElementById('modalBack').value.trim();
-                if(!themeId||!front||!back)return alert('⚠️ 必須項目を入力');
-                if(this.editingCardId){
-                    const card=this.data.cards.find(c=>c.id===this.editingCardId);
-                    if(card){
-                        card.themeId=themeId;
-                        card.front=front;
-                        card.back=back;
-                        card.image=document.getElementById('modalImage').value.trim();
-                    }
-                }else{
-                    this.data.cards.push({
-                        id:'c'+Date.now(),
-                        themeId,
-                        front,
-                        back,
-                        image:document.getElementById('modalImage').value.trim(),
-                        flags:[]
-                    });
-                }
-                this.saveData();
-                this.filterCards();
-                this.loadCardsForEdit();
-                this.hideModal('cardModal');
-                alert('✅ 保存完了！');
-            }
-            loadCardsForEdit(){
-                const themeId=document.getElementById('editTheme').value;
-                const container=document.getElementById('cardList');
-                if(!themeId){
-                    container.innerHTML='<div class="empty-state">テーマを選択</div>';
-                    return;
-                }
-                const cards=this.data.cards.filter(c=>c.themeId===themeId);
-                if(!cards.length){
-                    container.innerHTML='<div class="empty-state">カードなし<br><small>➕で追加</small></div>';
-                    return;
-                }
-                container.innerHTML='';
-                cards.forEach(c=>{
-                    const flags=c.flags?.length?`[${c.flags.join(',')}]`:'';  
-                    const div=document.createElement('div');
-                    div.className='list-item';
-                    div.innerHTML=`
-                        <div>
-                            <strong>${c.front}</strong><br>
-                            <span style="color:#6b7280">${c.back}</span>
-                            ${flags?`<br><small style="color:#ef4444">${flags}</small>`:''}
-                        </div>
-                        <div class="list-actions">
-                            <button class="icon-btn edit" onclick="app.editCard('${c.id}')">✏️</button>
-                            <button class="icon-btn delete" onclick="app.deleteCard('${c.id}')">🗑️</button>
-                        </div>
-                    `;
-                    container.appendChild(div);
-                });
-            }
-            editCard(id){
-                const card=this.data.cards.find(c=>c.id===id);
-                if(card){
-                    document.getElementById('modalTheme').value=card.themeId;
-                    document.getElementById('modalFront').value=card.front;
-                    document.getElementById('modalBack').value=card.back;
-                    document.getElementById('modalImage').value=card.image||'';
-                    this.editingCardId=id;
-                    document.getElementById('cardModal').classList.add('active');
-                }
-            }
-            deleteCard(id){
-                if(confirm('削除しますか？')){
-                    this.data.cards=this.data.cards.filter(c=>c.id!==id);
-                    this.saveData();
-                    this.loadCardsForEdit();
-                    this.filterCards();
-                    alert('✅ 削除完了');
-                }
-            }
-            filterCards(){
-                const q=document.getElementById('searchInput').value.toLowerCase();
-                const theme=document.getElementById('theme-filter')?.value||'';
-                this.filteredCards=this.data.cards.filter(c=>{
-                    const matchQ=!q||c.front.toLowerCase().includes(q)||c.back.toLowerCase().includes(q);
-                    const matchTheme=!theme||c.themeId===theme;
-                    const matchFlag=!this.activeFilters.size||c.flags?.some(f=>this.activeFilters.has(f));
-                    return matchQ&&matchTheme&&matchFlag;
-                });
-                this.currentIndex=0;
-                this.showCard();
-            }
-            toggleFilter(flag){
-                if(this.activeFilters.has(flag)){
-                    this.activeFilters.delete(flag);
-                    event.target.classList.remove('active');
-                }else{
-                    this.activeFilters.add(flag);
-                    event.target.classList.add('active');
-                }
-                this.filterCards();
-            }
-            showCard(){
-                const card=this.filteredCards[this.currentIndex];
-                const contentEl=document.getElementById('cardContent');
-                const mediaEl=document.getElementById('cardMedia');
-                const counterEl=document.getElementById('counter');
-                const prevBtn=document.getElementById('prevBtn');
-                const nextBtn=document.getElementById('nextBtn');
-                const speakBtn=document.getElementById('speakBtn');
+    <div id="view-test" class="view">
+        <div class="test-card">
+            <h3 style="margin-top: 0; color: var(--primary);">✍️ 実力テスト</h3>
+            
+            <select id="test-grade">
+                <option value="all">出題範囲: 全ての級</option>
+                <option value="5級">5級のみ</option>
+                <option value="4級">4級のみ</option>
+            </select>
+            <select id="test-rank">
+                <option value="all">ランク: 全て</option>
+                <option value="A">A(苦手)のみ</option>
+                <option value="B">B(微妙)のみ</option>
+                <option value="C">C(普通)のみ</option>
+                <option value="D">D(完璧)のみ</option>
+            </select>
+            <select id="test-mode">
+                <option value="type">タイピング (日本語を見て英語を打つ)</option>
+                <option value="read">読み取り (英語を見て意味を答える)</option>
+            </select>
+
+            <button class="btn" style="width: 100%; margin-bottom: 20px;" onclick="startTest()">テストを開始する</button>
+
+            <div id="test-area" style="display: none; width: 100%;">
+                <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
+                <p style="text-align: center; color: gray; font-size: 0.9rem; margin: 0;" id="t-counter"></p>
+                <h2 id="t-q" style="text-align: center; margin-bottom: 20px;"></h2>
                 
-                this.isFlipped=false;
-                document.getElementById('flashcard').classList.remove('flipped');
+                <input type="text" id="t-input" placeholder="ここにスペルを入力..." onkeypress="if(event.key === 'Enter') checkTest()"> 
                 
-                if(!card){
-                    contentEl.textContent='カードがありません\n➕ボタンで追加！';
-                    mediaEl.innerHTML='';
-                    counterEl.textContent='0 / 0';
-                    prevBtn.disabled=nextBtn.disabled=true;
-                    speakBtn.style.display='none';
-                    return;
-                }
-                
-                contentEl.textContent=card.front;
-                mediaEl.innerHTML='';
-                if(card.image){
-                    const img=new Image();
-                    img.src=card.image;
-                    img.className='media';
-                    img.onerror=()=>mediaEl.innerHTML='';
-                    mediaEl.appendChild(img);
-                }
-                
-                counterEl.textContent=`${this.currentIndex+1}/${this.filteredCards.length}`;
-                prevBtn.disabled=this.currentIndex===0;
-                nextBtn.disabled=this.currentIndex===this.filteredCards.length-1;
-                speakBtn.style.display='block';
-                
-                document.querySelectorAll('.flag-btn').forEach(btn=>{
-                    const f=btn.dataset.flag;
-                    btn.classList.toggle('active',card.flags?.includes(f));
-                });
-            }
-            flipCard(){
-                if(!this.filteredCards[this.currentIndex])return;
-                this.isFlipped=!this.isFlipped;
-                const el=document.getElementById('flashcard');
-                const content=document.getElementById('cardContent');
-                const card=this.filteredCards[this.currentIndex];
-                el.classList.toggle('flipped');
-                content.textContent=this.isFlipped?card.back:card.front;
-            }
-            nextCard(){if(this.currentIndex<this.filteredCards.length-1){this.currentIndex++;this.showCard()}}
-            prevCard(){if(this.currentIndex>0){this.currentIndex--;this.showCard()}}
-            speak(){
-                const card=this.filteredCards[this.currentIndex];
-                if(!card||!('speechSynthesis'in window))return;
-                const text=this.isFlipped?card.back:card.front;
-                const utterance=new SpeechSynthesisUtterance(text);
-                utterance.lang='ja-JP';
-                speechSynthesis.speak(utterance);
-            }
-            toggleFlag(flag){
-                const card=this.data.cards.find(c=>c.id===this.filteredCards[this.currentIndex]?.id);
-                if(!card)return;
-                if(!card.flags)card.flags=[];
-                const i=card.flags.indexOf(flag);
-                if(i>-1)card.flags.splice(i,1);
-                else card.flags.push(flag);
-                this.saveData();
-                this.showCard();
-            }
-            refresh(){
-                this.loadData();
-                this.updateSelects();
-                this.renderThemes();
-                this.filterCards();
-                this.loadCardsForEdit();
-                alert('✅ 最新データに更新！');
-            }
-            exportData(){
-                const blob=new Blob([JSON.stringify(this.data,null,2)],{type:'application/json'});
-                const url=URL.createObjectURL(blob);
-                const a=document.createElement('a');
-                a.href=url;
-                a.download=`単語帳_${new Date().toISOString().slice(0,10)}.json`;
-                a.click();
-                URL.revokeObjectURL(url);
-            }
-            downloadTemplate(){
-                const template={themes:[{id:'sample',name:'サンプル',description:'テスト用'}],cards:[{id:'1',themeId:'sample',front:'hello',back:'こんにちは',flags:[]}]};
-                const blob=new Blob([JSON.stringify(template,null,2)],{type:'application/json'});
-                const url=URL.createObjectURL(blob);
-                const a=document.createElement('a');
-                a.href=url;
-                a.download='単語帳テンプレート.json';
-                a.click();
-            }
-            importFile(file){
-                if(!file)return;
-                const reader=new FileReader();
-                reader.onload=e=>{
-                    try{
-                        const data=JSON.parse(e.target.result);
-                        if(confirm('データを追加しますか？')){
-                            if(data.themes)this.data.themes.push(...data.themes.filter(t=>!this.data.themes.find(et=>et.id===t.id)));
-                            if(data.cards)this.data.cards.push(...data.cards.filter(c=>!this.data.cards.find(ec=>ec.id===c.id)));
-                            this.saveData();
-                            this.refresh();
-                            alert('✅ インポート完了！');
-                        }
-                    }catch{alert('❌ ファイル形式エラー')}
-                };
-                reader.readAsText(file);
-            }
-            hideModal(id){document.getElementById(id).classList.remove('active')}
-            editTheme(id){this.showThemeModal(id)}
-            editCard(id){/* 既存のeditCardを使用 */}
+                <button class="btn" id="t-btn-check" style="width: 100%; margin: 0;" onclick="checkTest()">判定する</button>
+                <h2 id="t-res" style="text-align: center; margin: 15px 0;"></h2>
+                <button class="btn" id="t-btn-next" style="width: 100%; display: none; background: #555; margin: 0;" onclick="nextTest()">次の問題へ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<nav class="tab-bar">
+    <button onclick="showTab('view-study')">📖<br>単語帳</button>
+    <button onclick="showTab('view-commute')">🎧<br>通勤音声</button>
+    <button onclick="showTab('view-test')">✍️<br>テスト</button>
+</nav>
+
+<script>
+    /* ==============================================================
+       1. 初期データ (英検5級・4級厳選20単語)
+       ============================================================== */
+    const initWords = [
+        // --- 英検5級 (10単語) ---
+        { id: 1, grade: '5級', en: 'always', jp: 'いつも、常に', exEn: 'I always get up early.', exJp: '私はいつも早起きします。', flag: 'C' },
+        { id: 2, grade: '5級', en: 'breakfast', jp: '朝食', exEn: 'I eat breakfast every day.', exJp: '私は毎日朝食を食べます。', flag: 'C' },
+        { id: 3, grade: '5級', en: 'dictionary', jp: '辞書', exEn: 'I use a dictionary for English.', exJp: '私は英語のために辞書を使います。', flag: 'B' },
+        { id: 4, grade: '5級', en: 'evening', jp: '夕方、晩', exEn: 'Good evening.', exJp: 'こんばんは。', flag: 'D' },
+        { id: 5, grade: '5級', en: 'friend', jp: '友達', exEn: 'He is my best friend.', exJp: '彼は私の親友です。', flag: 'D' },
+        { id: 6, grade: '5級', en: 'guitar', jp: 'ギター', exEn: 'She plays the guitar well.', exJp: '彼女はギターを上手に弾きます。', flag: 'C' },
+        { id: 7, grade: '5級', en: 'library', jp: '図書館', exEn: 'Let\'s go to the library.', exJp: '図書館へ行きましょう。', flag: 'B' },
+        { id: 8, grade: '5級', en: 'music', jp: '音楽', exEn: 'I like listening to music.', exJp: '私は音楽を聴くのが好きです。', flag: 'C' },
+        { id: 9, grade: '5級', en: 'parent', jp: '親', exEn: 'My parents are kind.', exJp: '私の両親は優しいです。', flag: 'B' },
+        { id: 10, grade: '5級', en: 'usually', jp: 'たいてい、ふつうは', exEn: 'I usually study after dinner.', exJp: '私はたいてい夕食後に勉強します。', flag: 'A' },
+
+        // --- 英検4級 (10単語) ---
+        { id: 11, grade: '4級', en: 'popular', jp: '人気のある', exEn: 'Soccer is popular in Japan.', exJp: 'サッカーは日本で人気があります。', flag: 'B' },
+        { id: 12, grade: '4級', en: 'useful', jp: '役に立つ', exEn: 'This book is very useful.', exJp: 'この本はとても役に立ちます。', flag: 'B' },
+        { id: 13, grade: '4級', en: 'experience', jp: '経験', exEn: 'It was a great experience.', exJp: 'それは素晴らしい経験でした。', flag: 'A' },
+        { id: 14, grade: '4級', en: 'environment', jp: '環境', exEn: 'We must protect the environment.', exJp: '私たちは環境を守らなければならない。', flag: 'A' },
+        { id: 15, grade: '4級', en: 'necessary', jp: '必要な', exEn: 'Water is necessary for life.', exJp: '水は生命にとって必要です。', flag: 'B' },
+        { id: 16, grade: '4級', en: 'future', jp: '未来、将来', exEn: 'I want to be a doctor in the future.', exJp: '私は将来医者になりたいです。', flag: 'C' },
+        { id: 17, grade: '4級', en: 'improve', jp: '向上させる、改善する', exEn: 'I want to improve my English.', exJp: '私は英語を上達させたいです。', flag: 'A' },
+        { id: 18, grade: '4級', en: 'language', jp: '言語', exEn: 'English is a global language.', exJp: '英語は世界的な言語です。', flag: 'C' },
+        { id: 19, grade: '4級', en: 'volunteer', jp: 'ボランティア', exEn: 'She works as a volunteer.', exJp: '彼女はボランティアとして働いています。', flag: 'C' },
+        { id: 20, grade: '4級', en: 'weather', jp: '天気', exEn: 'The weather is fine today.', exJp: '今日は天気が良いです。', flag: 'D' }
+    ];
+
+    // ローカルストレージからデータを読み込む（なければ初期データ）
+    let words = JSON.parse(localStorage.getItem('vocab_v_pro')) || initWords;
+    let fw = []; // フィルターされた単語リスト
+    let cIdx = 0; // 現在の単語インデックス
+
+    /* ==============================================================
+       2. 音声設定 (ネイティブ発音の取得)
+       ============================================================== */
+    let synth = window.speechSynthesis;
+    let nativeVoice = null;
+
+    function initVoice() {
+        const vs = synth.getVoices();
+        // プレミアムまたはGoogleの高音質英語ボイスを優先して探す
+        nativeVoice = vs.find(v => v.lang === 'en-US' && (v.name.includes('Premium') || v.name.includes('Google') || v.name.includes('Enhanced'))) 
+                   || vs.find(v => v.lang.startsWith('en')) || null;
+    }
+    // ボイスがロードされたら初期化
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = initVoice;
+    }
+
+    /* ==============================================================
+       3. 学習画面 (単語帳) の制御
+       ============================================================== */
+    function save() {
+        localStorage.setItem('vocab_v_pro', JSON.stringify(words));
+        renderStats();
+    }
+
+    function showTab(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if (id === 'view-study') filterStudy();
+    }
+
+    // 級で絞り込み
+    function filterStudy() {
+        const g = document.getElementById('study-grade').value;
+        fw = g === 'all' ? words : words.filter(w => w.grade === g);
+        cIdx = 0;
+        renderStats();
+        updateCard();
+        document.getElementById('flashcard').classList.remove('is-flipped');
+    }
+
+    // 進捗バー（ダッシュボード）の描画
+    function renderStats() {
+        const total = fw.length;
+        if (!total) {
+            document.getElementById('stats-text').innerText = "データがありません";
+            document.getElementById('stats-bar').innerHTML = "";
+            return;
         }
-        const app=new FlashcardApp();
-    </script>
+        const c = { A: 0, B: 0, C: 0, D: 0 };
+        fw.forEach(w => c[w.flag]++);
+        document.getElementById('stats-text').innerText = `A: ${c.A}語 / B: ${c.B}語 / C: ${c.C}語 / D: ${c.D}語 (計${total}語)`;
+        
+        let h = '';
+        const cols = { A: 'var(--flag-A)', B: 'var(--flag-B)', C: 'var(--flag-C)', D: 'var(--flag-D)' };
+        ['A', 'B', 'C', 'D'].forEach(f => {
+            if (c[f] > 0) h += `<div class="stat-fill" style="width: ${(c[f] / total) * 100}%; background: ${cols[f]}"></div>`;
+        });
+        document.getElementById('stats-bar').innerHTML = h;
+    }
+
+    // カード内容の更新
+    function updateCard() {
+        if (!fw.length) {
+            document.getElementById('sc-en').innerText = '該当なし';
+            return;
+        }
+        const w = fw[cIdx];
+        document.getElementById('sc-grade').innerText = `英検 ${w.grade}`;
+        document.getElementById('sc-en').innerText = w.en;
+        document.getElementById('sc-jp').innerText = w.jp;
+        document.getElementById('sc-ex-en').innerText = w.exEn;
+        document.getElementById('sc-ex-jp').innerText = w.exJp;
+        
+        // フラグボタンの選択状態（枠線）を更新
+        document.querySelectorAll('.flag-btn').forEach(b => b.style.border = '2px solid transparent');
+        const fb = document.querySelector(`.flag-btn[data-flag="${w.flag}"]`);
+        if (fb) fb.style.border = '2px solid var(--text-color)';
+    }
+
+    // カードを裏返す
+    function flipCard() {
+        document.getElementById('flashcard').classList.toggle('is-flipped');
+    }
+
+    // 前後の単語へ移動
+    function moveWord(d) {
+        if (!fw.length) return;
+        cIdx = (cIdx + d + fw.length) % fw.length;
+        document.getElementById('flashcard').classList.remove('is-flipped');
+        updateCard();
+    }
+
+    // 習熟度フラグを設定して次へ
+    function setFlag(f) {
+        if (!fw.length) return;
+        const targetId = fw[cIdx].id;
+        const target = words.find(w => w.id === targetId);
+        if (target) {
+            target.flag = f;
+            save(); // 保存してプログレスバー更新
+            moveWord(1); // 自動的に次へ
+        }
+    }
+
+    /* ==============================================================
+       4. 音声発音処理
+       ============================================================== */
+    // 非同期で音声を再生する関数（通勤モード用）
+    async function speak(txt, lang, rate = 1.0) {
+        return new Promise(res => {
+            const u = new SpeechSynthesisUtterance(txt);
+            u.lang = lang;
+            u.rate = rate;
+            if (lang.startsWith('en') && nativeVoice) u.voice = nativeVoice;
+            u.onend = res;
+            u.onerror = res; // エラー時もPromiseを解決してループを止めない
+            synth.speak(u);
+        });
+    }
+
+    let wClick = 0;
+    let wTimer;
+    // 単語発音（ダブルクリック判定付き）
+    function playCurrentWordAudio() {
+        wClick++;
+        clearTimeout(wTimer);
+        wTimer = setTimeout(() => {
+            const txt = fw[cIdx].en;
+            speak(txt, 'en-US', wClick > 1 ? 0.5 : 1.0); // 2回クリックなら遅く
+            wClick = 0;
+        }, 300);
+    }
+
+    // 例文発音
+    function playCurrentExAudio() {
+        speak(fw[cIdx].exEn, 'en-US', 1.0);
+    }
+
+    /* ==============================================================
+       5. 通勤モード（最強の全自動ループ）
+       ============================================================== */
+    let comActive = false;
+    let comQ = [];
+    let comIdx = 0;
+
+    async function toggleCommute() {
+        const btn = document.getElementById('btn-com-start');
+        
+        // 停止処理
+        if (comActive) {
+            comActive = false;
+            btn.innerText = '▶ 再生スタート (続きから)';
+            btn.style.background = 'var(--primary)';
+            synth.cancel();
+            document.getElementById('com-playing').innerText = '停止中';
+            return;
+        }
+
+        // 開始処理
+        comActive = true;
+        btn.innerText = '■ 停止する';
+        btn.style.background = 'var(--flag-A)';
+        
+        const g = document.getElementById('com-grade').value;
+        const r = document.getElementById('com-rank').value;
+        comQ = words.filter(w => (g === 'all' || w.grade === g) && (r === 'all' || w.flag === r));
+        
+        if (!comQ.length) {
+            alert('指定した条件の単語がありません');
+            toggleCommute();
+            return;
+        }
+
+        // レジューム（続きから）機能
+        let savedId = localStorage.getItem('com_last_id');
+        if (savedId) {
+            const found = comQ.findIndex(w => w.id == savedId);
+            if (found !== -1) comIdx = found;
+            else comIdx = 0;
+        } else {
+            comIdx = 0;
+        }
+
+        runCommute();
+    }
+
+    // 全自動ループ本体 (awaitで直列実行)
+    async function runCommute() {
+        while (comActive && comIdx < comQ.length) {
+            const w = comQ[comIdx];
+            document.getElementById('com-playing').innerText = `${w.en}\n(${w.jp})`;
+            document.getElementById('com-progress').innerText = `${comIdx + 1} / ${comQ.length} 語`;
+            
+            // どこまで聞いたかを保存
+            localStorage.setItem('com_last_id', w.id);
+
+            // ① 日本語で意味
+            await speak(w.jp, 'ja-JP', 1.0); if (!comActive) break;
+            // ② 英語ネイティブ
+            await speak(w.en, 'en-US', 1.0); if (!comActive) break;
+            // ③ 英語ネイティブ(ゆっくり)
+            await speak(w.en, 'en-US', 0.5); if (!comActive) break;
+            // ④ 例文日本語
+            await speak(w.exJp, 'ja-JP', 1.0); if (!comActive) break;
+            // ⑤ 例文英語ネイティブ
+            await speak(w.exEn, 'en-US', 1.0); if (!comActive) break;
+            // ⑥ 例文英語ネイティブ(ゆっくり)
+            await speak(w.exEn, 'en-US', 0.5); if (!comActive) break;
+
+            // 次の単語へ行く前に1.5秒ポーズ
+            await new Promise(r => setTimeout(r, 1500));
+            
+            comIdx++;
+            if (comIdx >= comQ.length) comIdx = 0; // 最後までいったら最初から
+        }
+    }
+
+    /* ==============================================================
+       6. テスト機能
+       ============================================================== */
+    let tQ = [];
+    let tIdx = 0;
+    let tW = null;
+    let tMode = 'type';
+
+    function startTest() {
+        const g = document.getElementById('test-grade').value;
+        const r = document.getElementById('test-rank').value;
+        tMode = document.getElementById('test-mode').value;
+        
+        tQ = words.filter(w => (g === 'all' || w.grade === g) && (r === 'all' || w.flag === r));
+        
+        if (!tQ.length) {
+            alert('指定した条件の単語がありません');
+            return;
+        }
+        
+        // 問題をシャッフル
+        tQ.sort(() => Math.random() - 0.5);
+        tIdx = 0;
+        
+        document.getElementById('test-area').style.display = 'block';
+        nextTest();
+    }
+
+    function nextTest() {
+        tW = tQ[tIdx];
+        document.getElementById('t-res').innerText = '';
+        document.getElementById('t-input').value = '';
+        document.getElementById('t-btn-next').style.display = 'none';
+        document.getElementById('t-btn-check').style.display = 'block';
+        document.getElementById('t-counter').innerText = `第 ${tIdx + 1} 問 / 全 ${tQ.length} 問`;
+        
+        if (tMode === 'type') {
+            // タイピングモード
+            document.getElementById('t-input').style.display = 'block';
+            document.getElementById('t-q').innerText = tW.jp;
+            document.getElementById('t-btn-check').innerText = '判定する';
+            document.getElementById('t-input').focus();
+        } else {
+            // 読み取りモード
+            document.getElementById('t-input').style.display = 'none';
+            document.getElementById('t-q').innerText = tW.en;
+            document.getElementById('t-btn-check').innerText = '意味を確認する';
+        }
+    }
+
+    function checkTest() {
+        const res = document.getElementById('t-res');
+        const checkBtn = document.getElementById('t-btn-check');
+        const nextBtn = document.getElementById('t-btn-next');
+        
+        if (tMode === 'type') {
+            const ans = document.getElementById('t-input').value.trim().toLowerCase();
+            if (ans === tW.en.toLowerCase()) {
+                res.innerText = '〇 正解！';
+                res.style.color = 'var(--flag-D)';
+                // 正解の音声を流す
+                speak(tW.en, 'en-US', 1.0);
+            } else {
+                res.innerText = `× 不正解\n正解は: ${tW.en}`;
+                res.style.color = 'var(--flag-A)';
+                speak(tW.en, 'en-US', 1.0);
+            }
+        } else {
+            res.innerText = `意味: ${tW.jp}`;
+            res.style.color = 'var(--text-color)';
+            speak(tW.en, 'en-US', 1.0);
+        }
+        
+        checkBtn.style.display = 'none';
+        nextBtn.style.display = 'block';
+        
+        tIdx++;
+        if (tIdx >= tQ.length) {
+            nextBtn.innerText = 'テスト終了 (最初からやり直す)';
+            tIdx = 0;
+        } else {
+            nextBtn.innerText = '次の問題へ';
+        }
+    }
+
+    // アプリ起動時の初期化
+    initVoice();
+    filterStudy();
+
+</script>
 </body>
 </html>
