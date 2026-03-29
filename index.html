@@ -239,4 +239,598 @@
         <button class="btn-duo btn-gray" style="padding: 10px; margin-bottom: 15px;" onclick="goHome('play')">🔙 戻る</button>
         <h2 style="text-align: center; color: var(--duo-blue); margin-top:0;">AIロールプレイ</h2>
         <div class="chat-box" id="chat-box"></div>
-        <div class="chat-input-area
+        <div class="chat-input-area" id="chat-ui-area">
+            <button id="mic-btn" class="btn-duo btn-gray" style="flex:0.2; padding:12px 0; border-radius:12px; margin-bottom:0;" onclick="startDictation('chat')">🎤</button>
+            <input type="text" id="chat-input" placeholder="英語で返信..." style="flex:1; margin-bottom:0;" onkeypress="if(event.key === 'Enter') sendChat()">
+            <button class="btn-duo btn-green" style="flex:0.3; padding:12px 0; border-radius:12px; margin-bottom:0;" onclick="sendChat()">送信</button>
+        </div>
+        <div style="background: #e8f5e9; border: 2px solid var(--duo-green); border-radius: 12px; padding: 15px; margin-top: 15px; display: none;" id="chat-feedback">
+            <h3 style="color: var(--duo-green); margin-top:0;">🎉 ミッション完了！</h3>
+            <p><strong>使えた単語:</strong> <span id="used-words-list" style="color:var(--duo-blue);"></span></p>
+            <p><strong>💡 AIアドバイス:</strong><br><span id="grammar-advice"></span></p>
+            <button class="btn-duo btn-gray" style="margin-top:10px;" onclick="initChatGame()">もう一度</button>
+        </div>
+    </div>
+
+    <div id="view-match" class="sub-view">
+        <button class="btn-duo btn-gray" style="padding: 10px; margin-bottom: 15px;" onclick="goHome('play')">🔙 戻る</button>
+        <h2 style="text-align: center; color: var(--duo-purple); margin-top:0;">ペア合わせゲーム</h2>
+        <div style="text-align: center; font-weight: bold; margin-bottom: 10px; color: var(--duo-blue);" id="match-counter">残り: 20問</div>
+        <div class="match-grid" id="match-board"></div>
+        <div id="match-done" style="display: none; text-align: center;"><h1 style="color: var(--duo-yellow); font-size: 3rem; margin:0;">💎 +50 XP</h1><button class="btn-duo btn-purple" style="margin-top:20px;" onclick="initMatchGame()">もう一度</button></div>
+    </div>
+
+    <div id="view-puzzle" class="sub-view">
+        <button class="btn-duo btn-gray" style="padding: 10px; margin-bottom: 15px;" onclick="goHome('play')">🔙 戻る</button>
+        <h2 style="text-align: center; color: var(--duo-orange); margin-top:0;">ご褒美パズル</h2>
+        <div class="puzzle-wrapper"><img src="https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=600&q=80" class="puzzle-image" alt="絶景"><div class="puzzle-grid" id="puzzle-grid"></div></div>
+        <div class="puzzle-info" id="puzzle-info">🇵🇪 マチュピチュ (ペルー)<br><span style="font-size:0.9rem; color:var(--text-light); font-weight:normal;">インカ帝国の古代遺跡。標高2400m。</span></div>
+    </div>
+
+    <div id="view-data" class="view">
+        <h2 style="text-align: center; color: var(--text-color);">データ管理</h2>
+        
+        <div class="hub-section-title">📥 単語データの追加</div>
+        <div style="background: var(--light-gray); padding: 10px; border-radius: 12px; margin-bottom: 10px; text-align:center;">
+            <strong>収録: <span id="count-total" style="color:var(--duo-blue);">0</span> 語</strong> (5級:<span id="count-5">0</span> / 4級:<span id="count-4">0</span> / 3級:<span id="count-3">0</span>)
+        </div>
+        <textarea id="import-csv" rows="4" placeholder="英語	日本語	カタカナ	例文英	例文日	級"></textarea>
+        <button class="btn-duo btn-green" onclick="importCSV()">単語を記録する</button>
+        
+        <div class="hub-section-title">📚 長文ストーリーの作成</div>
+        <div class="create-story-box">
+            <input type="text" id="st-title" placeholder="タイトル (例: トムのりんご)">
+            <select id="st-grade"><option value="5級">5級</option><option value="4級">4級</option><option value="3級">3級</option></select>
+            <textarea id="st-text" rows="5" placeholder="英語の長文を入力してください..."></textarea>
+            
+            <p style="font-size:0.9rem; font-weight:bold; margin-bottom:5px;">📝 クイズを作成 (最低1問〜最大5問)</p>
+            <div id="st-quiz-container"></div>
+            <button class="btn-duo btn-gray" style="padding:10px; margin-bottom:15px;" onclick="addQuizField()">+ 問題を追加する</button>
+            <button class="btn-duo btn-blue" onclick="saveCustomStory()">ストーリーを登録する</button>
+        </div>
+
+        <hr style="border: 1px dashed var(--border-color); margin: 30px 0;">
+        <button class="btn-duo btn-red" onclick="clearAllData()">すべてのデータを消去</button>
+    </div>
+</div>
+
+<div id="pocket-overlay">
+    <p>🎧 通勤自動再生中...</p>
+    <h2 id="pocket-word" style="color: var(--duo-green); margin: 30px 0; text-align:center;"></h2>
+    <button class="btn-duo btn-red" style="width:80%;" onclick="stopCommute()">停止して戻る</button>
+</div>
+
+<nav class="tab-bar">
+    <button class="tab-btn active" onclick="goHome('study')"><span class="tab-icon">🏠</span>学ぶ</button>
+    <button class="tab-btn" onclick="goHome('play')"><span class="tab-icon">🎮</span>お楽しみ</button>
+    <button class="tab-btn" onclick="showTab('view-data', this)"><span class="tab-icon">⚙️</span>記録</button>
+</nav>
+
+<script>
+    // ==========================================
+    // 🧠 状態管理・初期化
+    // ==========================================
+    const defaultWords = [{ id: 1, en: 'apple', jp: 'りんご', rubi: 'アップル', exEn: 'An apple.', exJp: 'りんご。', grade: '5級', box: 0, nextReview: 0 }];
+    let words = [];
+    try { const stored = localStorage.getItem('vocab_srs_duo_v5'); words = stored ? JSON.parse(stored) : defaultWords; if(words.length===0) words = defaultWords; } catch(e) { words = defaultWords; }
+
+    let reviewQueue = []; let currentWord = null; let totalQueueCount = 0; let currentStudyMode = 'word';
+    let xp = parseInt(localStorage.getItem('vocab_xp_v5')) || 0; document.getElementById('xp-count').innerText = xp;
+
+    let synth = window.speechSynthesis; let bestVoice = null; let isMuted = false;
+    let recognition = null;
+
+    function initVoice() {
+        const vs = synth.getVoices();
+        bestVoice = vs.find(v => v.lang === 'en-US' && (v.name.includes('Premium') || v.name.includes('Samantha'))) || vs.find(v => v.lang.startsWith('en'));
+    }
+    if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = initVoice;
+
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SR(); recognition.lang = 'en-US'; recognition.interimResults = false;
+    }
+
+    function toggleMute() { isMuted = !isMuted; document.getElementById('mute-btn').innerText = isMuted ? '🔇' : '🔊'; if(isMuted) synth.cancel(); }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 3000);
+    }
+
+    function addXP(amount) {
+        const oldPieces = Math.floor(xp / 100); xp += amount; localStorage.setItem('vocab_xp_v5', xp); document.getElementById('xp-count').innerText = xp;
+        const newPieces = Math.floor(xp / 100);
+        if(newPieces > oldPieces && newPieces <= 9) { showToast("🧩 パズルのピースを獲得しました！"); renderPuzzle(); }
+    }
+
+    function showTab(id, btnObj=null) {
+        document.querySelectorAll('.view, .sub-view').forEach(v => v.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(btnObj) { document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btnObj.classList.add('active'); }
+        if(id === 'view-data') { updateWordCounts(); initStoryQuizFields(); }
+    }
+
+    function goHome(target = 'study') {
+        if(target === 'play') { showTab('view-play', document.querySelectorAll('.tab-btn')[1]); }
+        else { showTab('view-home', document.querySelectorAll('.tab-btn')[0]); }
+    }
+
+    function saveWords() { localStorage.setItem('vocab_srs_duo_v5', JSON.stringify(words)); }
+
+    function updateWordCounts() {
+        const c = { total: words.length, g5: 0, g4: 0, g3: 0 };
+        words.forEach(w => { if(w.grade === '5級') c.g5++; else if(w.grade === '4級') c.g4++; else if(w.grade === '3級') c.g3++; });
+        document.getElementById('count-total').innerText = c.total; document.getElementById('count-5').innerText = c.g5; document.getElementById('count-4').innerText = c.g4; document.getElementById('count-3').innerText = c.g3;
+    }
+
+    // ==========================================
+    // 📖 学習エンジン (単語/リス/スピ統合)
+    // ==========================================
+    function startSubMode(mode) {
+        currentStudyMode = mode;
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('view-study').classList.add('active');
+        
+        // 単語学習の時だけ3つの出題モード選択を表示
+        if(mode === 'word') document.getElementById('study-mode').style.display = 'block';
+        else document.getElementById('study-mode').style.display = 'none';
+
+        loadStudyQueue();
+    }
+
+    function loadStudyQueue(forceAll = false) {
+        if(words.length === 0) return;
+        const grade = document.getElementById('hub-grade-filter').value;
+        const now = Date.now();
+        reviewQueue = words.filter(w => (grade === 'all' || w.grade === grade) && (forceAll || !w.nextReview || w.nextReview <= now));
+        reviewQueue.sort(() => Math.random() - 0.5);
+        totalQueueCount = reviewQueue.length;
+        
+        if(reviewQueue.length === 0) {
+            document.getElementById('study-area').style.display = 'none';
+            document.getElementById('progress-bar').style.width = '100%';
+            document.getElementById('all-done').style.display = 'block';
+        } else {
+            document.getElementById('study-area').style.display = 'block';
+            document.getElementById('all-done').style.display = 'none';
+            showNextCard();
+        }
+    }
+
+    // 【要望】新しい単語を練習 (未出題を優先)
+    function loadNewLesson() {
+        const grade = document.getElementById('hub-grade-filter').value;
+        let pool = words.filter(w => grade === 'all' || w.grade === grade);
+        let unlearned = pool.filter(w => !w.nextReview || w.nextReview === 0);
+        if(unlearned.length === 0) { alert("全て学習済みです！復習するか新しい単語を追加してください。"); return; }
+        
+        unlearned.sort(() => Math.random() - 0.5);
+        reviewQueue = unlearned.slice(0, 10); totalQueueCount = reviewQueue.length;
+        document.getElementById('study-area').style.display = 'block'; document.getElementById('all-done').style.display = 'none';
+        showNextCard();
+    }
+
+    function showNextCard() {
+        if(reviewQueue.length === 0) { loadStudyQueue(); return; }
+        currentWord = reviewQueue[0];
+        
+        document.getElementById('answer-area').style.display = 'none';
+        document.getElementById('srs-controls').style.display = 'none';
+        document.getElementById('interaction-area').style.display = 'none';
+        document.getElementById('type-input').style.display = 'none';
+        document.getElementById('speak-mic-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('audio-controls').style.display = 'flex';
+        document.getElementById('tap-hint').style.display = 'block';
+        document.getElementById('flashcard').onclick = flipCard;
+        document.getElementById('sc-grade').innerText = currentWord.grade;
+
+        const fMain = document.getElementById('sc-front-main'); const fSub = document.getElementById('sc-front-sub');
+        const bMain = document.getElementById('sc-back-main'); const eEn = document.getElementById('sc-ex-en'); const eJp = document.getElementById('sc-ex-jp');
+
+        // 裏面（答え）
+        bMain.innerText = currentWord.en; eEn.innerText = currentWord.exEn || ""; eJp.innerText = currentWord.exJp || "";
+
+        if(currentStudyMode === 'word') {
+            const sm = document.getElementById('study-mode').value;
+            if(sm === 'jp-en-type') {
+                fMain.innerText = currentWord.jp; fSub.innerHTML = "";
+                setupInteraction('type', true);
+            } else {
+                const isEnToJp = (sm === 'en-jp');
+                fMain.innerText = isEnToJp ? currentWord.en : currentWord.jp;
+                fSub.innerHTML = isEnToJp ? (currentWord.rubi ? currentWord.rubi.replace(/\[(.*?)\]/g, "<b>$1</b>") : "") : "";
+            }
+        } else if(currentStudyMode === 'listen') {
+            fMain.innerText = "🔊 音声を聞いて入力"; fSub.innerHTML = "";
+            setupInteraction('type', true);
+            if(!isMuted) playAudio('word');
+        } else if(currentStudyMode === 'speak') {
+            fMain.innerText = currentWord.en; fSub.innerHTML = "👆 マイクを押して発音してね";
+            setupInteraction('speak');
+            document.getElementById('audio-controls').style.display = 'none';
+        }
+
+        const percent = ((totalQueueCount - reviewQueue.length) / totalQueueCount) * 100;
+        document.getElementById('progress-bar').style.width = `${percent}%`;
+    }
+
+    function setupInteraction(type, hideHint = false) {
+        document.getElementById('interaction-area').style.display = 'block';
+        document.getElementById('interaction-feedback').innerText = '';
+        document.getElementById('flashcard').onclick = null;
+        if(hideHint) document.getElementById('tap-hint').style.display = 'none';
+        
+        if(type === 'type') {
+            const input = document.getElementById('type-input');
+            input.style.display = 'block'; input.value = '';
+            document.getElementById('check-btn').style.display = 'block';
+        } else if (type === 'speak') {
+            document.getElementById('speak-mic-btn').style.display = 'block';
+            document.getElementById('speak-mic-btn').innerText = '🎤';
+        }
+    }
+
+    function checkInteractionAnswer(spokenText = null) {
+        let ans = spokenText || document.getElementById('type-input').value.trim();
+        if(!ans) return;
+        const cleanAns = ans.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+        const correct = currentWord.en.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+        const fb = document.getElementById('interaction-feedback');
+        
+        if(cleanAns === correct || cleanAns.includes(correct)) {
+            fb.innerText = `🎉 正解！ (${ans})`; fb.style.color = "var(--duo-green)";
+            if(!isMuted) playAudio('word'); setTimeout(showAnswerArea, 1000);
+        } else {
+            fb.innerText = `❌ おしい！ 正解は: ${currentWord.en}`; fb.style.color = "var(--duo-red)";
+            if(!isMuted) playAudio('word'); setTimeout(showAnswerArea, 1500);
+        }
+    }
+
+    function startSpeakingCheck() {
+        if(!recognition) { alert("ブラウザが音声入力非対応です。"); return; }
+        const btn = document.getElementById('speak-mic-btn');
+        btn.innerText = '🔴'; btn.classList.add('mic-active');
+        recognition.onresult = (e) => { btn.classList.remove('mic-active'); btn.innerText = '🎤'; checkInteractionAnswer(e.results[0][0].transcript); };
+        recognition.onerror = () => { btn.classList.remove('mic-active'); btn.innerText = '🎤'; };
+        recognition.start();
+    }
+
+    function flipCard() { if(document.getElementById('answer-area').style.display === 'block') return; showAnswerArea(); if(!isMuted && currentStudyMode === 'word') playAudio('word'); }
+
+    function showAnswerArea() {
+        document.getElementById('interaction-area').style.display = 'none';
+        document.getElementById('tap-hint').style.display = 'none';
+        document.getElementById('answer-area').style.display = 'block';
+        document.getElementById('srs-controls').style.display = 'grid';
+        document.getElementById('audio-controls').style.display = 'flex';
+    }
+
+    function answerSrs(q) {
+        const now = Date.now(); const intervals = [10*60*1000, 24*60*60*1000, 3*24*60*60*1000, 7*24*60*60*1000];
+        if(q === 0) { currentWord.box = 0; currentWord.nextReview = now + 60000; } 
+        else { currentWord.box = (currentWord.box || 0) + (q === 3 ? 2 : 1); currentWord.nextReview = now + intervals[Math.min(currentWord.box, intervals.length-1)]; addXP(10); }
+        saveWords(); reviewQueue.shift(); if(reviewQueue.length > 0) showNextCard(); else loadStudyQueue();
+    }
+
+    function playAudio(type, customRate = null) {
+        if(isMuted || !currentWord) return;
+        const text = type === 'word' ? currentWord.en : currentWord.exEn; if(!text) return;
+        synth.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = customRate !== null ? customRate : 1.0; if(bestVoice) u.voice = bestVoice; synth.speak(u);
+    }
+
+    // ==========================================
+    // 📚 長文ストーリー ＆ AI文脈推測翻訳
+    // ==========================================
+    const defaultStories = [
+        {
+            grade: "5級", title: "A Day at the Park (公園での一日)",
+            text: "Today is Sunday. The weather is very fine and warm. Tom and his family go to the big park near their house. Tom's father drives a car. In the park, many people are walking and running. Tom sees a small dog under a tall tree. The dog is very cute. Tom's sister, Mary, plays with a ball. They eat a delicious lunch together. Tom's mother makes sandwiches and apple juice. After lunch, they sit on the green grass and read books. It is a very happy and peaceful day for the family.",
+            quiz: [
+                {q: "What day is today?", o: ["Monday", "Sunday", "Friday"], a: 1},
+                {q: "Where does the family go?", o: ["To the hospital", "To the station", "To the park"], a: 2},
+                {q: "What does Tom see under the tree?", o: ["A small dog", "A big cat", "A bird"], a: 0},
+                {q: "What do they eat for lunch?", o: ["Fish and rice", "Sandwiches and juice", "Cake and tea"], a: 1},
+                {q: "What do they do after lunch?", o: ["Swim in the river", "Read books", "Play tennis"], a: 1}
+            ]
+        },
+        {
+            grade: "4級", title: "The Mystery of the Old Clock (古い時計の謎)",
+            text: "Ken lives in a small and old town. In his town, there is a famous clock tower. The clock is very old and beautiful, but it is broken. It stopped working fifty years ago. One night, Ken heard a strange sound from the tower. He was surprised and a little afraid. He went to the tower carefully. Inside the tower, he found a small door. He opened the door and saw an old man. The man was fixing the clock. The man said, 'I am a clock maker. I want to save this clock.' Ken decided to help him. They worked hard together. Finally, the clock started to move again. The town people were very happy to hear the sound of the clock.",
+            quiz: [
+                {q: "What is in Ken's town?", o: ["A famous castle", "An old clock tower", "A large hospital"], a: 1},
+                {q: "When did the clock stop working?", o: ["Fifty years ago", "Last week", "Yesterday"], a: 0},
+                {q: "How did Ken feel when he heard the sound?", o: ["Angry", "Surprised and afraid", "Very happy"], a: 1},
+                {q: "Who was inside the tower?", o: ["A police officer", "A clock maker", "Ken's father"], a: 1},
+                {q: "What did Ken do?", o: ["He ran away", "He called the police", "He helped the man"], a: 2}
+            ]
+        },
+        {
+            grade: "3級", title: "A Journey to the Future (未来への旅)",
+            text: "In the 22nd century, the global environment has changed a lot. Science and technology are highly developed. Lisa is a young scientist. Her ambition is to build a machine that can travel through time. After years of hard work and many failures, she finally completed the machine. She decided to go to the future to see the result of global warming. When she arrived in the future, she was shocked. The sea level was very high, and many islands were under the water. However, she also saw hope. People in the future created a new system to clean the air and water. They lived in harmony with nature. Lisa returned to her own time with valuable knowledge. She promised to share her experience to protect the Earth.",
+            quiz: [
+                {q: "When does the story begin?", o: ["In the 20th century", "In the 21st century", "In the 22nd century"], a: 2},
+                {q: "What is Lisa's profession?", o: ["A doctor", "A scientist", "A teacher"], a: 1},
+                {q: "Why did she go to the future?", o: ["To see the result of global warming", "To meet her grandchildren", "To find a treasure"], a: 0},
+                {q: "What shocked her in the future?", o: ["The sea level was very high", "There were no cars", "People were fighting"], a: 0},
+                {q: "What did she promise to do?", o: ["To destroy the machine", "To protect the Earth", "To live in the future"], a: 1}
+            ]
+        }
+    ];
+
+    let customStories = JSON.parse(localStorage.getItem('vocab_custom_stories_v5')) || [];
+    let currentStoryQuizIdx = 0; let currentStoryObj = null;
+
+    function renderStorySelector() {
+        const sel = document.getElementById('story-selector'); sel.innerHTML = '';
+        const allStories = [...defaultStories, ...customStories];
+        allStories.forEach((st, idx) => {
+            const opt = document.createElement('option'); opt.value = idx; opt.innerText = `【${st.grade}】${st.title}`;
+            sel.appendChild(opt);
+        });
+    }
+
+    function showSubView(id) {
+        document.querySelectorAll('.view, .sub-view').forEach(v => v.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(id === 'view-match') initMatchGame();
+        if(id === 'view-puzzle') renderPuzzle();
+        if(id === 'view-stories') { renderStorySelector(); loadStory(); }
+        if(id === 'view-chat') initChatGame();
+    }
+
+    function loadStory() {
+        const idx = document.getElementById('story-selector').value;
+        const allStories = [...defaultStories, ...customStories];
+        currentStoryObj = allStories[idx];
+        const box = document.getElementById('story-box');
+        
+        const textWords = currentStoryObj.text.split(/([ \n\.,!?])/);
+        let html = "";
+        textWords.forEach(w => {
+            if(w.match(/[a-zA-Z]/)) html += `<span class="story-word" onclick="lookupWord('${w}', this)">${w}</span>`;
+            else html += w;
+        });
+        box.innerHTML = html;
+        
+        document.getElementById('story-box').style.display = 'block';
+        document.getElementById('btn-start-quiz').style.display = 'block';
+        document.getElementById('story-quiz-area').style.display = 'none';
+        document.getElementById('story-done').style.display = 'none';
+        currentStoryQuizIdx = 0;
+    }
+
+    // 【提案】AIによる文脈推測（外部翻訳APIの非同期呼び出し）
+    async function lookupWord(wordStr, el) {
+        const cleanWord = wordStr.toLowerCase().replace(/[^a-z]/g, '');
+        const tip = document.getElementById('dict-tooltip');
+        
+        if(!isMuted) { synth.cancel(); const u = new SpeechSynthesisUtterance(cleanWord); u.lang='en-US'; synth.speak(u); }
+
+        const found = words.find(w => w.en.toLowerCase() === cleanWord);
+        
+        if (found) { 
+            tip.innerText = found.jp; tip.style.background = 'var(--duo-blue)'; 
+        } else { 
+            tip.innerText = "検索中..."; tip.style.background = '#333'; 
+            try {
+                const res = await fetch(`https://api.mymemory.translated.net/get?q=${cleanWord}&langpair=en|ja`);
+                const data = await res.json();
+                if(data && data.responseData && data.responseData.translatedText) {
+                    tip.innerText = `(未登録) ${data.responseData.translatedText}`;
+                } else { tip.innerText = "(未登録)"; }
+            } catch(e) { tip.innerText = "(未登録: エラー)"; }
+        }
+        
+        const rect = el.getBoundingClientRect();
+        tip.style.left = `${rect.left + (rect.width/2)}px`; tip.style.top = `${rect.top - 5}px`;
+        tip.style.display = 'block';
+        setTimeout(() => tip.style.display = 'none', 3000);
+    }
+
+    function startStoryQuiz() {
+        if(!currentStoryObj.quiz || currentStoryObj.quiz.length === 0) {
+            document.getElementById('story-box').style.display = 'none';
+            document.getElementById('btn-start-quiz').style.display = 'none';
+            document.getElementById('story-done').style.display = 'block';
+            addXP(50); showToast("✨ 読了ボーナス！ +50XP"); return;
+        }
+        document.getElementById('story-box').style.display = 'none';
+        document.getElementById('btn-start-quiz').style.display = 'none';
+        document.getElementById('story-quiz-area').style.display = 'block';
+        renderStoryQuiz();
+    }
+
+    function renderStoryQuiz() {
+        if(currentStoryQuizIdx >= currentStoryObj.quiz.length) {
+            document.getElementById('story-quiz-area').style.display = 'none';
+            document.getElementById('story-done').style.display = 'block';
+            addXP(100); showToast("✨ ストーリー完全クリア！ +100XP"); return;
+        }
+        const qData = currentStoryObj.quiz[currentStoryQuizIdx];
+        document.getElementById('sq-progress').innerText = `問題 ${currentStoryQuizIdx + 1} / ${currentStoryObj.quiz.length}`;
+        document.getElementById('sq-q').innerText = qData.q;
+        
+        const opts = document.getElementById('sq-options'); opts.innerHTML = '';
+        qData.o.forEach((opt, i) => {
+            const btn = document.createElement('button'); btn.className = 'btn-duo btn-gray'; btn.style.margin = '0'; btn.innerText = opt;
+            btn.onclick = () => {
+                if(i === parseInt(qData.a)) { btn.classList.replace('btn-gray', 'btn-green'); setTimeout(()=>{ currentStoryQuizIdx++; renderStoryQuiz(); }, 800); }
+                else { btn.classList.replace('btn-gray', 'btn-red'); setTimeout(()=>btn.classList.replace('btn-red', 'btn-gray'), 800); }
+            };
+            opts.appendChild(btn);
+        });
+    }
+
+    // ==========================================
+    // ⚙️ 長文ストーリー作成 (データ管理)
+    // ==========================================
+    let qCount = 0;
+    function initStoryQuizFields() {
+        document.getElementById('st-quiz-container').innerHTML = ''; qCount = 0;
+        addQuizField(); // 最低1問
+    }
+    
+    function addQuizField() {
+        if(qCount >= 5) { alert("問題は最大5問までです。"); return; }
+        qCount++;
+        const div = document.createElement('div'); div.className = 'quiz-input-group';
+        div.innerHTML = `
+            <p style="margin:0 0 5px 0; font-size:0.9rem;">問題 ${qCount}</p>
+            <input type="text" id="st-q${qCount}" placeholder="問題文 (例: What color is the apple?)">
+            <input type="text" id="st-o${qCount}" placeholder="選択肢をカンマ区切り (例: Red,Blue,Green)">
+            <input type="number" id="st-a${qCount}" placeholder="正解の番号(1〜3)" min="1" max="5">
+        `;
+        document.getElementById('st-quiz-container').appendChild(div);
+    }
+
+    function saveCustomStory() {
+        const title = document.getElementById('st-title').value.trim();
+        const grade = document.getElementById('st-grade').value;
+        const text = document.getElementById('st-text').value.trim();
+        if(!title || !text) { alert("タイトルと本文は必須です！"); return; }
+
+        let quizzes = [];
+        for(let i=1; i<=qCount; i++) {
+            const q = document.getElementById(`st-q${i}`).value.trim();
+            const optsStr = document.getElementById(`st-o${i}`).value.trim();
+            const aNum = parseInt(document.getElementById(`st-a${i}`).value);
+            if(q && optsStr && !isNaN(aNum)) {
+                const options = optsStr.split(',').map(s=>s.trim());
+                quizzes.push({ q: q, o: options, a: aNum - 1 }); // 配列は0スタート
+            }
+        }
+
+        customStories.push({ grade: grade, title: title, text: text, quiz: quizzes });
+        localStorage.setItem('vocab_custom_stories_v5', JSON.stringify(customStories));
+        alert("新しいストーリーを登録しました！");
+        
+        // リセット
+        document.getElementById('st-title').value = ''; document.getElementById('st-text').value = '';
+        initStoryQuizFields();
+    }
+
+    // ==========================================
+    // 🧩 マッチング＆パズル＆会話
+    // ==========================================
+    let matchRemaining = 20; let selectedLeft = null; let selectedRight = null;
+    function initMatchGame() {
+        if(words.length === 0) return; matchRemaining = 20; document.getElementById('match-counter').innerText = `残り: ${matchRemaining}問`;
+        document.getElementById('match-board').style.display = 'grid'; document.getElementById('match-done').style.display = 'none'; loadNextMatchSet();
+    }
+    function loadNextMatchSet() {
+        if(matchRemaining <= 0) { document.getElementById('match-board').style.display = 'none'; document.getElementById('match-done').style.display = 'block'; addXP(50); return; }
+        let currentMatchSet = []; for(let i=0; i<Math.min(6, matchRemaining); i++) { currentMatchSet.push(words[Math.floor(Math.random() * words.length)]); }
+        const board = document.getElementById('match-board'); board.innerHTML = ''; selectedLeft = null; selectedRight = null;
+        let leftItems = currentMatchSet.map((w, idx) => ({ uid: idx, text: w.jp, side: 'left' })).sort(() => Math.random() - 0.5);
+        let rightItems = currentMatchSet.map((w, idx) => ({ uid: idx, text: w.en, side: 'right' })).sort(() => Math.random() - 0.5);
+        for(let i=0; i<leftItems.length; i++) {
+            let lb = document.createElement('div'); lb.className = 'match-btn'; lb.innerText = leftItems[i].text; lb.onclick = () => handleMatchClick(lb, leftItems[i]); board.appendChild(lb);
+            let rb = document.createElement('div'); rb.className = 'match-btn'; rb.innerText = rightItems[i].text; rb.onclick = () => handleMatchClick(rb, rightItems[i]); board.appendChild(rb);
+        }
+    }
+    function handleMatchClick(btn, item) {
+        if(btn.classList.contains('matched') || btn.classList.contains('selected')) return;
+        if(item.side === 'left') { if(selectedLeft) selectedLeft.btn.classList.remove('selected'); selectedLeft = { btn, uid: item.uid }; btn.classList.add('selected'); } 
+        else { if(selectedRight) selectedRight.btn.classList.remove('selected'); selectedRight = { btn, uid: item.uid }; btn.classList.add('selected'); }
+        if(selectedLeft && selectedRight) {
+            if(selectedLeft.uid === selectedRight.uid) {
+                selectedLeft.btn.classList.replace('selected', 'matched'); selectedRight.btn.classList.replace('selected', 'matched');
+                if(!isMuted) { synth.cancel(); const u = new SpeechSynthesisUtterance(selectedRight.btn.innerText); u.lang = 'en-US'; synth.speak(u); }
+                matchRemaining--; document.getElementById('match-counter').innerText = `残り: ${matchRemaining}問`;
+                selectedLeft = null; selectedRight = null;
+                if(document.querySelectorAll('.match-btn:not(.matched)').length === 0) setTimeout(loadNextMatchSet, 400);
+            } else {
+                const lBtn = selectedLeft.btn; const rBtn = selectedRight.btn;
+                lBtn.classList.remove('selected'); rBtn.classList.remove('selected'); lBtn.classList.add('error'); rBtn.classList.add('error');
+                setTimeout(() => { lBtn.classList.remove('error'); rBtn.classList.remove('error'); }, 300);
+                selectedLeft = null; selectedRight = null;
+            }
+        }
+    }
+
+    function renderPuzzle() {
+        const grid = document.getElementById('puzzle-grid'); grid.innerHTML = '';
+        let unlockedPieces = Math.floor(xp / 100); if (unlockedPieces > 9) unlockedPieces = 9;
+        for(let i=0; i<9; i++) {
+            const piece = document.createElement('div'); piece.className = 'puzzle-piece';
+            if(i < unlockedPieces) piece.classList.add('revealed'); else piece.innerText = "?";
+            grid.appendChild(piece);
+        }
+        document.getElementById('puzzle-info').style.display = (unlockedPieces >= 9) ? 'block' : 'none';
+    }
+
+    let chatUsedWords = new Set(); let chatTurn = 0;
+    const aiScripts = ["That's interesting! Tell me more about it.", "Sounds great! What is your favorite food?", "Awesome! You did a great job today!"];
+    function initChatGame() {
+        chatTurn = 0; chatUsedWords.clear();
+        document.getElementById('chat-box').innerHTML = '<div class="chat-msg msg-ai">Hi! I am your AI teacher. Let\'s talk in English!</div>';
+        document.getElementById('chat-ui-area').style.display = 'flex'; document.getElementById('chat-feedback').style.display = 'none';
+    }
+    function startDictation() {
+        if(!recognition) return;
+        const btn = document.getElementById('mic-btn'); btn.innerText = '🔴'; btn.classList.add('mic-active');
+        recognition.onresult = (e) => { document.getElementById('chat-input').value = e.results[0][0].transcript; btn.classList.remove('mic-active'); btn.innerText = '🎤'; };
+        recognition.onerror = () => { btn.classList.remove('mic-active'); btn.innerText = '🎤'; };
+        recognition.start();
+    }
+    function sendChat() {
+        const inputEl = document.getElementById('chat-input'); const text = inputEl.value.trim(); if(!text) return;
+        const box = document.getElementById('chat-box'); box.innerHTML += `<div class="chat-msg msg-user">${text}</div>`; inputEl.value = ''; box.scrollTop = box.scrollHeight;
+        const wordsInText = text.toLowerCase().match(/\b(\w+)\b/g) || []; words.forEach(w => { if(wordsInText.includes(w.en.toLowerCase())) chatUsedWords.add(w.en); });
+        let grammarNote = "";
+        if(text.charAt(0) !== text.charAt(0).toUpperCase()) grammarNote += "・文の始まりは大文字にしましょう。<br>";
+        if(!text.match(/[.!?]$/)) grammarNote += "・最後にはピリオド(.)をつけましょう。<br>";
+        setTimeout(() => {
+            if(chatUsedWords.size >= 3 || chatTurn >= 2) {
+                box.innerHTML += `<div class="chat-msg msg-ai">Perfect! Let's review your chat.</div>`;
+                document.getElementById('chat-ui-area').style.display = 'none'; document.getElementById('chat-feedback').style.display = 'block';
+                const usedArr = Array.from(chatUsedWords); document.getElementById('used-words-list').innerText = usedArr.length > 0 ? usedArr.join(', ') : "なし";
+                document.getElementById('grammar-advice').innerHTML = grammarNote || "完璧な文法です！"; addXP(30); box.scrollTop = box.scrollHeight;
+            } else { box.innerHTML += `<div class="chat-msg msg-ai">${aiScripts[chatTurn]}</div>`; chatTurn++; box.scrollTop = box.scrollHeight; }
+        }, 800);
+    }
+
+    // ==========================================
+    // 🎧 通勤モード ＆ インポート
+    // ==========================================
+    let comActive = false; let wakeLock = null;
+    async function startCommute() {
+        if(isMuted) { alert("ミュートされています。右上の🔊をタップしてください。"); return; }
+        comActive = true; document.getElementById('pocket-overlay').style.display = 'flex';
+        try { if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
+        const filter = document.getElementById('hub-grade-filter').value; const now = Date.now();
+        let queue = words.filter(w => (filter === 'all' || w.grade === filter) && (!w.nextReview || w.nextReview <= now));
+        if(queue.length === 0) queue = words.filter(w => filter === 'all' || w.grade === filter);
+        let cIdx = 0;
+        while(comActive && queue.length > 0) {
+            const w = queue[cIdx % queue.length]; document.getElementById('pocket-word').innerText = w.en;
+            await speakText(w.jp, 'ja-JP', 1.0); if(!comActive) break;
+            await speakText(w.en, 'en-US', 1.0); if(!comActive) break;
+            await speakText(w.en, 'en-US', 0.2); if(!comActive) break;
+            if(w.exJp) await speakText(w.exJp, 'ja-JP', 1.0); if(!comActive) break;
+            if(w.exEn) await speakText(w.exEn, 'en-US', 1.0); if(!comActive) break;
+            if(w.exEn) await speakText(w.exEn, 'en-US', 0.2); if(!comActive) break;
+            await new Promise(r => setTimeout(r, 1500)); cIdx++;
+        }
+    }
+    function stopCommute() { comActive = false; synth.cancel(); if(wakeLock) wakeLock.release(); document.getElementById('pocket-overlay').style.display = 'none'; }
+    async function speakText(t, l, r=1.0) { if(isMuted) return; return new Promise(res => { const u = new SpeechSynthesisUtterance(t); u.lang=l; u.rate=r; if(l.startsWith('en')&&bestVoice) u.voice=bestVoice; u.onend=res; u.onerror=res; synth.speak(u); }); }
+
+    function importCSV() {
+        const text = document.getElementById('import-csv').value.trim(); if(!text) return;
+        if(words.length <= 3 && words[0].en === 'apple') words = [];
+        const lines = text.split('\n'); let added = 0;
+        lines.forEach(line => {
+            const c = line.split(/\t|,/);
+            if(c.length >= 2 && c[0].trim() !== '') { words.push({ id: Date.now()+Math.random(), en: c[0].trim(), jp: c[1].trim(), rubi: c[2]?.trim(), exEn: c[3]?.trim(), exJp: c[4]?.trim(), grade: c[5]?.trim()||"5級", box: 0, nextReview: 0 }); added++; }
+        });
+        saveWords(); updateWordCounts(); alert(`${added} 件のデータを記録しました！`); document.getElementById('import-csv').value = '';
+    }
+    function clearAllData() { if(confirm("全データを消去しますか？")) { localStorage.clear(); location.reload(); } }
+
+    initVoice(); updateWordCounts();
+</script>
+</body>
+</html>
