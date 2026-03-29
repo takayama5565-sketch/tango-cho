@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>無限単語帳 Ultimate V8</title>
+    <title>無限単語帳 Ultimate V9</title>
     <style>
         /* 🦉 Duolingo風 カラー＆デザイン */
         :root {
@@ -33,17 +33,18 @@
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
         /* 立体的ボタン */
-        .btn-duo { background-color: var(--duo-blue); color: white; border: none; border-radius: 16px; border-bottom: 4px solid var(--duo-blue-shadow); padding: 14px 20px; font-size: 1.1rem; font-weight: 800; cursor: pointer; width: 100%; text-align: center; transition: transform 0.1s, border-bottom-width 0.1s; margin-bottom: 15px; box-sizing: border-box; }
+        .btn-duo { background-color: var(--duo-blue); color: white; border: none; border-radius: 16px; border-bottom: 4px solid var(--duo-blue-shadow); padding: 14px 20px; font-size: 1.1rem; font-weight: 800; cursor: pointer; width: 100%; text-align: center; transition: transform 0.1s, border-bottom-width 0.1s; margin-bottom: 15px; box-sizing: border-box; display: inline-block; }
         .btn-duo:active { transform: translateY(4px); border-bottom-width: 0px; margin-bottom: 19px; }
         .btn-green { background-color: var(--duo-green); border-bottom-color: var(--duo-green-shadow); }
         .btn-red { background-color: var(--duo-red); border-bottom-color: var(--duo-red-shadow); }
         .btn-orange { background-color: var(--duo-orange); border-bottom-color: var(--duo-orange-shadow); }
         .btn-purple { background-color: var(--duo-purple); border-bottom-color: var(--duo-purple-shadow); }
         .btn-gray { background-color: var(--light-gray); color: var(--text-color); border-bottom-color: var(--border-color); }
-        .btn-small-audio { background: var(--light-gray); border: 2px solid var(--border-color); border-radius: 50%; width: 36px; height: 36px; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-left: 10px; transition: background 0.2s; }
+        .btn-small-audio { background: var(--light-gray); border: 2px solid var(--border-color); border-radius: 50%; width: 36px; height: 36px; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-left: 10px; transition: background 0.2s; vertical-align: middle; }
         .btn-small-audio:active { background: var(--duo-blue); color: white; border-color: var(--duo-blue-shadow); }
 
         select, input[type="text"], input[type="number"], textarea { background: var(--card-bg); color: var(--text-color); border: 2px solid var(--border-color); border-radius: 12px; padding: 12px; font-size: 1rem; width: 100%; box-sizing: border-box; margin-bottom: 10px; font-weight: bold; }
+        .large-select { font-size: 1.1rem; padding: 15px; border-color: var(--duo-blue); color: var(--duo-blue); border-width: 3px; }
 
         /* ハブメニュー */
         .hub-section-title { font-size: 1.2rem; font-weight: 800; color: var(--duo-green); margin: 25px 0 10px 0; border-bottom: 2px dashed var(--border-color); padding-bottom: 5px; }
@@ -100,7 +101,6 @@
         .view, .sub-view { display: none; }
         .view.active, .sub-view.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
         #pocket-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; color: #fff; flex-direction: column; justify-content: center; align-items: center; }
         
         /* 🗣️ 発音エラーモーダル */
@@ -110,6 +110,8 @@
         .mic-active { background-color: #ffcdd2 !important; border-color: #f44336 !important; }
         .create-story-box { background: var(--light-gray); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
         .quiz-input-group { background: var(--card-bg); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border-color); }
+        .import-box { background: #f0f7fa; border: 2px solid var(--duo-blue); padding: 15px; border-radius: 16px; margin-bottom: 20px; }
+        .step-label { font-size: 1rem; font-weight: bold; color: var(--duo-blue); margin-bottom: 5px; display: block; }
     </style>
 </head>
 <body>
@@ -205,7 +207,6 @@
                 <div id="answer-area" style="display: none; width: 100%; margin-top: 15px; border-top: 2px dashed var(--border-color); padding-top: 15px;">
                     <p id="sc-back-sub" style="font-size: 1.1rem; font-weight:bold; color: var(--duo-orange); margin: 0 0 5px 0;"></p>
                     <h2 style="font-size: 1.8rem; font-weight: bold; color: var(--duo-blue); margin: 0;" id="sc-back-main"></h2>
-                    
                     <div style="display: flex; align-items: center; justify-content: center; margin-top: 15px;">
                         <p style="font-size: 1rem; color: var(--text-light); font-style: italic; margin: 0;" id="sc-ex-en"></p>
                         <button class="btn-small-audio" id="sc-ex-audio-btn" onclick="playExSlow(event)">🔊</button>
@@ -239,7 +240,7 @@
         <h2 style="text-align: center; color: var(--duo-blue); margin-top:0;">通勤(自動再生)モード</h2>
         <p style="text-align: center; color: var(--text-light); font-size:0.85rem;">スマホをポケットに入れても、音声が聞こえ続ける「集中モード」に移行します。</p>
         
-        <select id="com-grade-filter">
+        <select id="com-grade-filter" class="large-select">
             <option value="all">全ての級を聴く</option>
             <option value="1級">1級のみ</option><option value="準1級">準1級のみ</option><option value="2級">2級のみ</option><option value="準2級">準2級のみ</option>
             <option value="3級">3級のみ</option><option value="4級">4級のみ</option><option value="5級">5級のみ</option>
@@ -290,7 +291,7 @@
         <p style="text-align: center; color: var(--text-light); font-size:0.85rem;">相手の言葉をタップすると意味がわかります。</p>
         
         <select id="chat-grade-selector" onchange="initChatGame()" style="margin-bottom: 10px;">
-            <option value="1級">1級（社会問題・哲学について）</option><option value="準1級">準1級（歴史・科学について）</option>
+            <option value="1級">1級（社会・経済・哲学について）</option><option value="準1級">準1級（歴史・科学について）</option>
             <option value="2級">2級（環境・テクノロジーについて）</option><option value="準2級">準2級（文化・教育について）</option>
             <option value="3級">3級（将来の夢・経験・意見）</option>
             <option value="4級">4級（週末の予定・趣味・学校）</option>
@@ -334,22 +335,23 @@
     <div id="view-data" class="view">
         <h2 style="text-align: center; color: var(--text-color);">データ管理</h2>
         
-        <div class="hub-section-title">📥 単語データの追加</div>
-        <div style="background: var(--light-gray); padding: 10px; border-radius: 12px; margin-bottom: 10px; text-align:center;">
+        <div style="background: var(--light-gray); padding: 10px; border-radius: 12px; margin-bottom: 15px; text-align:center;">
             <strong>収録: <span id="count-total" style="color:var(--duo-blue);">0</span> 語</strong><br>
             <span style="font-size:0.8rem; color:var(--text-light);">
             (5級:<span id="count-5">0</span> / 4級:<span id="count-4">0</span> / 3級:<span id="count-3">0</span> / 準2級:<span id="count-p2">0</span> / 2級:<span id="count-2">0</span> / 準1級:<span id="count-p1">0</span> / 1級:<span id="count-1">0</span>)
             </span>
         </div>
         
-        <p style="font-size:0.9rem; font-weight:bold; margin:0 0 5px 0;">① 追加する級を選んでください</p>
-        <select id="import-grade-selector">
-            <option value="5級">5級</option><option value="4級">4級</option><option value="3級">3級</option>
-            <option value="準2級">準2級</option><option value="2級">2級</option><option value="準1級">準1級</option><option value="1級">1級</option>
-        </select>
-        <p style="font-size:0.9rem; font-weight:bold; margin:10px 0 5px 0;">② エクセルのデータを貼り付けてください<br><span style="font-size:0.8rem; color:var(--text-light);">(英語, 日本語, カタカナ, 例文英, 例文日)</span></p>
-        <textarea id="import-csv" rows="4" placeholder="apple	りんご	アップル	I eat an apple.	りんごを食べる"></textarea>
-        <button class="btn-duo btn-green" onclick="importCSV()">単語を記録する</button>
+        <div class="import-box" style="background:#f0f7fa; border:2px solid var(--duo-blue); padding:15px; border-radius:16px; margin-bottom:20px;">
+            <span class="step-label" style="display:block; font-weight:bold; color:var(--duo-blue); margin-bottom:5px;">① 追加する級を選んでください</span>
+            <select id="import-grade-selector" class="large-select">
+                <option value="5級">5級</option><option value="4級">4級</option><option value="3級">3級</option>
+                <option value="準2級">準2級</option><option value="2級">2級</option><option value="準1級">準1級</option><option value="1級">1級</option>
+            </select>
+            <span class="step-label" style="display:block; font-weight:bold; color:var(--duo-blue); margin:10px 0 5px 0;">② エクセルのデータを貼り付けてください<br><span style="font-size:0.8rem; color:var(--text-light);">(英語, 日本語, カタカナ, 例文英, 例文日)</span></span>
+            <textarea id="import-csv" rows="4" placeholder="apple	りんご	アップル	I eat an apple.	りんごを食べる"></textarea>
+            <button class="btn-duo btn-green" onclick="importCSV()">③ 重複を削除して記録する</button>
+        </div>
         
         <div class="hub-section-title">📚 長文ストーリーの作成</div>
         <div class="create-story-box">
@@ -389,15 +391,18 @@
     // ==========================================
     const defaultWords = [{ id: 1, en: 'apple', jp: 'りんご', rubi: 'アップル', exEn: 'An apple.', exJp: 'りんご。', grade: '5級', box: 0, nextReview: 0 }];
     let words = [];
-    try { const stored = localStorage.getItem('vocab_srs_duo_v8'); words = stored ? JSON.parse(stored) : defaultWords; if(words.length===0) words = defaultWords; } catch(e) { words = defaultWords; }
+    try { 
+        const stored = localStorage.getItem('vocab_srs_duo_v9'); 
+        words = stored ? JSON.parse(stored) : defaultWords; 
+        if(!Array.isArray(words) || words.length===0) words = defaultWords; 
+    } catch(e) { words = defaultWords; }
 
     let reviewQueue = []; let currentWord = null; let totalQueueCount = 0; let currentStudyMode = 'word';
-    let xp = parseInt(localStorage.getItem('vocab_xp_v8')) || 0; document.getElementById('xp-count').innerText = xp;
+    let xp = parseInt(localStorage.getItem('vocab_xp_v9')) || 0; document.getElementById('xp-count').innerText = xp;
 
     let synth = window.speechSynthesis; let bestVoice = null; let isMuted = false;
     let recognition = null;
 
-    // AI翻訳フォールバック辞書（より正確な翻訳用）
     const fallbackDict = { "together": "一緒に", "weather": "天気", "beautiful": "美しい", "family": "家族", "always": "いつも", "friends": "友達", "decided": "決めた", "started": "始まった", "worked": "働いた", "because":"なぜなら", "clapped":"拍手した", "achievement":"達成感" };
 
     function initVoice() {
@@ -414,16 +419,26 @@
     function toggleMute() { isMuted = !isMuted; document.getElementById('mute-btn').innerText = isMuted ? '🔇' : '🔊'; if(isMuted) synth.cancel(); }
     function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); }
     function addXP(amount) {
-        const oldPieces = Math.floor(xp / 100); xp += amount; localStorage.setItem('vocab_xp_v8', xp); document.getElementById('xp-count').innerText = xp;
+        const oldPieces = Math.floor(xp / 100); xp += amount; localStorage.setItem('vocab_xp_v9', xp); document.getElementById('xp-count').innerText = xp;
         const newPieces = Math.floor(xp / 100);
         if(newPieces > oldPieces && newPieces <= 9) { showToast("🧩 パズルのピースを獲得しました！"); renderPuzzle(); }
     }
 
+    // エラー防止用のタブ切り替え関数
     function showTab(id, btnObj=null) {
-        document.querySelectorAll('.view, .sub-view').forEach(v => v.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        if(btnObj) { document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btnObj.classList.add('active'); }
-        if(id === 'view-data') { updateWordCounts(); initStoryQuizFields(); }
+        try {
+            document.querySelectorAll('.view, .sub-view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(btnObj) { document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btnObj.classList.add('active'); }
+            
+            if(id === 'view-data') { updateWordCounts(); initStoryQuizFields(); }
+            if(id === 'view-match') initMatchGame();
+            if(id === 'view-puzzle') renderPuzzle();
+            if(id === 'view-stories') loadRandomStory();
+            if(id === 'view-chat') initChatGame();
+        } catch(e) {
+            console.error("画面読み込みエラー:", e);
+        }
     }
 
     function goHome(target = 'study') {
@@ -431,7 +446,7 @@
         else { showTab('view-home', document.querySelectorAll('.tab-btn')[0]); }
     }
 
-    function saveWords() { localStorage.setItem('vocab_srs_duo_v8', JSON.stringify(words)); }
+    function saveWords() { localStorage.setItem('vocab_srs_duo_v9', JSON.stringify(words)); }
 
     function updateWordCounts() {
         const c = { total: words.length, g5: 0, g4: 0, g3: 0, p2: 0, g2: 0, p1: 0, g1: 0 };
@@ -506,7 +521,7 @@
         bMain.innerText = currentWord.en; 
         eEn.innerText = currentWord.exEn || ""; eJp.innerText = currentWord.exJp || "";
         bSub.innerText = ""; 
-        exBtn.style.display = currentWord.exEn ? 'inline-block' : 'none'; // 例文がないときはボタン非表示
+        exBtn.style.display = currentWord.exEn ? 'inline-block' : 'none';
 
         if(currentStudyMode === 'word') {
             const sm = document.getElementById('study-mode').value;
@@ -517,10 +532,7 @@
                 const isEnToJp = (sm === 'en-jp');
                 fMain.innerText = isEnToJp ? currentWord.en : currentWord.jp;
                 fSub.innerHTML = isEnToJp ? (currentWord.rubi ? currentWord.rubi.replace(/\[(.*?)\]/g, "<b>$1</b>") : "") : "";
-                // 【要望】日本語 ➔ 英語の時、裏面にカタカナ発音(ルビ)を表示
-                if(!isEnToJp && currentWord.rubi) {
-                    bSub.innerText = currentWord.rubi.replace(/\[|\]/g, "");
-                }
+                if(!isEnToJp && currentWord.rubi) bSub.innerText = currentWord.rubi.replace(/\[|\]/g, "");
             }
         } else if(currentStudyMode === 'listen') {
             fMain.innerText = "🔊 音声を聞いて入力"; fSub.innerHTML = "";
@@ -550,11 +562,11 @@
         } else if (type === 'speak') {
             document.getElementById('speak-mic-btn').style.display = 'block';
             document.getElementById('speak-mic-btn').innerText = '🎤';
-            document.getElementById('check-btn').style.display = 'none'; // 音声入力は自動判定
+            document.getElementById('check-btn').style.display = 'none';
         }
     }
 
-    // 【要望】スピーキング判定と小学生でもわかる優しいフィードバック
+    // スピーキング判定と解説モーダル
     function checkInteractionAnswer(spokenText = null) {
         let ans = spokenText || document.getElementById('type-input').value.trim();
         if(!ans) return;
@@ -568,17 +580,15 @@
             if(!isMuted) playAudio('word'); setTimeout(showAnswerArea, 1000);
         } else {
             if(currentStudyMode === 'speak') {
-                // スピーキング時：間違えた単語を抽出してアドバイス (モーダルで表示)
                 const tWords = correct.split(' '); const sWords = cleanAns.split(' ');
                 let wrongWords = tWords.filter(w => !sWords.includes(w));
-                if(wrongWords.length === 0) wrongWords = [correct]; // 全然違う場合
+                if(wrongWords.length === 0) wrongWords = [correct];
                 
                 let advice = `AIの耳には<br><strong style="color:var(--duo-red); font-size:1.3rem;">「${wrongWords.join(', ')}」</strong><br>が ちょっと聞こえなかったみたい💦<br><br>口を大きくあけて、お腹から声を出して<br>もう一度 元気に言ってみよう！`;
                 
                 document.getElementById('speak-error-modal').style.display = 'flex';
                 document.getElementById('speak-error-text').innerHTML = advice;
                 if(!isMuted) playAudio('word');
-                // モーダルが閉じるまで待機（OKボタンで closeSpeakError() が呼ばれる）
             } else {
                 fb.innerHTML = `❌ おしい！ 正解は: ${currentWord.en}`;
                 fb.style.color = "var(--duo-red)"; fb.style.backgroundColor = "#ffebee";
@@ -593,7 +603,7 @@
     }
 
     function startSpeakingCheck() {
-        if(!recognition) { alert("このブラウザは音声入力非対応です。Safari等をお使いください。"); return; }
+        if(!recognition) { alert("ブラウザが音声入力非対応です。"); return; }
         const btn = document.getElementById('speak-mic-btn');
         btn.innerText = '🔴'; btn.classList.add('mic-active');
         recognition.onresult = (e) => { btn.classList.remove('mic-active'); btn.innerText = '🎤'; checkInteractionAnswer(e.results[0][0].transcript); };
@@ -624,21 +634,11 @@
         synth.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = customRate !== null ? customRate : 1.0; if(bestVoice) u.voice = bestVoice; synth.speak(u);
     }
 
-    // 【要望】例文の通常➔ゆっくり連続再生
     async function playExSlow(e) {
-        e.stopPropagation(); // カードがめくれるのを防ぐ
-        if(isMuted || !currentWord || !currentWord.exEn) return;
-        synth.cancel();
-        
-        await new Promise(res => {
-            const u1 = new SpeechSynthesisUtterance(currentWord.exEn); u1.lang = 'en-US'; u1.rate = 1.0; if(bestVoice) u1.voice = bestVoice;
-            u1.onend = res; u1.onerror = res; synth.speak(u1);
-        });
+        e.stopPropagation(); if(isMuted || !currentWord || !currentWord.exEn) return; synth.cancel();
+        await new Promise(res => { const u1 = new SpeechSynthesisUtterance(currentWord.exEn); u1.lang = 'en-US'; u1.rate = 1.0; if(bestVoice) u1.voice = bestVoice; u1.onend = res; u1.onerror = res; synth.speak(u1); });
         await new Promise(r => setTimeout(r, 500));
-        await new Promise(res => {
-            const u2 = new SpeechSynthesisUtterance(currentWord.exEn); u2.lang = 'en-US'; u2.rate = 0.2; if(bestVoice) u2.voice = bestVoice;
-            u2.onend = res; u2.onerror = res; synth.speak(u2);
-        });
+        await new Promise(res => { const u2 = new SpeechSynthesisUtterance(currentWord.exEn); u2.lang = 'en-US'; u2.rate = 0.2; if(bestVoice) u2.voice = bestVoice; u2.onend = res; u2.onerror = res; synth.speak(u2); });
     }
 
     // ==========================================
@@ -654,7 +654,6 @@
     // ==========================================
     // 📚 長文ストーリー ＆ AI文脈推測翻訳
     // ==========================================
-    // 全級分の空オブジェクトを用意してエラーを防止
     const storyBank = {
         "5級": [
             { title: "A Day at the Park", text: "Today is Sunday. The weather is very fine and warm. Tom and his family go to the big park near their house. Tom's father drives a car. In the park, many people are walking and running. Tom sees a small dog under a tall tree. The dog is very cute. Tom's sister, Mary, plays with a ball. They eat a delicious lunch together. Tom's mother makes sandwiches and apple juice. After lunch, they sit on the green grass and read books. It is a very happy and peaceful day for the family.", quiz: [{q: "What day is today?", o: ["Monday", "Sunday", "Friday"], a: 1}, {q: "Where does the family go?", o: ["To the hospital", "To the station", "To the park"], a: 2}, {q: "What does Tom see under the tree?", o: ["A small dog", "A big cat", "A bird"], a: 0}, {q: "What do they eat for lunch?", o: ["Fish and rice", "Sandwiches and juice", "Cake and tea"], a: 1}, {q: "What do they do after lunch?", o: ["Swim in the river", "Read books", "Play tennis"], a: 1}] },
@@ -665,32 +664,34 @@
         ],
         "3級": [
             { title: "A Journey to the Future", text: "In the 22nd century, the global environment has changed a lot. Science and technology are highly developed. Lisa is a young scientist. Her ambition is to build a machine that can travel through time. After years of hard work and many failures, she finally completed the machine. She decided to go to the future to see the result of global warming. When she arrived in the future, she was shocked. The sea level was very high, and many islands were under the water. However, she also saw hope. People in the future created a new system to clean the air and water. They lived in harmony with nature. Lisa returned to her own time with valuable knowledge. She promised to share her experience to protect the Earth.", quiz: [{q: "When does the story begin?", o: ["In the 20th century", "In the 21st century", "In the 22nd century"], a: 2}, {q: "What is Lisa's profession?", o: ["A doctor", "A scientist", "A teacher"], a: 1}, {q: "Why did she go to the future?", o: ["To see the result of global warming", "To meet her grandchildren", "To find a treasure"], a: 0}, {q: "What shocked her in the future?", o: ["The sea level was very high", "There were no cars", "People were fighting"], a: 0}, {q: "What did she promise to do?", o: ["To destroy the machine", "To protect the Earth", "To live in the future"], a: 1}] }
-        ],
-        "準2級": [{ title: "Coming Soon", text: "New stories are coming soon.", quiz: [] }],
-        "2級": [{ title: "Coming Soon", text: "New stories are coming soon.", quiz: [] }],
-        "準1級": [{ title: "Coming Soon", text: "New stories are coming soon.", quiz: [] }],
-        "1級": [{ title: "Coming Soon", text: "New stories are coming soon.", quiz: [] }]
+        ]
     };
 
-    let customStories = JSON.parse(localStorage.getItem('vocab_custom_stories_v8')) || [];
+    let customStories = JSON.parse(localStorage.getItem('vocab_custom_stories_v9')) || [];
     let currentStoryQuizIdx = 0; let currentStoryObj = null;
 
     function loadRandomStory() {
-        const grade = document.getElementById('story-grade-selector').value;
-        const pool = storyBank[grade] || storyBank["5級"];
-        const cPool = customStories.filter(s => s.grade === grade);
-        const fullPool = [...pool, ...cPool];
-        
-        currentStoryObj = fullPool[Math.floor(Math.random() * fullPool.length)];
-        
-        document.getElementById('story-title').innerText = `【${grade}】 ${currentStoryObj.title}`;
-        document.getElementById('story-box').innerHTML = formatClickableText(currentStoryObj.text);
-        
-        document.getElementById('story-box').style.display = 'block';
-        document.getElementById('btn-start-quiz').style.display = 'block';
-        document.getElementById('story-quiz-area').style.display = 'none';
-        document.getElementById('story-done').style.display = 'none';
-        currentStoryQuizIdx = 0;
+        try {
+            const grade = document.getElementById('story-grade-selector').value;
+            const pool = storyBank[grade] || [];
+            const cPool = customStories.filter(s => s.grade === grade);
+            const fullPool = [...pool, ...cPool];
+            
+            if(fullPool.length === 0) { alert("この級のストーリーはまだありません。自分で作成してみましょう！"); return; }
+            
+            currentStoryObj = fullPool[Math.floor(Math.random() * fullPool.length)];
+            
+            document.getElementById('story-title').innerText = `【${grade}】 ${currentStoryObj.title}`;
+            document.getElementById('story-box').innerHTML = formatClickableText(currentStoryObj.text);
+            document.getElementById('story-box').style.display = 'block';
+            
+            if(currentStoryObj.quiz && currentStoryObj.quiz.length > 0) { document.getElementById('btn-start-quiz').style.display = 'block'; } 
+            else { document.getElementById('btn-start-quiz').style.display = 'none'; }
+            
+            document.getElementById('story-quiz-area').style.display = 'none';
+            document.getElementById('story-done').style.display = 'none';
+            currentStoryQuizIdx = 0;
+        } catch(e) { console.error(e); alert("ストーリーの読み込みに失敗しました。"); }
     }
 
     async function lookupWord(wordStr, el, event) {
@@ -710,9 +711,8 @@
             try {
                 const res = await fetch(`https://api.mymemory.translated.net/get?q=${cleanWord}&langpair=en|ja`);
                 const data = await res.json();
-                if(data && data.responseData && data.responseData.translatedText) {
-                    tip.innerText = `(未登録) ${data.responseData.translatedText}`;
-                } else { tip.innerText = "(未登録)"; }
+                if(data && data.responseData && data.responseData.translatedText) { tip.innerText = `(未登録) ${data.responseData.translatedText}`; } 
+                else { tip.innerText = "(未登録)"; }
             } catch(e) { tip.innerText = "(未登録: エラー)"; }
         }
         
@@ -723,10 +723,6 @@
     }
 
     function startStoryQuiz() {
-        if(!currentStoryObj.quiz || currentStoryObj.quiz.length === 0) {
-            document.getElementById('story-box').style.display = 'none'; document.getElementById('btn-start-quiz').style.display = 'none'; document.getElementById('story-done').style.display = 'block';
-            addXP(50); showToast("✨ 読了ボーナス！ +50XP"); return;
-        }
         document.getElementById('story-box').style.display = 'none'; document.getElementById('btn-start-quiz').style.display = 'none'; document.getElementById('story-quiz-area').style.display = 'block';
         renderStoryQuiz();
     }
@@ -774,7 +770,7 @@
             if(q && optsStr && !isNaN(aNum)) { quizzes.push({ q: q, o: optsStr.split(',').map(s=>s.trim()), a: aNum - 1 }); }
         }
         customStories.push({ grade: grade, title: title, text: text, quiz: quizzes });
-        localStorage.setItem('vocab_custom_stories_v8', JSON.stringify(customStories));
+        localStorage.setItem('vocab_custom_stories_v9', JSON.stringify(customStories));
         alert("新しいストーリーを登録しました！");
         document.getElementById('st-title').value = ''; document.getElementById('st-text').value = ''; initStoryQuizFields();
     }
@@ -784,15 +780,18 @@
     // ==========================================
     let matchRemaining = 20; let selectedLeft = null; let selectedRight = null;
     function initMatchGame() {
-        if(words.length === 0) return; matchRemaining = 20; document.getElementById('match-counter').innerText = `残り: ${matchRemaining}問`;
-        document.getElementById('match-board').style.display = 'grid'; document.getElementById('match-done').style.display = 'none'; loadNextMatchSet();
+        try {
+            if(words.length === 0) return; 
+            matchRemaining = 20; document.getElementById('match-counter').innerText = `残り: ${matchRemaining}問`;
+            document.getElementById('match-board').style.display = 'grid'; document.getElementById('match-done').style.display = 'none'; loadNextMatchSet();
+        } catch(e) { console.error(e); }
     }
     function loadNextMatchSet() {
         if(matchRemaining <= 0) { document.getElementById('match-board').style.display = 'none'; document.getElementById('match-done').style.display = 'block'; addXP(50); return; }
         
         const filter = document.getElementById('match-grade-filter').value;
         let pool = words.filter(w => filter === 'all' || w.grade === filter);
-        if(pool.length === 0) pool = words; 
+        if(pool.length === 0) { alert(`【${filter}】の単語がありません。全級から出題します。`); pool = words; } 
 
         let currentMatchSet = []; for(let i=0; i<Math.min(6, matchRemaining); i++) { currentMatchSet.push(pool[Math.floor(Math.random() * pool.length)]); }
         const board = document.getElementById('match-board'); board.innerHTML = ''; selectedLeft = null; selectedRight = null;
@@ -824,14 +823,16 @@
     }
 
     function renderPuzzle() {
-        const grid = document.getElementById('puzzle-grid'); grid.innerHTML = '';
-        let unlockedPieces = Math.floor(xp / 100); if (unlockedPieces > 9) unlockedPieces = 9;
-        for(let i=0; i<9; i++) {
-            const piece = document.createElement('div'); piece.className = 'puzzle-piece';
-            if(i < unlockedPieces) piece.classList.add('revealed'); else piece.innerText = "?";
-            grid.appendChild(piece);
-        }
-        document.getElementById('puzzle-info').style.display = (unlockedPieces >= 9) ? 'block' : 'none';
+        try {
+            const grid = document.getElementById('puzzle-grid'); grid.innerHTML = '';
+            let unlockedPieces = Math.floor(xp / 100); if (unlockedPieces > 9) unlockedPieces = 9;
+            for(let i=0; i<9; i++) {
+                const piece = document.createElement('div'); piece.className = 'puzzle-piece';
+                if(i < unlockedPieces) piece.classList.add('revealed'); else piece.innerText = "?";
+                grid.appendChild(piece);
+            }
+            document.getElementById('puzzle-info').style.display = (unlockedPieces >= 9) ? 'block' : 'none';
+        } catch(e){ console.error(e); }
     }
 
     // ==========================================
@@ -850,12 +851,14 @@
     };
 
     function initChatGame() {
-        chatTurn = 0; chatUsedWords.clear();
-        const grade = document.getElementById('chat-grade-selector').value;
-        const initialGreeting = (grade === "5級" || grade === "4級") ? "Hello! Let's talk in English!" : "Welcome! I am ready to talk with you.";
-        
-        document.getElementById('chat-box').innerHTML = `<div class="chat-msg msg-ai">${formatClickableText(initialGreeting)}</div>`;
-        document.getElementById('chat-ui-area').style.display = 'flex'; document.getElementById('chat-feedback').style.display = 'none';
+        try {
+            chatTurn = 0; chatUsedWords.clear();
+            const grade = document.getElementById('chat-grade-selector').value;
+            const initialGreeting = (grade === "5級" || grade === "4級") ? "Hello! Let's talk in English!" : "Welcome! I am ready to talk with you.";
+            
+            document.getElementById('chat-box').innerHTML = `<div class="chat-msg msg-ai">${formatClickableText(initialGreeting)}</div>`;
+            document.getElementById('chat-ui-area').style.display = 'flex'; document.getElementById('chat-feedback').style.display = 'none';
+        } catch(e){ console.error(e); }
     }
     
     function startDictation() {
@@ -882,34 +885,31 @@
                 document.getElementById('grammar-advice').innerHTML = grammarNote || "素晴らしい！自信を持って話せていますね！"; addXP(30); box.scrollTop = box.scrollHeight;
             } else { 
                 const grade = document.getElementById('chat-grade-selector').value;
-                box.innerHTML += `<div class="chat-msg msg-ai">${formatClickableText(chatScrips[grade][chatTurn])}</div>`; 
+                const scripts = chatScrips[grade] || chatScrips["5級"];
+                box.innerHTML += `<div class="chat-msg msg-ai">${formatClickableText(scripts[chatTurn])}</div>`; 
                 chatTurn++; box.scrollTop = box.scrollHeight; 
             }
         }, 800);
     }
 
     // ==========================================
-    // 🎧 通勤モード (フリーズ強制突破 ＆ 級別フィルター対応)
+    // 🎧 通勤モード (フリーズ強制突破 ＆ 級別)
     // ==========================================
     let comActive = false; let wakeLock = null;
     async function startCommute(restart = false) {
-        // 【重要ハック】iOSの音声ロックを解除するためのダミー同期再生 (0.01秒の無音)
-        let unlockUtterance = new SpeechSynthesisUtterance(' ');
-        unlockUtterance.volume = 0; synth.speak(unlockUtterance);
+        // iOSの音声ロックを解除するためのダミー同期再生
+        synth.speak(new SpeechSynthesisUtterance(' '));
 
         if(isMuted) { alert("ミュートされています。右上の🔊をタップしてください。"); return; }
         comActive = true; document.getElementById('pocket-overlay').style.display = 'flex';
         try { if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
         
-        // 【要望】ここで選んだ級を確実にフィルター
         const filter = document.getElementById('com-grade-filter').value; 
         const now = Date.now();
         let queue = words.filter(w => (filter === 'all' || w.grade === filter) && (!w.nextReview || w.nextReview <= now));
         if(queue.length === 0) queue = words.filter(w => filter === 'all' || w.grade === filter);
         
-        if(queue.length === 0) {
-            stopCommute(); alert(`${filter}の単語が登録されていません！`); return;
-        }
+        if(queue.length === 0) { stopCommute(); alert(`${filter}の単語が登録されていません！`); return; }
 
         let cIdx = restart ? 0 : 0;
         
@@ -919,7 +919,7 @@
                 
                 await speakSafe(w.jp, 'ja-JP', 1.0); if(!comActive) break; await new Promise(r => setTimeout(r, 200));
                 await speakSafe(w.en, 'en-US', 1.0); if(!comActive) break; await new Promise(r => setTimeout(r, 200));
-                await speakSafe(w.en, 'en-US', 0.2); if(!comActive) break; // 超スロー
+                await speakSafe(w.en, 'en-US', 0.2); if(!comActive) break;
                 if(w.exJp) { await new Promise(r=>setTimeout(r,300)); await speakSafe(w.exJp, 'ja-JP', 1.0); if(!comActive) break; await new Promise(r=>setTimeout(r, 200)); }
                 if(w.exEn) { await speakSafe(w.exEn, 'en-US', 1.0); if(!comActive) break; await new Promise(r=>setTimeout(r, 200)); }
                 if(w.exEn) { await speakSafe(w.exEn, 'en-US', 0.2); if(!comActive) break; }
@@ -931,49 +931,63 @@
     
     function stopCommute() { comActive = false; synth.cancel(); if(wakeLock) wakeLock.release(); document.getElementById('pocket-overlay').style.display = 'none'; document.getElementById('com-playing').innerText = "待機中"; }
     
-    // フリーズ回避用 安全な読み上げ関数 (3.5秒で強制次へ)
     async function speakSafe(t, l, r=1.0) { 
         if(isMuted) return; 
         return new Promise(res => { 
             const u = new SpeechSynthesisUtterance(t); u.lang=l; u.rate=r; 
             if(l.startsWith('en')&&bestVoice) u.voice=bestVoice; 
-            let finished = false;
-            u.onend = () => { finished = true; res(); };
-            u.onerror = () => { finished = true; res(); };
-            synth.speak(u);
-            setTimeout(() => { if(!finished) { synth.cancel(); res(); } }, 3500);
+            let finished = false; u.onend = () => { finished = true; res(); }; u.onerror = () => { finished = true; res(); };
+            synth.speak(u); setTimeout(() => { if(!finished) { synth.cancel(); res(); } }, 3500);
         }); 
     }
 
     // ==========================================
-    // ⚙️ データのインポート (級別一括指定)
+    // ⚙️ データのインポート (重複削除・上書き)
     // ==========================================
     function importCSV() {
         const text = document.getElementById('import-csv').value.trim(); 
-        if(!text) return;
+        if(!text) { alert("テキストが入力されていません"); return; }
         
-        // 【要望】選んだ級を一括適用
         const targetGrade = document.getElementById('import-grade-selector').value;
+        if(!Array.isArray(words)) words = [];
 
-        if(words.length <= 3 && words[0].en === 'apple') words = [];
-        const lines = text.split('\n'); let added = 0;
+        // 初期データ(apple等)のみの場合はクリア
+        if(words.length <= 3 && words.find(w => w.en === 'apple')) words = [];
+
+        const lines = text.split('\n'); 
+        let added = 0; let updated = 0;
+
         lines.forEach(line => {
             const c = line.split(/\t|,/);
-            // 英語(0), 日本語(1), カタカナ(2), 例文英(3), 例文日(4) のみでOK
             if(c.length >= 2 && c[0].trim() !== '') { 
-                words.push({ 
-                    id: Date.now()+Math.random(), 
-                    en: c[0].trim(), jp: c[1].trim(), 
-                    rubi: c[2]?.trim() || "", 
-                    exEn: c[3]?.trim() || "", exJp: c[4]?.trim() || "", 
-                    grade: targetGrade, // セレクトボックスの値を強制適用
-                    box: 0, nextReview: 0 
-                }); 
-                added++; 
+                const enWord = c[0].trim();
+                const cleanEn = enWord.toLowerCase();
+                const existingIdx = words.findIndex(w => w.en.toLowerCase() === cleanEn);
+                
+                if(existingIdx !== -1) {
+                    // 重複：上書き（学習進度はキープ）
+                    words[existingIdx].jp = c[1].trim();
+                    words[existingIdx].rubi = c[2]?.trim() || words[existingIdx].rubi;
+                    words[existingIdx].exEn = c[3]?.trim() || words[existingIdx].exEn;
+                    words[existingIdx].exJp = c[4]?.trim() || words[existingIdx].exJp;
+                    words[existingIdx].grade = targetGrade;
+                    updated++;
+                } else {
+                    // 新規追加
+                    words.push({ 
+                        id: Date.now() + Math.random(), en: enWord, jp: c[1].trim(), 
+                        rubi: c[2]?.trim() || "", exEn: c[3]?.trim() || "", exJp: c[4]?.trim() || "", 
+                        grade: targetGrade, box: 0, nextReview: 0 
+                    }); 
+                    added++; 
+                }
             }
         });
-        saveWords(); updateWordCounts(); alert(`【${targetGrade}】として ${added} 件のデータを記録しました！`); document.getElementById('import-csv').value = '';
+        saveWords(); updateWordCounts(); 
+        alert(`【${targetGrade}】に ${added}件を追加、${updated}件を更新（重複を上書き）しました！`); 
+        document.getElementById('import-csv').value = '';
     }
+
     function clearAllData() { if(confirm("全データを消去しますか？")) { localStorage.clear(); location.reload(); } }
 
     initVoice(); updateWordCounts();
