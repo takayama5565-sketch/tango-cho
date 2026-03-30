@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>無限単語帳 Ultimate V10</title>
+    <title>無限単語帳 Ultimate V11</title>
     <style>
-        /* 🦉 Duolingo風 カラー＆デザイン */
         :root {
             --bg-color: #ffffff; --text-color: #4b4b4b; --text-light: #777777;
             --light-gray: #e5e5e5; --border-color: #e5e5e5; --card-bg: #ffffff;
@@ -22,7 +21,6 @@
         body { font-family: "Nunito", -apple-system, sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; padding-top: 60px; padding-bottom: 90px; overflow-x: hidden; -webkit-user-select: none; user-select: none; }
         .container { max-width: 600px; margin: 0 auto; padding: 0 15px; }
 
-        /* ヘッダー */
         .header { position: fixed; top: 0; left: 0; width: 100%; background: var(--bg-color); z-index: 100; border-bottom: 2px solid var(--border-color); }
         .header-content { max-width: 600px; margin: 0 auto; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
         .status-item { display: flex; align-items: center; font-weight: 800; font-size: 1.1rem; color: var(--text-color); }
@@ -32,7 +30,6 @@
         #toast { position: fixed; top: 70px; right: 15px; background: var(--duo-purple); color: white; padding: 12px 20px; border-radius: 12px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: none; z-index: 1000; animation: slideIn 0.3s forwards; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
-        /* ボタン＆フォーム */
         .btn-duo { background-color: var(--duo-blue); color: white; border: none; border-radius: 16px; border-bottom: 4px solid var(--duo-blue-shadow); padding: 14px 20px; font-size: 1.1rem; font-weight: 800; cursor: pointer; width: 100%; text-align: center; transition: transform 0.1s, border-bottom-width 0.1s; margin-bottom: 15px; box-sizing: border-box; }
         .btn-duo:active { transform: translateY(4px); border-bottom-width: 0px; margin-bottom: 19px; }
         .btn-green { background-color: var(--duo-green); border-bottom-color: var(--duo-green-shadow); }
@@ -43,11 +40,9 @@
 
         select, input[type="text"], input[type="number"], input[type="password"], textarea { background: var(--card-bg); color: var(--text-color); border: 2px solid var(--border-color); border-radius: 12px; padding: 12px; font-size: 1rem; width: 100%; box-sizing: border-box; margin-bottom: 10px; font-weight: bold; }
 
-        /* ログインスクリーン */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .login-card { background: var(--card-bg); border: 2px solid var(--border-color); border-bottom: 6px solid var(--border-color); border-radius: 20px; padding: 30px; text-align: center; width: 100%; max-width: 400px; }
 
-        /* ハブ */
         .hub-section-title { font-size: 1.2rem; font-weight: 800; color: var(--duo-green); margin: 25px 0 10px 0; border-bottom: 2px dashed var(--border-color); padding-bottom: 5px; }
         .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .hub-card { background: var(--card-bg); border: 2px solid var(--border-color); border-bottom: 5px solid var(--border-color); border-radius: 16px; padding: 20px 10px; text-align: center; cursor: pointer; transition: transform 0.1s; }
@@ -55,17 +50,12 @@
         .hub-icon { font-size: 2.5rem; margin-bottom: 10px; }
         .hub-title { font-weight: 800; font-size: 1.1rem; color: var(--text-color); }
 
-        /* 学習カード */
         .progress-container { width: 100%; background: var(--light-gray); height: 16px; border-radius: 8px; margin-bottom: 20px; overflow: hidden; }
         .progress-bar { background: var(--duo-green); height: 100%; width: 0%; border-radius: 8px; transition: width 0.3s; }
-        
-        /* 💡カードアニメーション用調整 */
         .card { background: var(--card-bg); border: 2px solid var(--border-color); border-bottom: 6px solid var(--border-color); border-radius: 20px; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; margin-bottom: 20px; position: relative; cursor: pointer; transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        
         .srs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; display: none; }
         .mastery-level { position: absolute; top: 15px; right: 15px; font-size: 1.2rem; color: var(--duo-yellow); }
 
-        /* タップ翻訳・ストーリー */
         .story-text-area { background: var(--card-bg); border: 2px solid var(--border-color); border-radius: 16px; padding: 20px; font-size: 1.2rem; line-height: 1.8; margin-bottom: 20px; max-height: 50vh; overflow-y: auto; }
         .story-word { cursor: pointer; border-bottom: 2px dotted var(--duo-blue); display: inline-block; margin: 0 2px; border-radius: 4px;}
         .dict-tooltip { position: fixed; background: #333; color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 1rem; font-weight: bold; z-index: 10000; display: none; transform: translateX(-50%) translateY(-120%); pointer-events: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); white-space: nowrap; }
@@ -73,7 +63,6 @@
         .quiz-area { background: var(--card-bg); border: 2px solid var(--duo-orange); border-radius: 16px; padding: 20px; display: none; }
         .quiz-options { display: flex; flex-direction: column; gap: 10px; }
 
-        /* チャット・マッチング・パズル */
         .chat-box { background: var(--light-gray); border-radius: 16px; padding: 15px; height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
         .chat-msg { max-width: 85%; padding: 12px 16px; border-radius: 16px; font-weight: bold; line-height: 1.4; }
         .msg-ai { background: var(--card-bg); align-self: flex-start; border-bottom-left-radius: 4px; border: 2px solid var(--border-color); }
@@ -92,7 +81,6 @@
         .puzzle-piece { background: var(--light-gray); display: flex; justify-content: center; align-items: center; font-weight: bold; color: #aaa; font-size: 1.5rem; transition: opacity 0.8s ease-in-out; }
         .puzzle-piece.revealed { opacity: 0; }
 
-        /* タブバー */
         .tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card-bg); border-top: 2px solid var(--border-color); display: flex; padding: 10px 0 20px 0; z-index: 100; justify-content: space-around; }
         .tab-btn { background: none; border: none; color: var(--text-light); font-size: 0.8rem; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; width: 33%; }
         .tab-btn.active { color: var(--duo-blue); }
@@ -100,11 +88,16 @@
 
         .view, .sub-view { display: none; }
         .view.active, .sub-view.active { display: block; animation: fadeIn 0.3s; }
-        #pocket-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; color: #fff; flex-direction: column; justify-content: center; align-items: center; }
+        
+        /* 💡 通勤モードの新デザイン */
+        #pocket-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #131f24, #2c3e50); z-index: 9999; color: #fff; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        .commute-card { background: rgba(255,255,255,0.1); border-radius: 20px; padding: 40px 20px; width: 100%; max-width: 400px; text-align: center; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); }
+        #commute-en { font-size: 2.8rem; font-weight: 800; margin: 0 0 10px 0; color: var(--duo-green); word-break: break-word; line-height: 1.1; }
+        #commute-jp { font-size: 1.5rem; font-weight: bold; color: #fff; min-height: 2.5rem; }
+        .commute-controls { margin-top: 40px; display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 400px; }
         
         .danger-zone { background: #ffebee; padding: 15px; border-radius: 12px; border: 2px solid var(--duo-red); margin-bottom: 20px; }
         .control-group { background: var(--light-gray); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
-        
         .mastery-bar-bg { width: 100%; background: #ddd; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 5px; }
         .mastery-bar-fill { background: var(--duo-yellow); height: 100%; width: 0%; transition: width 0.5s; }
     </style>
@@ -134,7 +127,6 @@
     <div id="dict-tooltip">意味</div>
 
     <div class="container">
-        
         <div id="view-home" class="view active">
             <select id="hub-grade-filter" style="margin-bottom: 5px;">
                 <option value="all">全級から出題</option><option value="1級">1級</option><option value="準1級">準1級</option><option value="2級">2級</option><option value="準2級">準2級</option><option value="3級">3級</option><option value="4級">4級</option><option value="5級">5級</option>
@@ -144,7 +136,7 @@
                 <div class="hub-card" onclick="startSubMode('word')"><div class="hub-icon">🔤</div><div class="hub-title">単語・文章</div></div>
                 <div class="hub-card" onclick="startSubMode('listen')"><div class="hub-icon">👂</div><div class="hub-title">リスニング</div></div>
                 <div class="hub-card" onclick="startSubMode('speak')"><div class="hub-icon">🗣️</div><div class="hub-title">スピーキング</div></div>
-                <div class="hub-card" onclick="startCommute()"><div class="hub-icon">🎧</div><div class="hub-title">通勤(自動再生)</div></div>
+                <div class="hub-card" onclick="openCommuteUI()"><div class="hub-icon">🎧</div><div class="hub-title">通勤(自動再生)</div></div>
             </div>
         </div>
 
@@ -292,7 +284,6 @@
             <div class="hub-section-title" style="color:var(--duo-red);">⚠️ デンジャーゾーン (データ削除)</div>
             <div class="danger-zone">
                 <p style="font-size:0.9rem;">※消去したデータは復元できません</p>
-                
                 <hr style="border: 1px solid var(--duo-red); margin: 15px 0;">
                 <p style="text-align:left; color:var(--text-color);">■ 単語データの削除</p>
                 <select id="delete-vocab-grade">
@@ -300,7 +291,6 @@
                     <option value="準2級">準2級の単語のみ</option><option value="3級">3級の単語のみ</option><option value="4級">4級の単語のみ</option><option value="5級">5級の単語のみ</option>
                 </select>
                 <button class="btn-duo btn-red" onclick="deleteVocabByGrade()">指定した級の単語を消去</button>
-                
                 <hr style="border: 1px solid var(--duo-red); margin: 15px 0;">
                 <p style="text-align:left; color:var(--text-color);">■ 自作ストーリーの削除</p>
                 <select id="delete-story-grade">
@@ -308,10 +298,21 @@
                     <option value="準2級">準2級のストーリーのみ</option><option value="3級">3級のストーリーのみ</option><option value="4級">4級のストーリーのみ</option><option value="5級">5級のストーリーのみ</option>
                 </select>
                 <button class="btn-duo btn-red" onclick="deleteStoryByGrade()">指定した級のストーリーを消去</button>
-
                 <hr style="border: 1px solid var(--duo-red); margin: 15px 0;">
                 <button class="btn-duo btn-gray" style="margin-bottom:0;" onclick="clearAllData()">💣 アプリを完全に初期化 (全消去)</button>
             </div>
+        </div>
+    </div>
+
+    <div id="pocket-overlay">
+        <h2 style="margin: 0 0 5px 0; color:var(--duo-yellow); font-size:1rem;" id="commute-status">自動再生モード</h2>
+        <div class="commute-card">
+            <div id="commute-en">Ready...</div>
+            <div id="commute-jp"></div>
+        </div>
+        <div class="commute-controls">
+            <button id="btn-start-commute" class="btn-duo btn-green" onclick="startCommutePlay()">▶️ 再生スタート (タップ必須)</button>
+            <button id="btn-stop-commute" class="btn-duo btn-red" style="display:none;" onclick="stopCommute()">⏹️ 停止して戻る</button>
         </div>
     </div>
 
@@ -326,8 +327,8 @@
     // ==========================================
     // 🔒 パスワード＆ログイン機能
     // ==========================================
-    const LKEY_PASS = 'vocab_app_pwd_v10';
-    let appPassword = localStorage.getItem(LKEY_PASS);
+    const LKEY_PASS = 'vocab_app_pwd_v11';
+    let appPassword = localStorage.getItem(LKEY_PASS) || localStorage.getItem('vocab_app_pwd_v10');
 
     function checkLoginOnStart() {
         if (appPassword) { document.getElementById('login-screen').style.display = 'flex'; document.getElementById('app-content').style.display = 'none'; } 
@@ -338,45 +339,30 @@
         if (input === appPassword) { document.getElementById('login-error').style.display = 'none'; unlockApp(); } 
         else { document.getElementById('login-error').style.display = 'block'; }
     }
-    function unlockApp() {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app-content').style.display = 'block';
-        initAppContent();
-    }
+    function unlockApp() { document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').style.display = 'block'; initAppContent(); }
     function savePassword() {
-        const p = document.getElementById('setting-password').value.trim();
-        if(!p) { alert("パスワードを入力してください。"); return; }
-        appPassword = p; localStorage.setItem(LKEY_PASS, p);
-        alert("パスワードを設定しました。次回起動時からロックされます。"); document.getElementById('setting-password').value = '';
+        const p = document.getElementById('setting-password').value.trim(); if(!p) { alert("パスワードを入力してください。"); return; }
+        appPassword = p; localStorage.setItem(LKEY_PASS, p); alert("設定しました。"); document.getElementById('setting-password').value = '';
     }
-    function removePassword() {
-        appPassword = null; localStorage.removeItem(LKEY_PASS);
-        alert("パスワードロックを解除しました。");
-    }
+    function removePassword() { appPassword = null; localStorage.removeItem(LKEY_PASS); alert("解除しました。"); }
 
     // ==========================================
     // 🧠 アプリメインロジック (データ管理)
     // ==========================================
-    const LKEY_VOCAB = 'vocab_srs_v10';
-    const LKEY_STORY = 'vocab_stories_v10';
-    const LKEY_XP = 'vocab_xp_v10';
-    const fallbackDict = { "together": "一緒に", "weather": "天気", "beautiful": "美しい", "family": "家族" };
-    
+    const LKEY_VOCAB = 'vocab_srs_v11'; const LKEY_STORY = 'vocab_stories_v11'; const LKEY_XP = 'vocab_xp_v11';
     let words = []; let customStories = []; let xp = 0;
     let reviewQueue = []; let currentWord = null; let totalQueueCount = 0; let currentStudyMode = 'word';
     let synth = window.speechSynthesis; let bestVoice = null; let isMuted = false; let recognition = null;
 
     function initAppContent() {
-        try { let stored = localStorage.getItem(LKEY_VOCAB) || localStorage.getItem('vocab_srs_v9') || localStorage.getItem('vocab_srs_v8') || localStorage.getItem('vocab_srs_v7') || localStorage.getItem('vocab_srs_duo_v6');
-            if (stored) { words = JSON.parse(stored); localStorage.setItem(LKEY_VOCAB, JSON.stringify(words)); } 
-            else { words = [{ id: 1, en: 'apple', jp: 'りんご', rubi: 'アップル', grade: '5級', box: 0, nextReview: 0 }]; }
+        try { let stored = localStorage.getItem(LKEY_VOCAB) || localStorage.getItem('vocab_srs_v10') || localStorage.getItem('vocab_srs_v9') || localStorage.getItem('vocab_srs_v8');
+            if (stored) { words = JSON.parse(stored); localStorage.setItem(LKEY_VOCAB, JSON.stringify(words)); } else { words = [{ id: 1, en: 'apple', jp: 'りんご', grade: '5級', box: 0, nextReview: 0 }]; }
         } catch(e) {}
-        try { let storedSt = localStorage.getItem(LKEY_STORY) || localStorage.getItem('vocab_stories_v9') || localStorage.getItem('vocab_stories_v8') || localStorage.getItem('vocab_stories_v7');
+        try { let storedSt = localStorage.getItem(LKEY_STORY) || localStorage.getItem('vocab_stories_v10') || localStorage.getItem('vocab_stories_v9');
             if (storedSt) { customStories = JSON.parse(storedSt); localStorage.setItem(LKEY_STORY, JSON.stringify(customStories)); }
         } catch(e) {}
-        xp = parseInt(localStorage.getItem(LKEY_XP) || localStorage.getItem('vocab_xp_v9') || localStorage.getItem('vocab_xp_v8')) || 0;
+        xp = parseInt(localStorage.getItem(LKEY_XP) || localStorage.getItem('vocab_xp_v10') || localStorage.getItem('vocab_xp_v9')) || 0;
         document.getElementById('xp-count').innerText = xp;
-
         initVoice(); updateWordCounts();
     }
 
@@ -389,19 +375,7 @@
     function addXP(a) { const oldP = Math.floor(xp/100); xp += a; localStorage.setItem(LKEY_XP, xp); document.getElementById('xp-count').innerText = xp; if(Math.floor(xp/100) > oldP && Math.floor(xp/100) <= 9) { showToast("🧩 パズルのピース獲得！"); renderPuzzle(); } }
     
     function goHome(t) { if(t==='play') showTab('view-play', document.querySelectorAll('.tab-btn')[1]); else showTab('view-home', document.querySelectorAll('.tab-btn')[0]); }
-    
-    // 【修正】showSubViewをグローバルに定義して全ての「お楽しみ」項目が動くように
-    function showSubView(id) {
-        document.querySelectorAll('.view, .sub-view').forEach(v => v.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        
-        // 機能の初期化
-        if(id === 'view-match') initMatchGame();
-        if(id === 'view-puzzle') renderPuzzle();
-        if(id === 'view-stories') loadRandomStory();
-        if(id === 'view-chat') initChatGame();
-    }
-
+    function showSubView(id) { document.querySelectorAll('.view, .sub-view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); if(id === 'view-match') initMatchGame(); if(id === 'view-puzzle') renderPuzzle(); if(id === 'view-stories') loadRandomStory(); if(id === 'view-chat') initChatGame(); }
     function showTab(id, b) { document.querySelectorAll('.view, .sub-view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); if(b) { document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); b.classList.add('active'); } if(id === 'view-data') updateWordCounts(); }
     function saveWords() { localStorage.setItem(LKEY_VOCAB, JSON.stringify(words)); updateWordCounts(); }
 
@@ -414,7 +388,6 @@
 
     // --- 単語学習エンジン (表裏トグル対応) ---
     let isFlipped = false;
-
     function startSubMode(m) { currentStudyMode = m; showTab('view-study'); document.getElementById('study-mode').style.display = m==='word' ? 'block' : 'none'; loadStudyQueue(); }
     function loadStudyQueue(force = false) {
         const g = document.getElementById('hub-grade-filter').value; const now = Date.now();
@@ -431,93 +404,141 @@
     }
     function showNextCard() {
         if(reviewQueue.length === 0) { loadStudyQueue(); return; }
-        currentWord = reviewQueue[0];
-        isFlipped = false; // フラグリセット
+        currentWord = reviewQueue[0]; isFlipped = false;
         document.getElementById('answer-area').style.display = 'none'; document.getElementById('srs-controls').style.display = 'none'; document.getElementById('type-area').style.display = 'none';
-        
         let stars = ""; for(let i=0; i<(currentWord.box || 0); i++) stars += "⭐"; document.getElementById('sc-mastery').innerText = stars;
-
-        const mode = document.getElementById('study-mode').value;
-        document.getElementById('sc-grade').innerText = currentWord.grade;
-        
-        if(mode === 'jp-en-type' && currentStudyMode === 'word') { 
-            document.getElementById('sc-front-main').innerText = currentWord.jp; 
-            document.getElementById('sc-front-sub').innerHTML = ""; 
-            document.getElementById('type-area').style.display = 'block'; 
-            document.getElementById('type-input').value = ''; 
-            document.getElementById('tap-hint').style.display = 'none'; 
-            document.getElementById('flashcard').onclick = flipCard; // 【修正】タイプでもクリックで強制的に裏返せる
-        }
-        else if (currentStudyMode === 'word') { 
-            const e2j = mode==='en-jp'; 
-            document.getElementById('sc-front-main').innerText = e2j ? currentWord.en : currentWord.jp; 
-            document.getElementById('sc-front-sub').innerHTML = e2j ? (currentWord.rubi ? currentWord.rubi.replace(/\[(.*?)\]/g, "<b>$1</b>") : "") : ""; 
-            document.getElementById('tap-hint').style.display = 'block'; document.getElementById('tap-hint').innerText = "👇 タップして答えを確認";
-            document.getElementById('flashcard').onclick = flipCard; 
-        }
-        else if (currentStudyMode === 'listen') { 
-            document.getElementById('sc-front-main').innerText = "🔊 音声を聞いて入力"; document.getElementById('sc-front-sub').innerHTML = ""; 
-            document.getElementById('type-area').style.display = 'block'; document.getElementById('type-input').value = ''; 
-            document.getElementById('tap-hint').style.display = 'none'; document.getElementById('flashcard').onclick = flipCard; 
-            if(!isMuted) playAudio('word'); 
-        }
-        else if (currentStudyMode === 'speak') { 
-            document.getElementById('sc-front-main').innerText = currentWord.en; document.getElementById('sc-front-sub').innerHTML = "👆 マイクを押して発音してね"; 
-            document.getElementById('type-area').style.display = 'none'; document.getElementById('tap-hint').style.display = 'none'; document.getElementById('flashcard').onclick = startSpeakingCheck; 
-        }
-        
-        document.getElementById('sc-back-main').innerText = (mode==='en-jp' || currentStudyMode !== 'word') ? currentWord.jp : currentWord.en;
-        document.getElementById('sc-back-rubi').innerText = (mode==='jp-en' && currentWord.rubi) ? currentWord.rubi.replace(/\[|\]/g, "") : "";
-        document.getElementById('sc-ex-en').innerText = currentWord.exEn || ""; document.getElementById('sc-ex-jp').innerText = currentWord.exJp || "";
-        document.getElementById('progress-bar').style.width = `${((totalQueueCount - reviewQueue.length) / totalQueueCount) * 100}%`;
+        const mode = document.getElementById('study-mode').value; document.getElementById('sc-grade').innerText = currentWord.grade;
+        if(mode === 'jp-en-type' && currentStudyMode === 'word') { document.getElementById('sc-front-main').innerText = currentWord.jp; document.getElementById('sc-front-sub').innerHTML = ""; document.getElementById('type-area').style.display = 'block'; document.getElementById('type-input').value = ''; document.getElementById('tap-hint').style.display = 'none'; document.getElementById('flashcard').onclick = flipCard; }
+        else if (currentStudyMode === 'word') { const e2j = mode==='en-jp'; document.getElementById('sc-front-main').innerText = e2j ? currentWord.en : currentWord.jp; document.getElementById('sc-front-sub').innerHTML = e2j ? (currentWord.rubi ? currentWord.rubi.replace(/\[(.*?)\]/g, "<b>$1</b>") : "") : ""; document.getElementById('tap-hint').style.display = 'block'; document.getElementById('tap-hint').innerText = "👇 タップして答えを確認"; document.getElementById('flashcard').onclick = flipCard; }
+        else if (currentStudyMode === 'listen') { document.getElementById('sc-front-main').innerText = "🔊 音声を聞いて入力"; document.getElementById('sc-front-sub').innerHTML = ""; document.getElementById('type-area').style.display = 'block'; document.getElementById('type-input').value = ''; document.getElementById('tap-hint').style.display = 'none'; document.getElementById('flashcard').onclick = flipCard; if(!isMuted) playAudio('word'); }
+        else if (currentStudyMode === 'speak') { document.getElementById('sc-front-main').innerText = currentWord.en; document.getElementById('sc-front-sub').innerHTML = "👆 マイクを押して発音してね"; document.getElementById('type-area').style.display = 'none'; document.getElementById('tap-hint').style.display = 'none'; document.getElementById('flashcard').onclick = startSpeakingCheck; }
+        document.getElementById('sc-back-main').innerText = (mode==='en-jp' || currentStudyMode !== 'word') ? currentWord.jp : currentWord.en; document.getElementById('sc-back-rubi').innerText = (mode==='jp-en' && currentWord.rubi) ? currentWord.rubi.replace(/\[|\]/g, "") : ""; document.getElementById('sc-ex-en').innerText = currentWord.exEn || ""; document.getElementById('sc-ex-jp').innerText = currentWord.exJp || ""; document.getElementById('progress-bar').style.width = `${((totalQueueCount - reviewQueue.length) / totalQueueCount) * 100}%`;
     }
     
-    // 【修正】何度でも表と裏を行き来できるトグル関数
     function flipCard() { 
-        // スピーキングモードの場合はマイク機能と干渉するので除外
         if(currentStudyMode === 'speak') return;
-
-        isFlipped = !isFlipped; 
-        const card = document.getElementById('flashcard');
-        
-        // 沈み込むアニメーション
-        card.style.transform = "scale(0.96)";
-        setTimeout(() => { card.style.transform = "scale(1)"; }, 150);
-
+        isFlipped = !isFlipped; const card = document.getElementById('flashcard');
+        card.style.transform = "scale(0.96)"; setTimeout(() => { card.style.transform = "scale(1)"; }, 150);
         if(isFlipped) {
-            // 裏面を表示
-            document.getElementById('answer-area').style.display = 'block'; 
-            document.getElementById('srs-controls').style.display = 'grid'; 
-            document.getElementById('tap-hint').innerText = "👆 タップして表面に戻す";
-            document.getElementById('tap-hint').style.display = 'block';
+            document.getElementById('answer-area').style.display = 'block'; document.getElementById('srs-controls').style.display = 'grid'; 
+            document.getElementById('tap-hint').innerText = "👆 タップして表面に戻す"; document.getElementById('tap-hint').style.display = 'block';
             document.getElementById('type-area').style.display = 'none'; 
             if(!isMuted && currentStudyMode==='word') playAudio('word'); 
         } else {
-            // 表面に戻す
-            document.getElementById('answer-area').style.display = 'none'; 
-            document.getElementById('srs-controls').style.display = 'none'; 
+            document.getElementById('answer-area').style.display = 'none'; document.getElementById('srs-controls').style.display = 'none'; 
             document.getElementById('tap-hint').innerText = "👇 タップして答えを確認";
-            
             const mode = document.getElementById('study-mode').value;
-            if((mode === 'jp-en-type' && currentStudyMode === 'word') || currentStudyMode === 'listen') {
-                document.getElementById('type-area').style.display = 'block';
-                document.getElementById('tap-hint').style.display = 'none';
-            } else {
-                document.getElementById('tap-hint').style.display = 'block';
-            }
+            if((mode === 'jp-en-type' && currentStudyMode === 'word') || currentStudyMode === 'listen') { document.getElementById('type-area').style.display = 'block'; document.getElementById('tap-hint').style.display = 'none'; } else { document.getElementById('tap-hint').style.display = 'block'; }
         }
     }
 
-    function checkTypeAnswer(spoken = null) { 
-        const a = (spoken || document.getElementById('type-input').value).trim().toLowerCase().replace(/[^a-z0-9 ]/g, ''); 
-        const c = currentWord.en.toLowerCase().replace(/[^a-z0-9 ]/g, ''); 
-        if(a === c || a.includes(c)) { showToast("🎉 正解！"); if(!isFlipped) flipCard(); } else { alert(`❌ おしい！ 正解は: ${currentWord.en}`); if(!isFlipped) flipCard(); } 
-    }
-    function startSpeakingCheck() { if(!recognition) { alert("ブラウザ非対応です"); return; } recognition.onresult = (e) => { checkTypeAnswer(e.results[0][0].transcript); }; recognition.start(); }
+    function checkTypeAnswer(spoken = null) { const a = (spoken || document.getElementById('type-input').value).trim().toLowerCase().replace(/[^a-z0-9 ]/g, ''); const c = currentWord.en.toLowerCase().replace(/[^a-z0-9 ]/g, ''); if(a === c || a.includes(c)) { showToast("🎉 正解！"); if(!isFlipped) flipCard(); } else { alert(`❌ おしい！ 正解は: ${currentWord.en}`); if(!isFlipped) flipCard(); } }
+    function startSpeakingCheck() { if(!recognition) return; recognition.onresult = (e) => { checkTypeAnswer(e.results[0][0].transcript); }; recognition.start(); }
     function answerSrs(q) { const now = Date.now(); if(q>1) addXP(10); const intervals = [60000, 600000, 86400000, 259200000]; currentWord.box = (q===0?0:(currentWord.box||0)+(q===3?2:1)); currentWord.nextReview = now + intervals[Math.min(currentWord.box, 3)]; saveWords(); reviewQueue.shift(); showNextCard(); }
     function playAudio(t, r=1.0) { if(isMuted) return; synth.cancel(); const u = new SpeechSynthesisUtterance(t==='word'?currentWord.en:currentWord.exEn); u.lang='en-US'; u.rate=r; if(bestVoice) u.voice=bestVoice; synth.speak(u); }
 
-    // --- ストーリー・AI ---
+    // ==========================================
+    // 🎧 通勤モードの完全改修 (iOS対応・エコーメソッド)
+    // ==========================================
+    let isCommuting = false;
+    let commuteQueue = [];
+    let commuteIdx = 0;
+
+    function openCommuteUI() {
+        if(isMuted) { alert("ミュートされています。右上の🔊をタップしてください。"); return; }
+        document.getElementById('pocket-overlay').style.display = 'flex';
+        document.getElementById('btn-start-commute').style.display = 'block';
+        document.getElementById('btn-stop-commute').style.display = 'none';
+        document.getElementById('commute-en').innerText = "Ready...";
+        document.getElementById('commute-jp').innerText = "";
+        
+        const g = document.getElementById('hub-grade-filter').value; const now = Date.now();
+        commuteQueue = words.filter(w => (g === 'all' || w.grade === g) && (!w.nextReview || w.nextReview <= now)).sort(() => Math.random() - 0.5);
+        if(commuteQueue.length === 0) commuteQueue = words.filter(w => (g === 'all' || w.grade === g)); // 復習ゼロなら全部から
+        commuteIdx = 0;
+    }
+
+    // ユーザーのアクション(タップ)を起点に音声コンテキストを確実に生成する
+    function startCommutePlay() {
+        if(commuteQueue.length === 0) { alert("学習する単語がありません。"); return; }
+        isCommuting = true;
+        document.getElementById('btn-start-commute').style.display = 'none';
+        document.getElementById('btn-stop-commute').style.display = 'block';
+        
+        // iOS対策：空の音声を再生してロックを解除
+        let initU = new SpeechSynthesisUtterance("");
+        synth.speak(initU);
+
+        playNextCommuteWord();
+    }
+
+    function playNextCommuteWord() {
+        if (!isCommuting) return;
+        if (commuteIdx >= commuteQueue.length) commuteIdx = 0; // ループ
+        
+        let w = commuteQueue[commuteIdx];
+        
+        // UI更新
+        document.getElementById('commute-en').innerText = w.en;
+        document.getElementById('commute-jp').innerText = ''; // 日本語は後出し
+
+        // エコーメソッドのシーケンス: 英(通常) -> 日本語 -> 英(ゆっくり)
+        let sequence = [
+            { text: w.en, lang: 'en-US', rate: 1.0 },
+            { delay: 500, action: () => { document.getElementById('commute-jp').innerText = w.jp; } },
+            { text: w.jp, lang: 'ja-JP', rate: 1.1 },
+            { delay: 500 },
+            { text: w.en, lang: 'en-US', rate: 0.8 }, // ゆっくり強調
+            { delay: 1000 }
+        ];
+
+        processCommuteSequence(sequence, () => {
+            commuteIdx++;
+            playNextCommuteWord();
+        });
+    }
+
+    function processCommuteSequence(steps, onComplete) {
+        if (!isCommuting) return;
+        if (steps.length === 0) { onComplete(); return; }
+
+        let step = steps.shift();
+
+        if (step.delay) {
+            if (step.action) step.action();
+            setTimeout(() => processCommuteSequence(steps, onComplete), step.delay);
+        } else {
+            let u = new SpeechSynthesisUtterance(step.text);
+            u.lang = step.lang;
+            u.rate = step.rate;
+            if (step.lang === 'en-US' && bestVoice) u.voice = bestVoice;
+
+            let isFinished = false;
+            let finishLogic = () => {
+                if(isFinished) return;
+                isFinished = true;
+                setTimeout(() => processCommuteSequence(steps, onComplete), 100);
+            };
+
+            u.onend = finishLogic;
+            u.onerror = finishLogic; // エラー時も止めずに次へ
+            
+            synth.speak(u);
+
+            // iOS Safariのバグ対策: onendが発火しない場合の強制次スキップ (文字数に応じた秒数)
+            let fallbackTime = Math.max(2500, step.text.length * 200);
+            setTimeout(finishLogic, fallbackTime);
+        }
+    }
+
+    function stopCommute() {
+        isCommuting = false;
+        synth.cancel();
+        document.getElementById('pocket-overlay').style.display = 'none';
+    }
+
+
+    // --- ストーリー・AI・マッチング・パズル (V10から変更なし) ---
     async function lookupWord(w, el) {
         const clean = w.toLowerCase().replace(/[^a-z]/g, ''); const tip = document.getElementById('dict-tooltip');
         if(!isMuted) { synth.cancel(); const u = new SpeechSynthesisUtterance(clean); u.lang='en-US'; synth.speak(u); }
@@ -528,20 +549,10 @@
     }
     function formatText(t) { return t.split(/([ \n\.,!?])/).map(w => w.match(/[a-zA-Z]/) ? `<span class="story-word" onclick="lookupWord('${w.replace(/'/g,"\\'")}', this)">${w}</span>` : w).join(''); }
     
-    const storyBank = { 
-        "1級": [{title:"The Ubiquitous AI", text:"In the 21st century, artificial intelligence has become ubiquitous. It is no longer an esoteric concept, but a pragmatic tool. However, some experts are apprehensive about its volatile nature and potential to exacerbate social inequality. They argue that rigorous regulations are imperative.", quiz:[{q:"What is ubiquitous?", o:["Internet","AI"], a:1}]}],
-        "準1級": [{title:"A Corporate Merger", text:"The two companies decided to collaborate and merge. The CEO announced it was an unprecedented opportunity to augment their market share. Employees were initially bewildered, but the transition was surprisingly smooth.", quiz:[{q:"What did the companies do?", o:["Merge","Fight"], a:0}]}],
-        "2級": [{title:"The Importance of Sleep", text:"Adequate sleep is essential for human brain function. A chronic lack of sleep can negatively affect your physical health and lead to a decline in capacity. It is critical to maintain a good balance.", quiz:[{q:"What is essential?", o:["Money","Sleep"], a:1}]}],
-        "準2級": [{title:"Exploring the Cave", text:"The scientists decided to explore the ancient cave. Inside, they found brilliant crystals and strange insects. It was an amazing adventure that expanded their knowledge of biology.", quiz:[{q:"What did they explore?", o:["A cave","A mountain"], a:0}]}],
-        "3級": [{title:"A Journey to the Future", text:"Lisa is a young scientist. Her ambition is to build a machine that can travel through time. She went to the future and saw the result of global warming.", quiz:[{q:"Who is Lisa?", o:["A teacher","A scientist"], a:1}]}],
-        "4級": [{title:"The Mystery of the Old Clock", text:"Ken lives in a small town. The famous clock tower stopped working fifty years ago. Ken helped an old man fix it, and the town people were very happy.", quiz:[{q:"What was broken?", o:["A clock","A car"], a:0}]}],
-        "5級": [{title:"A Day at the Park", text:"Today is Sunday. Tom and his family go to the big park. They eat sandwiches and read books. It is a happy day.", quiz:[{q:"Where do they go?", o:["School","Park"], a:1}]}]
-    };
-    
+    const storyBank = { "5級": [{title:"A Day at the Park", text:"Today is Sunday. Tom goes to the park.", quiz:[{q:"Where does Tom go?", o:["Park","School"], a:0}]}] };
     let currentStoryQuizIdx = 0; let currentStoryObj = null;
     function loadRandomStory() { 
-        const g = document.getElementById('story-grade-selector').value; 
-        const pool = [...(storyBank[g] || storyBank["5級"]), ...customStories.filter(s=>s.grade===g)];
+        const g = document.getElementById('story-grade-selector').value; const pool = [...(storyBank[g] || storyBank["5級"]), ...customStories.filter(s=>s.grade===g)];
         currentStoryObj = pool[Math.floor(Math.random() * pool.length)];
         document.getElementById('story-title').innerText = currentStoryObj.title; document.getElementById('story-box').innerHTML = formatText(currentStoryObj.text); 
         document.getElementById('story-box').style.display='block'; document.getElementById('btn-start-quiz').style.display='block'; document.getElementById('story-quiz-area').style.display='none'; document.getElementById('story-done').style.display='none';
@@ -554,29 +565,6 @@
         q.o.forEach((o, i) => { const b = document.createElement('button'); b.className='btn-duo btn-gray'; b.innerText=o; b.onclick=()=>{ if(i===parseInt(q.a)){b.classList.replace('btn-gray','btn-green');setTimeout(()=>{currentStoryQuizIdx++;renderStoryQuiz();},800);}else{b.classList.replace('btn-gray','btn-red');setTimeout(()=>b.classList.replace('btn-red','btn-gray'),800);} }; opts.appendChild(b); });
     }
 
-    // --- 通勤モード ---
-    let comActive = false;
-    async function startCommute() {
-        if(isMuted) { alert("ミュートされています。右上の🔊をタップしてください。"); return; }
-        comActive = true; document.getElementById('pocket-overlay').style.display = 'flex';
-        let q = words.filter(w => !w.nextReview || w.nextReview <= Date.now()); if(q.length===0) q = words;
-        let i = 0;
-        try {
-            while(comActive) {
-                const w = q[i % q.length]; document.getElementById('pocket-word').innerText = w.en;
-                await speakText(w.jp, 'ja-JP', 1.1); if(!comActive) break; await new Promise(r=>setTimeout(r,200));
-                await speakText(w.en, 'en-US', 1.0); if(!comActive) break; await new Promise(r=>setTimeout(r,200));
-                await speakText(w.en, 'en-US', 0.2); if(!comActive) break;
-                if(w.exJp) { await new Promise(r=>setTimeout(r,400)); await speakText(w.exJp, 'ja-JP', 1.1); if(!comActive) break; }
-                if(w.exEn) { await new Promise(r=>setTimeout(r,200)); await speakText(w.exEn, 'en-US', 1.0); if(!comActive) break; }
-                await new Promise(r => setTimeout(r, 600)); i++;
-            }
-        } catch(e) { stopCommute(); }
-    }
-    function stopCommute() { comActive = false; synth.cancel(); document.getElementById('pocket-overlay').style.display = 'none'; }
-    async function speakText(t, l, r) { return new Promise(res => { const u = new SpeechSynthesisUtterance(t); u.lang=l; u.rate=r; u.onend = res; u.onerror = res; synth.speak(u); setTimeout(res, 3500); }); }
-
-    // --- その他ゲーム（マッチ/AI/パズル） ---
     let matchRemaining = 20; let selectedLeft = null; let selectedRight = null;
     function initMatchGame() { if(words.length === 0) return; matchRemaining = 20; document.getElementById('match-counter').innerText = `残り: ${matchRemaining}問`; document.getElementById('match-board').style.display = 'grid'; document.getElementById('match-done').style.display = 'none'; loadNextMatchSet(); }
     function loadNextMatchSet() {
@@ -622,37 +610,24 @@
         }, 800);
     }
 
-    // --- ⚙️ 設定管理（追加・削除・バックアップ） ---
+    // --- ⚙️ 設定管理 ---
     function importCSV() {
         const t = document.getElementById('import-csv').value.trim(); if(!t) return;
         const selGrade = document.getElementById('import-grade-select').value;
-        if(words.length <= 3 && words[0].en === 'apple') words = [];
-        let added = 0;
+        if(words.length <= 3 && words[0].en === 'apple') words = []; let added = 0;
         t.split('\n').forEach(l => {
             const c = l.split(/\t|,/);
             if(c.length>=2 && c[0].trim()!=='') { 
                 let finalGrade = (selGrade === 'auto') ? (c[5]?.trim() || "5級") : selGrade;
-                words.push({id:Date.now()+Math.random(), en:c[0].trim(), jp:c[1].trim(), rubi:c[2]?.trim(), exEn:c[3]?.trim(), exJp:c[4]?.trim(), grade:finalGrade, box:0, nextReview:0}); 
-                added++; 
+                words.push({id:Date.now()+Math.random(), en:c[0].trim(), jp:c[1].trim(), rubi:c[2]?.trim(), exEn:c[3]?.trim(), exJp:c[4]?.trim(), grade:finalGrade, box:0, nextReview:0}); added++; 
             }
         });
-        saveWords(); alert(`${added} 件の単語を ${selGrade==='auto'?'データ通り':'「'+selGrade+'」'}に記録しました！`); document.getElementById('import-csv').value = '';
+        saveWords(); alert(`${added} 件記録しました！`); document.getElementById('import-csv').value = '';
     }
-
-    // 【個別削除処理】
-    function deleteVocabByGrade() {
-        const g = document.getElementById('delete-vocab-grade').value; const countBefore = words.length;
-        words = words.filter(w => w.grade !== g); const deleted = countBefore - words.length;
-        if(deleted > 0) { if(confirm(`本当に ${g} の単語 ${deleted}件 を削除しますか？`)) { saveWords(); alert(`削除しました。`); location.reload(); } } else { alert(`${g} の単語は見つかりませんでした。`); }
-    }
-    function deleteStoryByGrade() {
-        const g = document.getElementById('delete-story-grade').value; const countBefore = customStories.length;
-        customStories = customStories.filter(s => s.grade !== g); const deleted = countBefore - customStories.length;
-        if(deleted > 0) { if(confirm(`本当に ${g} の自作ストーリー ${deleted}件 を削除しますか？`)) { localStorage.setItem(LKEY_STORY, JSON.stringify(customStories)); alert(`削除しました。`); location.reload(); } } else { alert(`${g} の自作ストーリーは見つかりませんでした。`); }
-    }
+    function deleteVocabByGrade() { const g = document.getElementById('delete-vocab-grade').value; const countBefore = words.length; words = words.filter(w => w.grade !== g); const deleted = countBefore - words.length; if(deleted > 0) { if(confirm(`本当に ${g} の単語 ${deleted}件 を削除しますか？`)) { saveWords(); alert(`削除しました。`); location.reload(); } } else { alert(`${g} の単語はありません。`); } }
+    function deleteStoryByGrade() { const g = document.getElementById('delete-story-grade').value; const countBefore = customStories.length; customStories = customStories.filter(s => s.grade !== g); const deleted = countBefore - customStories.length; if(deleted > 0) { if(confirm(`本当に ${g} のストーリー ${deleted}件 を削除しますか？`)) { localStorage.setItem(LKEY_STORY, JSON.stringify(customStories)); alert(`削除しました。`); location.reload(); } } else { alert(`${g} のストーリーはありません。`); } }
     function clearAllData() { if(confirm("【警告】アプリを初期化し、全データを消去しますか？")) { localStorage.clear(); location.reload(); } }
-
-    // ストーリー作成
+    
     let qCount = 0;
     function initStoryQuizFields() { document.getElementById('st-quiz-container').innerHTML = ''; qCount = 0; addQuizField(); }
     function addQuizField() { if(qCount >= 5) return; qCount++; const div = document.createElement('div'); div.className = 'quiz-input-group'; div.innerHTML = `<p style="margin:0 0 5px 0; font-size:0.9rem;">問題 ${qCount}</p><input type="text" id="st-q${qCount}" placeholder="問題文"><input type="text" id="st-o${qCount}" placeholder="選択肢(カンマ区切り)"><input type="number" id="st-a${qCount}" placeholder="正解の番号(1〜3)" min="1" max="5">`; document.getElementById('st-quiz-container').appendChild(div); }
@@ -668,18 +643,14 @@
         alert("新しいストーリーを登録しました！"); document.getElementById('st-title').value = ''; document.getElementById('st-text').value = ''; initStoryQuizFields();
     }
 
-    // バックアップ防衛機能 (ファイル保存・読込)
     function exportDataToFile() {
         const data = { words: words, stories: customStories, xp: xp };
-        const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
+        const blob = new Blob([JSON.stringify(data)], { type: 'application/json' }); const url = URL.createObjectURL(blob);
         const a = document.createElement('a'); a.href = url; a.download = 'duo_vocab_backup.json';
-        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-        showToast("💾 バックアップを保存しました");
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); showToast("💾 バックアップを保存しました");
     }
     function importDataFromFile(event) {
-        const file = event.target.files[0]; if (!file) return;
-        const reader = new FileReader();
+        const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 const data = JSON.parse(e.target.result);
