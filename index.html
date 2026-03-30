@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>無限単語帳 Ultimate Duo V7</title>
+    <title>無限単語帳 Ultimate</title>
     <style>
         /* 🦉 Duolingo風 カラー＆デザイン */
         :root {
@@ -44,7 +44,7 @@
 
         select, input[type="text"], input[type="number"], textarea { background: var(--card-bg); color: var(--text-color); border: 2px solid var(--border-color); border-radius: 12px; padding: 12px; font-size: 1rem; width: 100%; box-sizing: border-box; margin-bottom: 10px; font-weight: bold; }
 
-        /* ハブ */
+        /* ハブメニュー */
         .hub-section-title { font-size: 1.2rem; font-weight: 800; color: var(--duo-green); margin: 25px 0 10px 0; border-bottom: 2px dashed var(--border-color); padding-bottom: 5px; }
         .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .hub-card { background: var(--card-bg); border: 2px solid var(--border-color); border-bottom: 5px solid var(--border-color); border-radius: 16px; padding: 20px 10px; text-align: center; cursor: pointer; transition: transform 0.1s; }
@@ -52,27 +52,24 @@
         .hub-icon { font-size: 2.5rem; margin-bottom: 10px; }
         .hub-title { font-weight: 800; font-size: 1.1rem; color: var(--text-color); }
 
-        /* 学習カード */
+        /* 学習コンテナ */
         .progress-container { width: 100%; background: var(--light-gray); height: 16px; border-radius: 8px; margin-bottom: 20px; overflow: hidden; }
         .progress-bar { background: var(--duo-green); height: 100%; width: 0%; border-radius: 8px; transition: width 0.3s; }
-        .card { background: var(--card-bg); border: 2px solid var(--border-color); border-bottom: 6px solid var(--border-color); border-radius: 20px; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; margin-bottom: 20px; transition: transform 0.1s; position: relative; }
+        .card { background: var(--card-bg); border: 2px solid var(--border-color); border-bottom: 6px solid var(--border-color); border-radius: 20px; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; margin-bottom: 20px; transition: transform 0.1s; }
         .srs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; display: none; }
-        .mastery-level { position: absolute; top: 15px; right: 15px; font-size: 1.2rem; color: var(--duo-yellow); }
 
-        /* タップ翻訳 */
+        /* 📚 ショートストーリー */
         .story-text-area { background: var(--card-bg); border: 2px solid var(--border-color); border-radius: 16px; padding: 20px; font-size: 1.2rem; line-height: 1.8; margin-bottom: 20px; max-height: 50vh; overflow-y: auto; }
         .story-word { cursor: pointer; border-bottom: 2px dotted var(--duo-blue); display: inline-block; margin: 0 2px; transition: background 0.2s; border-radius: 4px;}
         .story-word:active { background: #e1f5fe; }
         .dict-tooltip { position: fixed; background: #333; color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 1rem; font-weight: bold; z-index: 10000; display: none; transform: translateX(-50%) translateY(-120%); pointer-events: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); white-space: nowrap; }
         .dict-tooltip::after { content: ''; position: absolute; bottom: -8px; left: 50%; margin-left: -8px; border-width: 8px 8px 0; border-style: solid; border-color: #333 transparent transparent transparent; }
+        
+        .quiz-area { background: var(--card-bg); border: 2px solid var(--duo-orange); border-radius: 16px; padding: 20px; display: none; }
+        .quiz-q { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; color: var(--text-color); }
+        .quiz-options { display: flex; flex-direction: column; gap: 10px; }
 
-        /* AIチャット */
-        .chat-box { background: var(--light-gray); border-radius: 16px; padding: 15px; height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
-        .chat-msg { max-width: 85%; padding: 12px 16px; border-radius: 16px; font-weight: bold; line-height: 1.4; }
-        .msg-ai { background: var(--card-bg); align-self: flex-start; border-bottom-left-radius: 4px; border: 2px solid var(--border-color); }
-        .msg-user { background: var(--duo-blue); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-
-        /* その他ゲーム */
+        /* 🧩 マッチング＆絶景パズル */
         .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .match-btn { background: var(--card-bg); border: 2px solid var(--border-color); border-bottom: 4px solid var(--border-color); border-radius: 12px; padding: 15px 5px; text-align: center; font-weight: bold; font-size: 1rem; cursor: pointer; color: var(--text-color); transition: all 0.1s; }
         .match-btn.selected { background: #e1f5fe; border-color: var(--duo-blue); border-bottom-color: var(--duo-blue-shadow); color: var(--duo-blue); }
@@ -86,6 +83,14 @@
         .puzzle-piece { background: var(--light-gray); display: flex; justify-content: center; align-items: center; font-weight: bold; color: #aaa; font-size: 1.5rem; transition: opacity 0.8s ease-in-out; }
         .puzzle-piece.revealed { opacity: 0; }
 
+        /* 💬 AIチャット */
+        .chat-box { background: var(--light-gray); border-radius: 16px; padding: 15px; height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+        .chat-msg { max-width: 80%; padding: 12px 16px; border-radius: 16px; font-weight: bold; line-height: 1.4; }
+        .msg-ai { background: var(--card-bg); align-self: flex-start; border-bottom-left-radius: 4px; border: 2px solid var(--border-color); }
+        .msg-user { background: var(--duo-blue); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .chat-input-area { display: flex; gap: 8px; align-items: center; }
+
+        /* タブバー */
         .tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card-bg); border-top: 2px solid var(--border-color); display: flex; padding: 10px 0 20px 0; z-index: 100; justify-content: space-around; }
         .tab-btn { background: none; border: none; color: var(--text-light); font-size: 0.8rem; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; width: 33%; }
         .tab-btn.active { color: var(--duo-blue); }
@@ -93,10 +98,12 @@
 
         .view, .sub-view { display: none; }
         .view.active, .sub-view.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         #pocket-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; color: #fff; flex-direction: column; justify-content: center; align-items: center; }
         
-        .danger-zone { background: #ffebee; padding: 15px; border-radius: 12px; border: 2px solid var(--duo-red); margin-bottom: 20px; }
-        .danger-zone p { color: var(--duo-red); font-weight: bold; margin-top: 0; text-align: center; }
+        .mic-active { background-color: #ffcdd2 !important; border-color: #f44336 !important; }
+        .create-story-box { background: var(--light-gray); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        .quiz-input-group { background: var(--card-bg); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border-color); }
     </style>
 </head>
 <body>
@@ -109,358 +116,609 @@
     </div>
 </header>
 
-<div id="toast">メッセージ</div>
-<div id="dict-tooltip" class="dict-tooltip">意味</div>
+<div id="toast">🧩 パズルのピースを獲得！</div>
+<div id="dict-tooltip" class="dict-tooltip"></div>
 
 <div class="container">
     
     <div id="view-home" class="view active">
         <select id="hub-grade-filter" style="margin-bottom: 5px;">
-            <option value="all">全級から出題</option><option value="5級">5級</option><option value="4級">4級</option><option value="3級">3級</option><option value="準2級">準2級</option><option value="2級">2級</option><option value="準1級">準1級</option><option value="1級">1級</option>
+            <option value="all">全級から出題</option><option value="5級">5級</option><option value="4級">4級</option><option value="3級">3級</option>
         </select>
+        
         <div class="hub-section-title">🔰 基本レッスン</div>
         <div class="hub-grid">
-            <div class="hub-card" onclick="startSubMode('word')"><div class="hub-icon">🔤</div><div class="hub-title">単語・文章</div></div>
-            <div class="hub-card" onclick="startSubMode('listen')"><div class="hub-icon">👂</div><div class="hub-title">リスニング</div></div>
-            <div class="hub-card" onclick="startSubMode('speak')"><div class="hub-icon">🗣️</div><div class="hub-title">スピーキング</div></div>
-            <div class="hub-card" onclick="startCommute()"><div class="hub-icon">🎧</div><div class="hub-title">通勤(自動再生)</div></div>
+            <div class="hub-card" onclick="startSubMode('word')">
+                <div class="hub-icon">🔤</div><div class="hub-title">単語・文章</div>
+            </div>
+            <div class="hub-card" onclick="startSubMode('listen')">
+                <div class="hub-icon">👂</div><div class="hub-title">リスニング</div>
+            </div>
+            <div class="hub-card" onclick="startSubMode('speak')">
+                <div class="hub-icon">🗣️</div><div class="hub-title">スピーキング</div>
+            </div>
+            <div class="hub-card" onclick="startCommute()">
+                <div class="hub-icon">🎧</div><div class="hub-title">通勤(自動再生)</div>
+            </div>
         </div>
     </div>
 
     <div id="view-play" class="view">
         <div class="hub-section-title" style="color:var(--duo-orange);">🌟 応用・お楽しみ</div>
         <div class="hub-grid">
-            <div class="hub-card" onclick="showSubView('view-chat')"><div class="hub-icon">💬</div><div class="hub-title">AIロールプレイ</div></div>
-            <div class="hub-card" onclick="showSubView('view-stories')"><div class="hub-icon">📚</div><div class="hub-title">長文ストーリー</div></div>
-            <div class="hub-card" onclick="showSubView('view-match')"><div class="hub-icon">🧩</div><div class="hub-title">マッチング</div></div>
-            <div class="hub-card" onclick="showSubView('view-puzzle')"><div class="hub-icon">🖼️</div><div class="hub-title">絶景パズル</div></div>
+            <div class="hub-card" onclick="showSubView('view-chat')">
+                <div class="hub-icon">💬</div><div class="hub-title">AIロールプレイ</div>
+            </div>
+            <div class="hub-card" onclick="showSubView('view-stories')">
+                <div class="hub-icon">📚</div><div class="hub-title">長文ストーリー</div>
+            </div>
+            <div class="hub-card" onclick="showSubView('view-match')">
+                <div class="hub-icon">🧩</div><div class="hub-title">マッチング</div>
+            </div>
+            <div class="hub-card" onclick="showSubView('view-puzzle')">
+                <div class="hub-icon">🖼️</div><div class="hub-title">絶景パズル</div>
+            </div>
         </div>
     </div>
 
     <div id="view-study" class="sub-view">
         <button class="btn-duo btn-gray" style="padding: 10px; margin-bottom: 15px;" onclick="goHome('study')">🔙 戻る</button>
-        <select id="study-mode" onchange="loadStudyQueue()" style="margin-bottom:15px;">
-            <option value="en-jp">英語 ➔ 日本語 (意味)</option>
-            <option value="jp-en">日本語 ➔ 英語 (想起)</option>
-            <option value="jp-en-type">日本語 ➔ 英語 (スペル入力)</option>
+        
+        <select id="study-mode" onchange="loadStudyQueue()" style="display:none; margin-bottom:15px;">
+            <option value="en-jp">英語 ➔ 日本語 (意味を答える)</option>
+            <option value="jp-en">日本語 ➔ 英語 (英語を思い浮かべる)</option>
+            <option value="jp-en-type">日本語 ➔ 英語 (スペルを入力する)</option>
         </select>
+
         <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+
         <div id="study-area">
             <div class="card" id="flashcard">
-                <div class="mastery-level" id="sc-mastery"></div>
                 <div style="font-size: 0.9rem; color: var(--duo-orange); font-weight: bold;" id="sc-grade"></div>
                 <h1 style="font-size: 2.2rem; font-weight: 800; margin: 10px 0; color: var(--text-color);" id="sc-front-main"></h1>
-                <p id="sc-front-sub"></p>
+                <p style="font-size: 1.1rem; color: var(--text-light); margin-top: 5px;" id="sc-front-sub"></p>
                 <p style="color: var(--text-light); font-size: 0.9rem; margin-top:20px; cursor:pointer;" id="tap-hint" onclick="flipCard()">👇 タップして答えを確認</p>
                 
-                <div id="type-area" style="display: none; width: 100%; margin-top: 15px;">
-                    <input type="text" id="type-input" placeholder="英語のスペルを入力..." onkeypress="if(event.key==='Enter') checkTypeAnswer()">
-                    <button class="btn-duo btn-blue" onclick="checkTypeAnswer()">判定</button>
-                    <p id="type-feedback" style="font-weight:bold; margin-top: 10px;"></p>
+                <div id="interaction-area" style="display: none; width: 100%; margin-top: 15px;">
+                    <input type="text" id="type-input" placeholder="英語を入力..." style="display:none;" onkeypress="if(event.key==='Enter') checkInteractionAnswer()">
+                    <button id="speak-mic-btn" class="btn-duo btn-gray" style="display:none; border-radius:50%; width:80px; height:80px; font-size:2rem; margin: 10px auto;" onclick="startSpeakingCheck()">🎤</button>
+                    <button class="btn-duo btn-blue" id="check-btn" style="margin-bottom:5px;" onclick="checkInteractionAnswer()">判定する</button>
+                    <p id="interaction-feedback" style="font-weight:bold; margin: 10px 0 0 0; font-size:1.1rem;"></p>
                 </div>
-                
+
                 <div id="answer-area" style="display: none; width: 100%; margin-top: 15px; border-top: 2px dashed var(--border-color); padding-top: 15px;">
-                    <p id="sc-back-rubi" style="font-size: 1.1rem; font-weight:bold; color: var(--duo-orange); margin: 0 0 5px 0;"></p>
-                    <h2 style="font-size: 1.8rem; font-weight: bold; color: var(--duo-blue); margin: 0;" id="sc-back-main"></h2>
-                    <p id="sc-ex-en" style="font-style: italic; color: var(--text-light); margin-top: 10px;"></p>
-                    <p id="sc-ex-jp" style="font-size: 0.95rem;"></p>
+                    <h2 style="font-size: 1.6rem; font-weight: bold; color: var(--duo-blue); margin: 0;" id="sc-back-main"></h2>
+                    <p style="font-size: 1rem; color: var(--text-light); margin-top: 10px; font-style: italic;" id="sc-ex-en"></p>
+                    <p style="font-size: 0.95rem; color: var(--text-color); margin-top: 5px;" id="sc-ex-jp"></p>
                 </div>
             </div>
+
             <div style="display:flex; gap:10px; margin-bottom:15px;" id="audio-controls">
-                <button class="btn-duo btn-gray" style="flex:1;" onclick="playAudio('word')">🔈 音声</button>
-                <button class="btn-duo btn-gray" style="flex:1;" onclick="playAudio('word', 0.2)">🐢 ゆっくり</button>
+                <button class="btn-duo btn-gray" style="flex:1; padding: 10px;" onclick="playAudio('word')">🔈 音声</button>
+                <button class="btn-duo btn-gray" style="flex:1; padding: 10px;" onclick="playAudio('word', 0.2)">🐢 ゆっくり</button>
             </div>
+            
             <div class="srs-grid" id="srs-controls">
-                <button class="btn-duo btn-red" onclick="answerSrs(0)">忘れた</button>
-                <button class="btn-duo btn-orange" onclick="answerSrs(1)">難しい</button>
-                <button class="btn-duo btn-blue" onclick="answerSrs(2)">普通</button>
-                <button class="btn-duo btn-green" onclick="answerSrs(3)">簡単</button>
+                <button class="btn-duo btn-red" onclick="answerSrs(0)">忘れた<br><span style="font-size:0.7rem;">1分後</span></button>
+                <button class="btn-duo btn-orange" onclick="answerSrs(1)">難しい<br><span style="font-size:0.7rem;">10分後</span></button>
+                <button class="btn-duo btn-blue" onclick="answerSrs(2)">普通<br><span style="font-size:0.7rem;">明日</span></button>
+                <button class="btn-duo btn-green" onclick="answerSrs(3)">簡単<br><span style="font-size:0.7rem;">3日後</span></button>
             </div>
         </div>
+
         <div id="all-done" style="display: none; text-align: center; padding: 40px 10px;">
             <h1 style="color: var(--duo-yellow); font-size: 4rem; margin:0;">🎉</h1>
-            <h2 style="color: var(--duo-green);">完了！</h2>
-            <button class="btn-duo btn-purple" style="margin-top:20px;" onclick="loadNewLesson()">未出題を練習</button>
+            <h2 style="color: var(--duo-green);">レッスン完了！</h2>
+            <button class="btn-duo btn-purple" style="margin-top:20px;" onclick="loadNewLesson()">未出題の新しい単語を練習</button>
         </div>
     </div>
 
     <div id="view-stories" class="sub-view">
         <button class="btn-duo btn-gray" style="padding: 10px; margin-bottom: 15px;" onclick="goHome('play')">🔙 戻る</button>
-        <select id="story-grade-selector" onchange="loadRandomStory()">
-            <option value="1級">1級の物語</option><option value="準1級">準1級の物語</option><option value="2級">2級の物語</option><option value="準2級">準2級の物語</option><option value="3級">3級の物語</option><option value="4級">4級の物語</option><option value="5級">5級の物語</option>
-        </select>
-        <h3 id="story-title" style="color: var(--duo-orange); text-align: center;"></h3>
+        <h2 style="text-align: center; color: var(--duo-green); margin-top:0;">長文ストーリー読解</h2>
+        <p style="text-align: center; color: var(--text-light); font-size:0.85rem;">単語をタップすると意味がわかります。<br>未登録の単語はAIが自動で翻訳します！</p>
+        
+        <select id="story-selector" onchange="loadStory()"></select>
+        
         <div class="story-text-area" id="story-box"></div>
-        <button class="btn-duo btn-orange" id="btn-start-quiz" onclick="startStoryQuiz()" style="display:none;">📖 読んだ！問題へ</button>
+        <button class="btn-duo btn-orange" id="btn-start-quiz" onclick="startStoryQuiz()" style="display:none;">📖 読んだ！問題に挑戦する</button>
+
         <div class="quiz-area" id="story-quiz-area">
-            <div id="sq-progress" style="font-weight:bold; color:var(--duo-orange); margin-bottom:10px;"></div>
+            <div style="font-weight:bold; color:var(--duo-orange); margin-bottom:10px;" id="sq-progress">問題 1 / 5</div>
             <div class="quiz-q" id="sq-q"></div>
             <div class="quiz-options" id="sq-options"></div>
         </div>
-        <div id="story-done" style="display:none; text-align:center;">
-            <h1 style="color: var(--duo-yellow); font-size: 3rem;">💎 +100</h1>
-            <button class="btn-duo btn-purple" onclick="loadRandomStory()">別の物語</button>
+        
+        <div id="story-done" style="display:none; text-align:center; padding: 20px 0;">
+            <h1 style="color: var(--duo-yellow); font-size: 3rem; margin:0;">💎 +100 XP</h1>
+            <h3 style="color: var(--duo-green);">全問クリア！読解力アップ！</h3>
         </div>
     </div>
 
     <div id="view-chat" class="sub-view">
         <button class="btn-duo btn-gray" style="padding: 10px; margin-bottom: 15px;" onclick="goHome('play')">🔙 戻る</button>
+        <h2 style="text-align: center; color: var(--duo-blue); margin-top:0;">AIロールプレイ</h2>
         <div class="chat-box" id="chat-box"></div>
-        <div class="chat-input-area">
-            <button id="mic-btn" class="btn-duo btn-gray" style="flex:0.2;" onclick="startDictation('chat')">🎤</button>
-            <input type="text" id="chat-input" placeholder="英語で返信..." style="flex:1;" onkeypress="if(event.key==='Enter') sendChat()">
-            <button class="btn-duo btn-green" style="flex:0.3;" onclick="sendChat()">送信</button>
+        <div class="chat-input-area" id="chat-ui-area">
+            <button id="mic-btn" class="btn-duo btn-gray" style="flex:0.2; padding:12px 0; border-radius:12px; margin-bottom:0;" onclick="startDictation('chat')">🎤</button>
+            <input type="text" id="chat-input" placeholder="英語で返信..." style="flex:1; margin-bottom:0;" onkeypress="if(event.key === 'Enter') sendChat()">
+            <button class="btn-duo btn-green" style="flex:0.3; padding:12px 0; border-radius:12px; margin-bottom:0;" onclick="sendChat()">送信</button>
         </div>
-        <div style="background: #e8f5e9; border: 2px solid var(--duo-green); border-radius: 12px; padding: 15px; margin-top: 15px; display: none;" id="chat-feedback"></div>
+        <div style="background: #e8f5e9; border: 2px solid var(--duo-green); border-radius: 12px; padding: 15px; margin-top: 15px; display: none;" id="chat-feedback">
+            <h3 style="color: var(--duo-green); margin-top:0;">🎉 ミッション完了！</h3>
+            <p><strong>使えた単語:</strong> <span id="used-words-list" style="color:var(--duo-blue);"></span></p>
+            <p><strong>💡 AIアドバイス:</strong><br><span id="grammar-advice"></span></p>
+            <button class="btn-duo btn-gray" style="margin-top:10px;" onclick="initChatGame()">もう一度</button>
+        </div>
     </div>
 
     <div id="view-match" class="sub-view">
-        <button class="btn-duo btn-gray" style="padding: 10px;" onclick="goHome('play')">🔙</button>
-        <div id="match-counter" style="text-align: center; font-weight: bold; color: var(--duo-blue);"></div>
+        <button class="btn-duo btn-gray" style="padding: 10px; margin-bottom: 15px;" onclick="goHome('play')">🔙 戻る</button>
+        <h2 style="text-align: center; color: var(--duo-purple); margin-top:0;">ペア合わせゲーム</h2>
+        <div style="text-align: center; font-weight: bold; margin-bottom: 10px; color: var(--duo-blue);" id="match-counter">残り: 20問</div>
         <div class="match-grid" id="match-board"></div>
-        <div id="match-done" style="display:none; text-align:center;"><button class="btn-duo btn-purple" onclick="initMatchGame()">もう一度</button></div>
+        <div id="match-done" style="display: none; text-align: center;"><h1 style="color: var(--duo-yellow); font-size: 3rem; margin:0;">💎 +50 XP</h1><button class="btn-duo btn-purple" style="margin-top:20px;" onclick="initMatchGame()">もう一度</button></div>
     </div>
+
     <div id="view-puzzle" class="sub-view">
-        <button class="btn-duo btn-gray" style="padding: 10px;" onclick="goHome('play')">🔙</button>
-        <div class="puzzle-wrapper"><img src="https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=600" class="puzzle-image"><div class="puzzle-grid" id="puzzle-grid"></div></div>
+        <button class="btn-duo btn-gray" style="padding: 10px; margin-bottom: 15px;" onclick="goHome('play')">🔙 戻る</button>
+        <h2 style="text-align: center; color: var(--duo-orange); margin-top:0;">ご褒美パズル</h2>
+        <div class="puzzle-wrapper"><img src="https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=600&q=80" class="puzzle-image" alt="絶景"><div class="puzzle-grid" id="puzzle-grid"></div></div>
+        <div class="puzzle-info" id="puzzle-info">🇵🇪 マチュピチュ (ペルー)<br><span style="font-size:0.9rem; color:var(--text-light); font-weight:normal;">インカ帝国の古代遺跡。標高2400m。</span></div>
     </div>
 
     <div id="view-data" class="view">
-        <h2 style="text-align: center;">設定・管理</h2>
+        <h2 style="text-align: center; color: var(--text-color);">データ管理</h2>
         
-        <div style="background: var(--light-gray); padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align:center;">
-            <strong>収録: <span id="count-total" style="color:var(--duo-blue);">0</span> 語</strong><br>
-            <span style="font-size:0.85rem; color:var(--text-light);">
-                1級:<span id="count-1">0</span> / 準1級:<span id="count-p1">0</span> / 2級:<span id="count-2">0</span> / 準2級:<span id="count-p2">0</span><br>
-                3級:<span id="count-3">0</span> / 4級:<span id="count-4">0</span> / 5級:<span id="count-5">0</span>
-            </span>
+        <div class="hub-section-title">📥 単語データの追加</div>
+        <div style="background: var(--light-gray); padding: 10px; border-radius: 12px; margin-bottom: 10px; text-align:center;">
+            <strong>収録: <span id="count-total" style="color:var(--duo-blue);">0</span> 語</strong> (5級:<span id="count-5">0</span> / 4級:<span id="count-4">0</span> / 3級:<span id="count-3">0</span>)
         </div>
-
-        <div class="hub-section-title">📥 新しい単語を追加</div>
         <textarea id="import-csv" rows="4" placeholder="英語	日本語	カタカナ	例文英	例文日	級"></textarea>
         <button class="btn-duo btn-green" onclick="importCSV()">単語を記録する</button>
         
-        <div class="hub-section-title">📚 新しい長文を作成</div>
-        <div style="background: var(--light-gray); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-            <input type="text" id="st-title" placeholder="タイトル">
-            <select id="st-grade"><option value="1級">1級</option><option value="準1級">準1級</option><option value="2級">2級</option><option value="準2級">準2級</option><option value="3級">3級</option><option value="4級">4級</option><option value="5級">5級</option></select>
-            <textarea id="st-text" rows="4" placeholder="英語の長文を入力..."></textarea>
-            <p style="font-size:0.9rem; font-weight:bold; margin-bottom:5px;">📝 クイズ（最低1問）</p>
+        <div class="hub-section-title">📚 長文ストーリーの作成</div>
+        <div class="create-story-box">
+            <input type="text" id="st-title" placeholder="タイトル (例: トムのりんご)">
+            <select id="st-grade"><option value="5級">5級</option><option value="4級">4級</option><option value="3級">3級</option></select>
+            <textarea id="st-text" rows="5" placeholder="英語の長文を入力してください..."></textarea>
+            
+            <p style="font-size:0.9rem; font-weight:bold; margin-bottom:5px;">📝 クイズを作成 (最低1問〜最大5問)</p>
             <div id="st-quiz-container"></div>
-            <button class="btn-duo btn-gray" style="padding:10px; margin-bottom:15px;" onclick="addQuizField()">+ 問題を追加</button>
-            <button class="btn-duo btn-blue" onclick="saveCustomStory()">ストーリーを登録</button>
+            <button class="btn-duo btn-gray" style="padding:10px; margin-bottom:15px;" onclick="addQuizField()">+ 問題を追加する</button>
+            <button class="btn-duo btn-blue" onclick="saveCustomStory()">ストーリーを登録する</button>
         </div>
 
-        <div class="hub-section-title">💾 バックアップ</div>
-        <p style="font-size:0.85rem; color:var(--text-light);">苦労して集めた単語データをコピーして、メモ帳などに貼り付けて保存できます。</p>
-        <button class="btn-duo btn-blue" onclick="exportCSV()">現在の単語データをコピー</button>
-
-        <div class="hub-section-title" style="color:var(--duo-red);">⚠️ デンジャーゾーン</div>
-        <div class="danger-zone">
-            <p>※消去したデータは元に戻せません</p>
-            <button class="btn-duo btn-red" onclick="clearVocabData()">🗑️ 単語データのみ消去</button>
-            <button class="btn-duo btn-red" onclick="clearStoryData()">🗑️ 自作ストーリーのみ消去</button>
-            <button class="btn-duo btn-gray" onclick="clearAllData()">💣 アプリを完全に初期化</button>
-        </div>
+        <hr style="border: 1px dashed var(--border-color); margin: 30px 0;">
+        <button class="btn-duo btn-red" onclick="clearAllData()">すべてのデータを消去</button>
     </div>
 </div>
 
 <div id="pocket-overlay">
-    <h2 id="pocket-word"></h2>
-    <button class="btn-duo btn-red" onclick="stopCommute()">停止</button>
+    <p>🎧 通勤自動再生中...</p>
+    <h2 id="pocket-word" style="color: var(--duo-green); margin: 30px 0; text-align:center;"></h2>
+    <button class="btn-duo btn-red" style="width:80%;" onclick="stopCommute()">停止して戻る</button>
 </div>
 
 <nav class="tab-bar">
     <button class="tab-btn active" onclick="goHome('study')"><span class="tab-icon">🏠</span>学ぶ</button>
     <button class="tab-btn" onclick="goHome('play')"><span class="tab-icon">🎮</span>お楽しみ</button>
-    <button class="tab-btn" onclick="showTab('view-data', this)"><span class="tab-icon">⚙️</span>設定・管理</button>
+    <button class="tab-btn" onclick="showTab('view-data', this)"><span class="tab-icon">⚙️</span>記録</button>
 </nav>
 
 <script>
     // ==========================================
-    // 🧠 鉄壁のデータ管理・マイグレーション
+    // 🧠 状態管理・初期化
     // ==========================================
-    const LKEY_VOCAB = 'vocab_srs_v7';
-    const LKEY_STORY = 'vocab_stories_v7';
-    const LKEY_XP = 'vocab_xp_v7';
-    
-    const fallbackDict = { "together": "一緒に", "weather": "天気", "beautiful": "美しい", "family": "家族", "president": "大統領", "company": "会社" };
     const defaultWords = [{ id: 1, en: 'apple', jp: 'りんご', rubi: 'アップル', exEn: 'An apple.', exJp: 'りんご。', grade: '5級', box: 0, nextReview: 0 }];
-
     let words = [];
-    try {
-        // v7のデータを探す。なければ旧バージョン(v6, v5)を探して引き継ぐ
-        let stored = localStorage.getItem(LKEY_VOCAB) || localStorage.getItem('vocab_srs_duo_v6') || localStorage.getItem('vocab_srs_duo_v5');
-        if (stored) {
-            words = JSON.parse(stored);
-            localStorage.setItem(LKEY_VOCAB, JSON.stringify(words)); // 新バージョンとして保存し直す
-        } else { words = defaultWords; }
-    } catch(e) { words = defaultWords; }
-
-    let customStories = [];
-    try {
-        let storedSt = localStorage.getItem(LKEY_STORY) || localStorage.getItem('vocab_custom_stories_v6') || localStorage.getItem('vocab_custom_stories_v5');
-        if (storedSt) {
-            customStories = JSON.parse(storedSt);
-            localStorage.setItem(LKEY_STORY, JSON.stringify(customStories));
-        }
-    } catch(e) {}
-
-    let xp = parseInt(localStorage.getItem(LKEY_XP) || localStorage.getItem('vocab_xp_v6')) || 0;
-    document.getElementById('xp-count').innerText = xp;
-    localStorage.setItem(LKEY_XP, xp);
+    try { const stored = localStorage.getItem('vocab_srs_duo_v5'); words = stored ? JSON.parse(stored) : defaultWords; if(words.length===0) words = defaultWords; } catch(e) { words = defaultWords; }
 
     let reviewQueue = []; let currentWord = null; let totalQueueCount = 0; let currentStudyMode = 'word';
-    let synth = window.speechSynthesis; let bestVoice = null; let isMuted = false; let recognition = null;
+    let xp = parseInt(localStorage.getItem('vocab_xp_v5')) || 0; document.getElementById('xp-count').innerText = xp;
 
-    function initVoice() { const vs = synth.getVoices(); bestVoice = vs.find(v => v.lang === 'en-US' && v.name.includes('Premium')) || vs.find(v => v.lang.startsWith('en')); }
+    let synth = window.speechSynthesis; let bestVoice = null; let isMuted = false;
+    let recognition = null;
+
+    function initVoice() {
+        const vs = synth.getVoices();
+        bestVoice = vs.find(v => v.lang === 'en-US' && (v.name.includes('Premium') || v.name.includes('Samantha'))) || vs.find(v => v.lang.startsWith('en'));
+    }
     if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = initVoice;
-    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) { recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)(); recognition.lang = 'en-US'; }
+
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SR(); recognition.lang = 'en-US'; recognition.interimResults = false;
+    }
 
     function toggleMute() { isMuted = !isMuted; document.getElementById('mute-btn').innerText = isMuted ? '🔇' : '🔊'; if(isMuted) synth.cancel(); }
-    function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); }
-    function addXP(a) { const oldP = Math.floor(xp/100); xp += a; localStorage.setItem(LKEY_XP, xp); document.getElementById('xp-count').innerText = xp; if(Math.floor(xp/100) > oldP && Math.floor(xp/100) <= 9) { showToast("🧩 パズルのピース獲得！"); renderPuzzle(); } }
-    
-    function goHome(t) { if(t==='play') showTab('view-play', document.querySelectorAll('.tab-btn')[1]); else showTab('view-home', document.querySelectorAll('.tab-btn')[0]); }
-    function showTab(id, b) { document.querySelectorAll('.view, .sub-view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); if(b) { document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); b.classList.add('active'); } if(id === 'view-data') { updateWordCounts(); initStoryQuizFields(); } }
-    
-    function saveWords() { localStorage.setItem(LKEY_VOCAB, JSON.stringify(words)); }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 3000);
+    }
+
+    function addXP(amount) {
+        const oldPieces = Math.floor(xp / 100); xp += amount; localStorage.setItem('vocab_xp_v5', xp); document.getElementById('xp-count').innerText = xp;
+        const newPieces = Math.floor(xp / 100);
+        if(newPieces > oldPieces && newPieces <= 9) { showToast("🧩 パズルのピースを獲得しました！"); renderPuzzle(); }
+    }
+
+    function showTab(id, btnObj=null) {
+        document.querySelectorAll('.view, .sub-view').forEach(v => v.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(btnObj) { document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btnObj.classList.add('active'); }
+        if(id === 'view-data') { updateWordCounts(); initStoryQuizFields(); }
+    }
+
+    function goHome(target = 'study') {
+        if(target === 'play') { showTab('view-play', document.querySelectorAll('.tab-btn')[1]); }
+        else { showTab('view-home', document.querySelectorAll('.tab-btn')[0]); }
+    }
+
+    function saveWords() { localStorage.setItem('vocab_srs_duo_v5', JSON.stringify(words)); }
 
     function updateWordCounts() {
-        const c = { total: words.length, g1:0, gp1:0, g2:0, gp2:0, g3:0, g4:0, g5:0 };
-        words.forEach(w => { 
-            if(w.grade === '1級') c.g1++; else if(w.grade === '準1級') c.gp1++; else if(w.grade === '2級') c.g2++; else if(w.grade === '準2級') c.gp2++;
-            else if(w.grade === '3級') c.g3++; else if(w.grade === '4級') c.g4++; else if(w.grade === '5級') c.g5++; 
-        });
-        document.getElementById('count-total').innerText = c.total; 
-        document.getElementById('count-1').innerText = c.g1; document.getElementById('count-p1').innerText = c.gp1; 
-        document.getElementById('count-2').innerText = c.g2; document.getElementById('count-p2').innerText = c.gp2;
-        document.getElementById('count-3').innerText = c.g3; document.getElementById('count-4').innerText = c.g4; document.getElementById('count-5').innerText = c.g5;
+        const c = { total: words.length, g5: 0, g4: 0, g3: 0 };
+        words.forEach(w => { if(w.grade === '5級') c.g5++; else if(w.grade === '4級') c.g4++; else if(w.grade === '3級') c.g3++; });
+        document.getElementById('count-total').innerText = c.total; document.getElementById('count-5').innerText = c.g5; document.getElementById('count-4').innerText = c.g4; document.getElementById('count-3').innerText = c.g3;
     }
 
-    // --- 単語学習エンジン ---
-    function startSubMode(m) { currentStudyMode = m; showTab('view-study'); document.getElementById('study-mode').style.display = m==='word' ? 'block' : 'none'; loadStudyQueue(); }
-    function loadStudyQueue(force = false) {
-        const g = document.getElementById('hub-grade-filter').value; const now = Date.now();
-        reviewQueue = words.filter(w => (g === 'all' || w.grade === g) && (force || !w.nextReview || w.nextReview <= now)).sort(() => Math.random() - 0.5);
+    // ==========================================
+    // 📖 学習エンジン (単語/リス/スピ統合)
+    // ==========================================
+    function startSubMode(mode) {
+        currentStudyMode = mode;
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('view-study').classList.add('active');
+        
+        // 単語学習の時だけ3つの出題モード選択を表示
+        if(mode === 'word') document.getElementById('study-mode').style.display = 'block';
+        else document.getElementById('study-mode').style.display = 'none';
+
+        loadStudyQueue();
+    }
+
+    function loadStudyQueue(forceAll = false) {
+        if(words.length === 0) return;
+        const grade = document.getElementById('hub-grade-filter').value;
+        const now = Date.now();
+        reviewQueue = words.filter(w => (grade === 'all' || w.grade === grade) && (forceAll || !w.nextReview || w.nextReview <= now));
+        reviewQueue.sort(() => Math.random() - 0.5);
         totalQueueCount = reviewQueue.length;
-        if(totalQueueCount === 0) { document.getElementById('study-area').style.display = 'none'; document.getElementById('all-done').style.display = 'block'; }
-        else { document.getElementById('study-area').style.display = 'block'; document.getElementById('all-done').style.display = 'none'; showNextCard(); }
+        
+        if(reviewQueue.length === 0) {
+            document.getElementById('study-area').style.display = 'none';
+            document.getElementById('progress-bar').style.width = '100%';
+            document.getElementById('all-done').style.display = 'block';
+        } else {
+            document.getElementById('study-area').style.display = 'block';
+            document.getElementById('all-done').style.display = 'none';
+            showNextCard();
+        }
     }
+
+    // 【要望】新しい単語を練習 (未出題を優先)
     function loadNewLesson() {
-        const g = document.getElementById('hub-grade-filter').value; let unlearned = words.filter(w => (g === 'all' || w.grade === g) && (!w.nextReview || w.nextReview === 0));
-        if(unlearned.length === 0) { alert("全て学習済みです！"); return; }
-        reviewQueue = unlearned.sort(() => Math.random() - 0.5).slice(0, 10); totalQueueCount = reviewQueue.length;
-        document.getElementById('study-area').style.display = 'block'; document.getElementById('all-done').style.display = 'none'; showNextCard();
+        const grade = document.getElementById('hub-grade-filter').value;
+        let pool = words.filter(w => grade === 'all' || w.grade === grade);
+        let unlearned = pool.filter(w => !w.nextReview || w.nextReview === 0);
+        if(unlearned.length === 0) { alert("全て学習済みです！復習するか新しい単語を追加してください。"); return; }
+        
+        unlearned.sort(() => Math.random() - 0.5);
+        reviewQueue = unlearned.slice(0, 10); totalQueueCount = reviewQueue.length;
+        document.getElementById('study-area').style.display = 'block'; document.getElementById('all-done').style.display = 'none';
+        showNextCard();
     }
+
     function showNextCard() {
         if(reviewQueue.length === 0) { loadStudyQueue(); return; }
         currentWord = reviewQueue[0];
-        document.getElementById('answer-area').style.display = 'none'; document.getElementById('srs-controls').style.display = 'none'; document.getElementById('type-area').style.display = 'none';
         
-        // メタ認知（記憶レベルの可視化）
-        const box = currentWord.box || 0;
-        let stars = ""; for(let i=0; i<box; i++) stars += "⭐";
-        document.getElementById('sc-mastery').innerText = stars;
-
-        const mode = document.getElementById('study-mode').value;
+        document.getElementById('answer-area').style.display = 'none';
+        document.getElementById('srs-controls').style.display = 'none';
+        document.getElementById('interaction-area').style.display = 'none';
+        document.getElementById('type-input').style.display = 'none';
+        document.getElementById('speak-mic-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('audio-controls').style.display = 'flex';
+        document.getElementById('tap-hint').style.display = 'block';
+        document.getElementById('flashcard').onclick = flipCard;
         document.getElementById('sc-grade').innerText = currentWord.grade;
-        if(mode === 'jp-en-type' && currentStudyMode === 'word') { document.getElementById('sc-front-main').innerText = currentWord.jp; document.getElementById('sc-front-sub').innerHTML = ""; document.getElementById('type-area').style.display = 'block'; document.getElementById('type-input').value = ''; document.getElementById('tap-hint').style.display = 'none'; document.getElementById('flashcard').onclick = null; }
-        else if (currentStudyMode === 'word') {
-            const e2j = mode==='en-jp';
-            document.getElementById('sc-front-main').innerText = e2j ? currentWord.en : currentWord.jp;
-            document.getElementById('sc-front-sub').innerHTML = e2j ? (currentWord.rubi ? currentWord.rubi.replace(/\[(.*?)\]/g, "<b>$1</b>") : "") : "";
-            document.getElementById('tap-hint').style.display = 'block'; document.getElementById('flashcard').onclick = flipCard;
-        } else if (currentStudyMode === 'listen') {
-            document.getElementById('sc-front-main').innerText = "🔊 音声を聞いて入力"; document.getElementById('sc-front-sub').innerHTML = "";
-            document.getElementById('type-area').style.display = 'block'; document.getElementById('type-input').value = ''; document.getElementById('tap-hint').style.display = 'none'; document.getElementById('flashcard').onclick = null;
+
+        const fMain = document.getElementById('sc-front-main'); const fSub = document.getElementById('sc-front-sub');
+        const bMain = document.getElementById('sc-back-main'); const eEn = document.getElementById('sc-ex-en'); const eJp = document.getElementById('sc-ex-jp');
+
+        // 裏面（答え）
+        bMain.innerText = currentWord.en; eEn.innerText = currentWord.exEn || ""; eJp.innerText = currentWord.exJp || "";
+
+        if(currentStudyMode === 'word') {
+            const sm = document.getElementById('study-mode').value;
+            if(sm === 'jp-en-type') {
+                fMain.innerText = currentWord.jp; fSub.innerHTML = "";
+                setupInteraction('type', true);
+            } else {
+                const isEnToJp = (sm === 'en-jp');
+                fMain.innerText = isEnToJp ? currentWord.en : currentWord.jp;
+                fSub.innerHTML = isEnToJp ? (currentWord.rubi ? currentWord.rubi.replace(/\[(.*?)\]/g, "<b>$1</b>") : "") : "";
+            }
+        } else if(currentStudyMode === 'listen') {
+            fMain.innerText = "🔊 音声を聞いて入力"; fSub.innerHTML = "";
+            setupInteraction('type', true);
             if(!isMuted) playAudio('word');
-        } else if (currentStudyMode === 'speak') {
-            document.getElementById('sc-front-main').innerText = currentWord.en; document.getElementById('sc-front-sub').innerHTML = "👆 マイクを押して発音してね";
-            document.getElementById('type-area').style.display = 'none'; document.getElementById('tap-hint').style.display = 'none'; document.getElementById('flashcard').onclick = startSpeakingCheck;
+        } else if(currentStudyMode === 'speak') {
+            fMain.innerText = currentWord.en; fSub.innerHTML = "👆 マイクを押して発音してね";
+            setupInteraction('speak');
+            document.getElementById('audio-controls').style.display = 'none';
         }
 
-        document.getElementById('sc-back-main').innerText = (mode==='en-jp' || currentStudyMode !== 'word') ? currentWord.jp : currentWord.en;
-        document.getElementById('sc-back-rubi').innerText = (mode==='jp-en' && currentWord.rubi) ? currentWord.rubi.replace(/\[|\]/g, "") : "";
-        document.getElementById('sc-ex-en').innerText = currentWord.exEn || ""; document.getElementById('sc-ex-jp').innerText = currentWord.exJp || "";
-        document.getElementById('progress-bar').style.width = `${((totalQueueCount - reviewQueue.length) / totalQueueCount) * 100}%`;
+        const percent = ((totalQueueCount - reviewQueue.length) / totalQueueCount) * 100;
+        document.getElementById('progress-bar').style.width = `${percent}%`;
     }
-    
-    function flipCard() { document.getElementById('answer-area').style.display = 'block'; document.getElementById('srs-controls').style.display = 'grid'; document.getElementById('tap-hint').style.display = 'none'; document.getElementById('type-area').style.display = 'none'; if(!isMuted && currentStudyMode==='word') playAudio('word'); }
-    function checkTypeAnswer(spoken = null) { 
-        const a = (spoken || document.getElementById('type-input').value).trim().toLowerCase().replace(/[^a-z0-9 ]/g, '');
-        const c = currentWord.en.toLowerCase().replace(/[^a-z0-9 ]/g, '');
-        if(a === c || a.includes(c)) { showToast("🎉 正解！"); flipCard(); } else { alert(`❌ おしい！ 正解は: ${currentWord.en}`); flipCard(); } 
+
+    function setupInteraction(type, hideHint = false) {
+        document.getElementById('interaction-area').style.display = 'block';
+        document.getElementById('interaction-feedback').innerText = '';
+        document.getElementById('flashcard').onclick = null;
+        if(hideHint) document.getElementById('tap-hint').style.display = 'none';
+        
+        if(type === 'type') {
+            const input = document.getElementById('type-input');
+            input.style.display = 'block'; input.value = '';
+            document.getElementById('check-btn').style.display = 'block';
+        } else if (type === 'speak') {
+            document.getElementById('speak-mic-btn').style.display = 'block';
+            document.getElementById('speak-mic-btn').innerText = '🎤';
+        }
     }
+
+    function checkInteractionAnswer(spokenText = null) {
+        let ans = spokenText || document.getElementById('type-input').value.trim();
+        if(!ans) return;
+        const cleanAns = ans.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+        const correct = currentWord.en.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+        const fb = document.getElementById('interaction-feedback');
+        
+        if(cleanAns === correct || cleanAns.includes(correct)) {
+            fb.innerText = `🎉 正解！ (${ans})`; fb.style.color = "var(--duo-green)";
+            if(!isMuted) playAudio('word'); setTimeout(showAnswerArea, 1000);
+        } else {
+            fb.innerText = `❌ おしい！ 正解は: ${currentWord.en}`; fb.style.color = "var(--duo-red)";
+            if(!isMuted) playAudio('word'); setTimeout(showAnswerArea, 1500);
+        }
+    }
+
     function startSpeakingCheck() {
-        if(!recognition) { alert("ブラウザ非対応です"); return; }
-        recognition.onresult = (e) => { checkTypeAnswer(e.results[0][0].transcript); }; recognition.start();
+        if(!recognition) { alert("ブラウザが音声入力非対応です。"); return; }
+        const btn = document.getElementById('speak-mic-btn');
+        btn.innerText = '🔴'; btn.classList.add('mic-active');
+        recognition.onresult = (e) => { btn.classList.remove('mic-active'); btn.innerText = '🎤'; checkInteractionAnswer(e.results[0][0].transcript); };
+        recognition.onerror = () => { btn.classList.remove('mic-active'); btn.innerText = '🎤'; };
+        recognition.start();
     }
-    function answerSrs(q) { const now = Date.now(); if(q>1) addXP(10); const intervals = [60000, 600000, 86400000, 259200000]; currentWord.box = (q===0?0:(currentWord.box||0)+(q===3?2:1)); currentWord.nextReview = now + intervals[Math.min(currentWord.box, 3)]; saveWords(); reviewQueue.shift(); showNextCard(); }
-    function playAudio(t, r=1.0) { if(isMuted) return; synth.cancel(); const u = new SpeechSynthesisUtterance(t==='word'?currentWord.en:currentWord.exEn); u.lang='en-US'; u.rate=r; if(bestVoice) u.voice=bestVoice; synth.speak(u); }
 
-    // --- ストーリー・AI ---
-    async function lookupWord(w, el) {
-        const clean = w.toLowerCase().replace(/[^a-z]/g, ''); const tip = document.getElementById('dict-tooltip');
-        if(!isMuted) { synth.cancel(); const u = new SpeechSynthesisUtterance(clean); u.lang='en-US'; synth.speak(u); }
-        let f = words.find(v => v.en.toLowerCase() === clean) || (fallbackDict[clean] ? {jp: fallbackDict[clean]} : null);
-        if(f) { tip.innerText = f.jp; tip.style.background = 'var(--duo-blue)'; }
-        else { tip.innerText = "翻訳中..."; try { const r = await fetch(`https://api.mymemory.translated.net/get?q=${clean}&langpair=en|ja`); const d = await r.json(); tip.innerText = "(未登録) " + d.responseData.translatedText; } catch(e){ tip.innerText = "(未登録)"; } }
-        const r = el.getBoundingClientRect(); tip.style.left = `${r.left + r.width/2}px`; tip.style.top = `${r.top - 5}px`; tip.style.display = 'block'; setTimeout(() => tip.style.display = 'none', 2500);
+    function flipCard() { if(document.getElementById('answer-area').style.display === 'block') return; showAnswerArea(); if(!isMuted && currentStudyMode === 'word') playAudio('word'); }
+
+    function showAnswerArea() {
+        document.getElementById('interaction-area').style.display = 'none';
+        document.getElementById('tap-hint').style.display = 'none';
+        document.getElementById('answer-area').style.display = 'block';
+        document.getElementById('srs-controls').style.display = 'grid';
+        document.getElementById('audio-controls').style.display = 'flex';
     }
-    function formatText(t) { return t.split(/([ \n\.,!?])/).map(w => w.match(/[a-zA-Z]/) ? `<span class="story-word" onclick="lookupWord('${w.replace(/'/g,"\\'")}', this)">${w}</span>` : w).join(''); }
-    
-    const storyBank = { 
-        "1級": [{title:"The Ubiquitous AI", text:"In the 21st century, artificial intelligence has become ubiquitous. It is no longer an esoteric concept, but a pragmatic tool. However, some experts are apprehensive about its volatile nature and potential to exacerbate social inequality. They argue that rigorous regulations are imperative.", quiz:[{q:"What is ubiquitous?", o:["Internet","AI"], a:1}]}],
-        "準1級": [{title:"A Corporate Merger", text:"The two companies decided to collaborate and merge. The CEO announced it was an unprecedented opportunity to augment their market share. Employees were initially bewildered, but the transition was surprisingly smooth.", quiz:[{q:"What did the companies do?", o:["Merge","Fight"], a:0}]}],
-        "2級": [{title:"The Importance of Sleep", text:"Adequate sleep is essential for human brain function. A chronic lack of sleep can negatively affect your physical health and lead to a decline in capacity. It is critical to maintain a good balance.", quiz:[{q:"What is essential?", o:["Money","Sleep"], a:1}]}],
-        "準2級": [{title:"Exploring the Cave", text:"The scientists decided to explore the ancient cave. Inside, they found brilliant crystals and strange insects. It was an amazing adventure that expanded their knowledge of biology.", quiz:[{q:"What did they explore?", o:["A cave","A mountain"], a:0}]}],
-        "3級": [{title:"A Journey to the Future", text:"Lisa is a young scientist. Her ambition is to build a machine that can travel through time. She went to the future and saw the result of global warming.", quiz:[{q:"Who is Lisa?", o:["A teacher","A scientist"], a:1}]}],
-        "4級": [{title:"The Mystery of the Old Clock", text:"Ken lives in a small town. The famous clock tower stopped working fifty years ago. Ken helped an old man fix it, and the town people were very happy.", quiz:[{q:"What was broken?", o:["A clock","A car"], a:0}]}],
-        "5級": [{title:"A Day at the Park", text:"Today is Sunday. Tom and his family go to the big park. They eat sandwiches and read books. It is a happy day.", quiz:[{q:"Where do they go?", o:["School","Park"], a:1}]}]
-    };
-    
+
+    function answerSrs(q) {
+        const now = Date.now(); const intervals = [10*60*1000, 24*60*60*1000, 3*24*60*60*1000, 7*24*60*60*1000];
+        if(q === 0) { currentWord.box = 0; currentWord.nextReview = now + 60000; } 
+        else { currentWord.box = (currentWord.box || 0) + (q === 3 ? 2 : 1); currentWord.nextReview = now + intervals[Math.min(currentWord.box, intervals.length-1)]; addXP(10); }
+        saveWords(); reviewQueue.shift(); if(reviewQueue.length > 0) showNextCard(); else loadStudyQueue();
+    }
+
+    function playAudio(type, customRate = null) {
+        if(isMuted || !currentWord) return;
+        const text = type === 'word' ? currentWord.en : currentWord.exEn; if(!text) return;
+        synth.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = customRate !== null ? customRate : 1.0; if(bestVoice) u.voice = bestVoice; synth.speak(u);
+    }
+
+    // ==========================================
+    // 📚 長文ストーリー ＆ AI文脈推測翻訳
+    // ==========================================
+    const defaultStories = [
+        {
+            grade: "5級", title: "A Day at the Park (公園での一日)",
+            text: "Today is Sunday. The weather is very fine and warm. Tom and his family go to the big park near their house. Tom's father drives a car. In the park, many people are walking and running. Tom sees a small dog under a tall tree. The dog is very cute. Tom's sister, Mary, plays with a ball. They eat a delicious lunch together. Tom's mother makes sandwiches and apple juice. After lunch, they sit on the green grass and read books. It is a very happy and peaceful day for the family.",
+            quiz: [
+                {q: "What day is today?", o: ["Monday", "Sunday", "Friday"], a: 1},
+                {q: "Where does the family go?", o: ["To the hospital", "To the station", "To the park"], a: 2},
+                {q: "What does Tom see under the tree?", o: ["A small dog", "A big cat", "A bird"], a: 0},
+                {q: "What do they eat for lunch?", o: ["Fish and rice", "Sandwiches and juice", "Cake and tea"], a: 1},
+                {q: "What do they do after lunch?", o: ["Swim in the river", "Read books", "Play tennis"], a: 1}
+            ]
+        },
+        {
+            grade: "4級", title: "The Mystery of the Old Clock (古い時計の謎)",
+            text: "Ken lives in a small and old town. In his town, there is a famous clock tower. The clock is very old and beautiful, but it is broken. It stopped working fifty years ago. One night, Ken heard a strange sound from the tower. He was surprised and a little afraid. He went to the tower carefully. Inside the tower, he found a small door. He opened the door and saw an old man. The man was fixing the clock. The man said, 'I am a clock maker. I want to save this clock.' Ken decided to help him. They worked hard together. Finally, the clock started to move again. The town people were very happy to hear the sound of the clock.",
+            quiz: [
+                {q: "What is in Ken's town?", o: ["A famous castle", "An old clock tower", "A large hospital"], a: 1},
+                {q: "When did the clock stop working?", o: ["Fifty years ago", "Last week", "Yesterday"], a: 0},
+                {q: "How did Ken feel when he heard the sound?", o: ["Angry", "Surprised and afraid", "Very happy"], a: 1},
+                {q: "Who was inside the tower?", o: ["A police officer", "A clock maker", "Ken's father"], a: 1},
+                {q: "What did Ken do?", o: ["He ran away", "He called the police", "He helped the man"], a: 2}
+            ]
+        },
+        {
+            grade: "3級", title: "A Journey to the Future (未来への旅)",
+            text: "In the 22nd century, the global environment has changed a lot. Science and technology are highly developed. Lisa is a young scientist. Her ambition is to build a machine that can travel through time. After years of hard work and many failures, she finally completed the machine. She decided to go to the future to see the result of global warming. When she arrived in the future, she was shocked. The sea level was very high, and many islands were under the water. However, she also saw hope. People in the future created a new system to clean the air and water. They lived in harmony with nature. Lisa returned to her own time with valuable knowledge. She promised to share her experience to protect the Earth.",
+            quiz: [
+                {q: "When does the story begin?", o: ["In the 20th century", "In the 21st century", "In the 22nd century"], a: 2},
+                {q: "What is Lisa's profession?", o: ["A doctor", "A scientist", "A teacher"], a: 1},
+                {q: "Why did she go to the future?", o: ["To see the result of global warming", "To meet her grandchildren", "To find a treasure"], a: 0},
+                {q: "What shocked her in the future?", o: ["The sea level was very high", "There were no cars", "People were fighting"], a: 0},
+                {q: "What did she promise to do?", o: ["To destroy the machine", "To protect the Earth", "To live in the future"], a: 1}
+            ]
+        }
+    ];
+
+    let customStories = JSON.parse(localStorage.getItem('vocab_custom_stories_v5')) || [];
     let currentStoryQuizIdx = 0; let currentStoryObj = null;
-    function loadRandomStory() { 
-        const g = document.getElementById('story-grade-selector').value; 
-        const pool = [...(storyBank[g] || storyBank["5級"]), ...customStories.filter(s=>s.grade===g)];
-        currentStoryObj = pool[Math.floor(Math.random() * pool.length)];
-        document.getElementById('story-title').innerText = currentStoryObj.title; document.getElementById('story-box').innerHTML = formatText(currentStoryObj.text); 
-        document.getElementById('story-box').style.display='block'; document.getElementById('btn-start-quiz').style.display='block'; document.getElementById('story-quiz-area').style.display='none'; document.getElementById('story-done').style.display='none';
+
+    function renderStorySelector() {
+        const sel = document.getElementById('story-selector'); sel.innerHTML = '';
+        const allStories = [...defaultStories, ...customStories];
+        allStories.forEach((st, idx) => {
+            const opt = document.createElement('option'); opt.value = idx; opt.innerText = `【${st.grade}】${st.title}`;
+            sel.appendChild(opt);
+        });
     }
-    function startStoryQuiz() { if(!currentStoryObj.quiz || currentStoryObj.quiz.length===0) { document.getElementById('story-box').style.display='none'; document.getElementById('btn-start-quiz').style.display='none'; document.getElementById('story-done').style.display='block'; addXP(50); return; } document.getElementById('story-box').style.display='none'; document.getElementById('btn-start-quiz').style.display='none'; document.getElementById('story-quiz-area').style.display='block'; currentStoryQuizIdx=0; renderStoryQuiz(); }
+
+    function showSubView(id) {
+        document.querySelectorAll('.view, .sub-view').forEach(v => v.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(id === 'view-match') initMatchGame();
+        if(id === 'view-puzzle') renderPuzzle();
+        if(id === 'view-stories') { renderStorySelector(); loadStory(); }
+        if(id === 'view-chat') initChatGame();
+    }
+
+    function loadStory() {
+        const idx = document.getElementById('story-selector').value;
+        const allStories = [...defaultStories, ...customStories];
+        currentStoryObj = allStories[idx];
+        const box = document.getElementById('story-box');
+        
+        const textWords = currentStoryObj.text.split(/([ \n\.,!?])/);
+        let html = "";
+        textWords.forEach(w => {
+            if(w.match(/[a-zA-Z]/)) html += `<span class="story-word" onclick="lookupWord('${w}', this)">${w}</span>`;
+            else html += w;
+        });
+        box.innerHTML = html;
+        
+        document.getElementById('story-box').style.display = 'block';
+        document.getElementById('btn-start-quiz').style.display = 'block';
+        document.getElementById('story-quiz-area').style.display = 'none';
+        document.getElementById('story-done').style.display = 'none';
+        currentStoryQuizIdx = 0;
+    }
+
+    // 【提案】AIによる文脈推測（外部翻訳APIの非同期呼び出し）
+    async function lookupWord(wordStr, el) {
+        const cleanWord = wordStr.toLowerCase().replace(/[^a-z]/g, '');
+        const tip = document.getElementById('dict-tooltip');
+        
+        if(!isMuted) { synth.cancel(); const u = new SpeechSynthesisUtterance(cleanWord); u.lang='en-US'; synth.speak(u); }
+
+        const found = words.find(w => w.en.toLowerCase() === cleanWord);
+        
+        if (found) { 
+            tip.innerText = found.jp; tip.style.background = 'var(--duo-blue)'; 
+        } else { 
+            tip.innerText = "検索中..."; tip.style.background = '#333'; 
+            try {
+                const res = await fetch(`https://api.mymemory.translated.net/get?q=${cleanWord}&langpair=en|ja`);
+                const data = await res.json();
+                if(data && data.responseData && data.responseData.translatedText) {
+                    tip.innerText = `(未登録) ${data.responseData.translatedText}`;
+                } else { tip.innerText = "(未登録)"; }
+            } catch(e) { tip.innerText = "(未登録: エラー)"; }
+        }
+        
+        const rect = el.getBoundingClientRect();
+        tip.style.left = `${rect.left + (rect.width/2)}px`; tip.style.top = `${rect.top - 5}px`;
+        tip.style.display = 'block';
+        setTimeout(() => tip.style.display = 'none', 3000);
+    }
+
+    function startStoryQuiz() {
+        if(!currentStoryObj.quiz || currentStoryObj.quiz.length === 0) {
+            document.getElementById('story-box').style.display = 'none';
+            document.getElementById('btn-start-quiz').style.display = 'none';
+            document.getElementById('story-done').style.display = 'block';
+            addXP(50); showToast("✨ 読了ボーナス！ +50XP"); return;
+        }
+        document.getElementById('story-box').style.display = 'none';
+        document.getElementById('btn-start-quiz').style.display = 'none';
+        document.getElementById('story-quiz-area').style.display = 'block';
+        renderStoryQuiz();
+    }
+
     function renderStoryQuiz() {
-        if(currentStoryQuizIdx >= currentStoryObj.quiz.length) { document.getElementById('story-quiz-area').style.display='none'; document.getElementById('story-done').style.display='block'; addXP(100); return; }
-        const q = currentStoryObj.quiz[currentStoryQuizIdx]; document.getElementById('sq-progress').innerText = `問題 ${currentStoryQuizIdx+1}/${currentStoryObj.quiz.length}`; document.getElementById('sq-q').innerText = q.q;
-        const opts = document.getElementById('sq-options'); opts.innerHTML='';
-        q.o.forEach((o, i) => { const b = document.createElement('button'); b.className='btn-duo btn-gray'; b.innerText=o; b.onclick=()=>{ if(i===q.a){b.classList.replace('btn-gray','btn-green');setTimeout(()=>{currentStoryQuizIdx++;renderStoryQuiz();},800);}else{b.classList.replace('btn-gray','btn-red');setTimeout(()=>b.classList.replace('btn-red','btn-gray'),800);} }; opts.appendChild(b); });
+        if(currentStoryQuizIdx >= currentStoryObj.quiz.length) {
+            document.getElementById('story-quiz-area').style.display = 'none';
+            document.getElementById('story-done').style.display = 'block';
+            addXP(100); showToast("✨ ストーリー完全クリア！ +100XP"); return;
+        }
+        const qData = currentStoryObj.quiz[currentStoryQuizIdx];
+        document.getElementById('sq-progress').innerText = `問題 ${currentStoryQuizIdx + 1} / ${currentStoryObj.quiz.length}`;
+        document.getElementById('sq-q').innerText = qData.q;
+        
+        const opts = document.getElementById('sq-options'); opts.innerHTML = '';
+        qData.o.forEach((opt, i) => {
+            const btn = document.createElement('button'); btn.className = 'btn-duo btn-gray'; btn.style.margin = '0'; btn.innerText = opt;
+            btn.onclick = () => {
+                if(i === parseInt(qData.a)) { btn.classList.replace('btn-gray', 'btn-green'); setTimeout(()=>{ currentStoryQuizIdx++; renderStoryQuiz(); }, 800); }
+                else { btn.classList.replace('btn-gray', 'btn-red'); setTimeout(()=>btn.classList.replace('btn-red', 'btn-gray'), 800); }
+            };
+            opts.appendChild(btn);
+        });
     }
 
-    // --- 通勤モード (高速化・フリーズ防止) ---
-    let comActive = false;
-    async function startCommute() {
-        if(isMuted) { alert("ミュートされています。右上の🔊をタップしてください。"); return; }
-        comActive = true; document.getElementById('pocket-overlay').style.display = 'flex';
-        let q = words.filter(w => !w.nextReview || w.nextReview <= Date.now()); if(q.length===0) q = words;
-        let i = 0;
-        try {
-            while(comActive) {
-                const w = q[i % q.length]; document.getElementById('pocket-word').innerText = w.en;
-                await speakText(w.jp, 'ja-JP', 1.1); if(!comActive) break; await new Promise(r=>setTimeout(r,200));
-                await speakText(w.en, 'en-US', 1.0); if(!comActive) break; await new Promise(r=>setTimeout(r,200));
-                await speakText(w.en, 'en-US', 0.2); if(!comActive) break;
-                if(w.exJp) { await new Promise(r=>setTimeout(r,400)); await speakText(w.exJp, 'ja-JP', 1.1); if(!comActive) break; }
-                if(w.exEn) { await new Promise(r=>setTimeout(r,200)); await speakText(w.exEn, 'en-US', 1.0); if(!comActive) break; }
-                await new Promise(r => setTimeout(r, 600)); i++;
+    // ==========================================
+    // ⚙️ 長文ストーリー作成 (データ管理)
+    // ==========================================
+    let qCount = 0;
+    function initStoryQuizFields() {
+        document.getElementById('st-quiz-container').innerHTML = ''; qCount = 0;
+        addQuizField(); // 最低1問
+    }
+    
+    function addQuizField() {
+        if(qCount >= 5) { alert("問題は最大5問までです。"); return; }
+        qCount++;
+        const div = document.createElement('div'); div.className = 'quiz-input-group';
+        div.innerHTML = `
+            <p style="margin:0 0 5px 0; font-size:0.9rem;">問題 ${qCount}</p>
+            <input type="text" id="st-q${qCount}" placeholder="問題文 (例: What color is the apple?)">
+            <input type="text" id="st-o${qCount}" placeholder="選択肢をカンマ区切り (例: Red,Blue,Green)">
+            <input type="number" id="st-a${qCount}" placeholder="正解の番号(1〜3)" min="1" max="5">
+        `;
+        document.getElementById('st-quiz-container').appendChild(div);
+    }
+
+    function saveCustomStory() {
+        const title = document.getElementById('st-title').value.trim();
+        const grade = document.getElementById('st-grade').value;
+        const text = document.getElementById('st-text').value.trim();
+        if(!title || !text) { alert("タイトルと本文は必須です！"); return; }
+
+        let quizzes = [];
+        for(let i=1; i<=qCount; i++) {
+            const q = document.getElementById(`st-q${i}`).value.trim();
+            const optsStr = document.getElementById(`st-o${i}`).value.trim();
+            const aNum = parseInt(document.getElementById(`st-a${i}`).value);
+            if(q && optsStr && !isNaN(aNum)) {
+                const options = optsStr.split(',').map(s=>s.trim());
+                quizzes.push({ q: q, o: options, a: aNum - 1 }); // 配列は0スタート
             }
-        } catch(e) { stopCommute(); }
-    }
-    function stopCommute() { comActive = false; synth.cancel(); document.getElementById('pocket-overlay').style.display = 'none'; }
-    async function speakText(t, l, r) { return new Promise(res => { const u = new SpeechSynthesisUtterance(t); u.lang=l; u.rate=r; u.onend = res; u.onerror = res; synth.speak(u); setTimeout(res, 3500); }); }
+        }
 
-    // --- その他ゲーム（マッチ/AI/パズル） ---
+        customStories.push({ grade: grade, title: title, text: text, quiz: quizzes });
+        localStorage.setItem('vocab_custom_stories_v5', JSON.stringify(customStories));
+        alert("新しいストーリーを登録しました！");
+        
+        // リセット
+        document.getElementById('st-title').value = ''; document.getElementById('st-text').value = '';
+        initStoryQuizFields();
+    }
+
+    // ==========================================
+    // 🧩 マッチング＆パズル＆会話
+    // ==========================================
     let matchRemaining = 20; let selectedLeft = null; let selectedRight = null;
-    function initMatchGame() { if(words.length === 0) return; matchRemaining = 20; document.getElementById('match-counter').innerText = `残り: ${matchRemaining}問`; document.getElementById('match-board').style.display = 'grid'; document.getElementById('match-done').style.display = 'none'; loadNextMatchSet(); }
+    function initMatchGame() {
+        if(words.length === 0) return; matchRemaining = 20; document.getElementById('match-counter').innerText = `残り: ${matchRemaining}問`;
+        document.getElementById('match-board').style.display = 'grid'; document.getElementById('match-done').style.display = 'none'; loadNextMatchSet();
+    }
     function loadNextMatchSet() {
         if(matchRemaining <= 0) { document.getElementById('match-board').style.display = 'none'; document.getElementById('match-done').style.display = 'block'; addXP(50); return; }
         let currentMatchSet = []; for(let i=0; i<Math.min(6, matchRemaining); i++) { currentMatchSet.push(words[Math.floor(Math.random() * words.length)]); }
@@ -474,75 +732,103 @@
     }
     function handleMatchClick(btn, item) {
         if(btn.classList.contains('matched') || btn.classList.contains('selected')) return;
-        if(item.side === 'left') { if(selectedLeft) selectedLeft.btn.classList.remove('selected'); selectedLeft = { btn, uid: item.uid }; btn.classList.add('selected'); } else { if(selectedRight) selectedRight.btn.classList.remove('selected'); selectedRight = { btn, uid: item.uid }; btn.classList.add('selected'); }
+        if(item.side === 'left') { if(selectedLeft) selectedLeft.btn.classList.remove('selected'); selectedLeft = { btn, uid: item.uid }; btn.classList.add('selected'); } 
+        else { if(selectedRight) selectedRight.btn.classList.remove('selected'); selectedRight = { btn, uid: item.uid }; btn.classList.add('selected'); }
         if(selectedLeft && selectedRight) {
             if(selectedLeft.uid === selectedRight.uid) {
                 selectedLeft.btn.classList.replace('selected', 'matched'); selectedRight.btn.classList.replace('selected', 'matched');
                 if(!isMuted) { synth.cancel(); const u = new SpeechSynthesisUtterance(selectedRight.btn.innerText); u.lang = 'en-US'; synth.speak(u); }
-                matchRemaining--; document.getElementById('match-counter').innerText = `残り: ${matchRemaining}問`; selectedLeft = null; selectedRight = null;
+                matchRemaining--; document.getElementById('match-counter').innerText = `残り: ${matchRemaining}問`;
+                selectedLeft = null; selectedRight = null;
                 if(document.querySelectorAll('.match-btn:not(.matched)').length === 0) setTimeout(loadNextMatchSet, 400);
             } else {
-                const lBtn = selectedLeft.btn; const rBtn = selectedRight.btn; lBtn.classList.remove('selected'); rBtn.classList.remove('selected'); lBtn.classList.add('error'); rBtn.classList.add('error');
-                setTimeout(() => { lBtn.classList.remove('error'); rBtn.classList.remove('error'); }, 300); selectedLeft = null; selectedRight = null;
+                const lBtn = selectedLeft.btn; const rBtn = selectedRight.btn;
+                lBtn.classList.remove('selected'); rBtn.classList.remove('selected'); lBtn.classList.add('error'); rBtn.classList.add('error');
+                setTimeout(() => { lBtn.classList.remove('error'); rBtn.classList.remove('error'); }, 300);
+                selectedLeft = null; selectedRight = null;
             }
         }
     }
-    function renderPuzzle() { const grid = document.getElementById('puzzle-grid'); grid.innerHTML = ''; let unlockedPieces = Math.floor(xp / 100); if (unlockedPieces > 9) unlockedPieces = 9; for(let i=0; i<9; i++) { const piece = document.createElement('div'); piece.className = 'puzzle-piece'; if(i < unlockedPieces) piece.classList.add('revealed'); else piece.innerText = "?"; grid.appendChild(piece); } }
-    
-    let chatUsedWords = new Set(); let chatTurn = 0; const aiScripts = ["That's interesting! Tell me more about it.", "Sounds great! What do you think about the future?", "Awesome! You did a great job today!"];
-    function initChatGame() { chatTurn = 0; chatUsedWords.clear(); document.getElementById('chat-box').innerHTML = `<div class="chat-msg msg-ai">${formatText("Hi! I am your AI teacher. Let's talk in English!")}</div>`; document.getElementById('chat-ui-area').style.display = 'flex'; document.getElementById('chat-feedback').style.display = 'none'; }
-    function startDictation() { if(!recognition) return; recognition.onresult = (e) => { document.getElementById('chat-input').value = e.results[0][0].transcript; }; recognition.start(); }
+
+    function renderPuzzle() {
+        const grid = document.getElementById('puzzle-grid'); grid.innerHTML = '';
+        let unlockedPieces = Math.floor(xp / 100); if (unlockedPieces > 9) unlockedPieces = 9;
+        for(let i=0; i<9; i++) {
+            const piece = document.createElement('div'); piece.className = 'puzzle-piece';
+            if(i < unlockedPieces) piece.classList.add('revealed'); else piece.innerText = "?";
+            grid.appendChild(piece);
+        }
+        document.getElementById('puzzle-info').style.display = (unlockedPieces >= 9) ? 'block' : 'none';
+    }
+
+    let chatUsedWords = new Set(); let chatTurn = 0;
+    const aiScripts = ["That's interesting! Tell me more about it.", "Sounds great! What is your favorite food?", "Awesome! You did a great job today!"];
+    function initChatGame() {
+        chatTurn = 0; chatUsedWords.clear();
+        document.getElementById('chat-box').innerHTML = '<div class="chat-msg msg-ai">Hi! I am your AI teacher. Let\'s talk in English!</div>';
+        document.getElementById('chat-ui-area').style.display = 'flex'; document.getElementById('chat-feedback').style.display = 'none';
+    }
+    function startDictation() {
+        if(!recognition) return;
+        const btn = document.getElementById('mic-btn'); btn.innerText = '🔴'; btn.classList.add('mic-active');
+        recognition.onresult = (e) => { document.getElementById('chat-input').value = e.results[0][0].transcript; btn.classList.remove('mic-active'); btn.innerText = '🎤'; };
+        recognition.onerror = () => { btn.classList.remove('mic-active'); btn.innerText = '🎤'; };
+        recognition.start();
+    }
     function sendChat() {
         const inputEl = document.getElementById('chat-input'); const text = inputEl.value.trim(); if(!text) return;
         const box = document.getElementById('chat-box'); box.innerHTML += `<div class="chat-msg msg-user">${text}</div>`; inputEl.value = ''; box.scrollTop = box.scrollHeight;
         const wordsInText = text.toLowerCase().match(/\b(\w+)\b/g) || []; words.forEach(w => { if(wordsInText.includes(w.en.toLowerCase())) chatUsedWords.add(w.en); });
+        let grammarNote = "";
+        if(text.charAt(0) !== text.charAt(0).toUpperCase()) grammarNote += "・文の始まりは大文字にしましょう。<br>";
+        if(!text.match(/[.!?]$/)) grammarNote += "・最後にはピリオド(.)をつけましょう。<br>";
         setTimeout(() => {
             if(chatUsedWords.size >= 3 || chatTurn >= 2) {
-                box.innerHTML += `<div class="chat-msg msg-ai">${formatText("Perfect! Let's review your chat.")}</div>`;
-                document.getElementById('chat-ui-area').style.display = 'none'; document.getElementById('chat-feedback').style.display = 'block'; addXP(30); box.scrollTop = box.scrollHeight;
-            } else { box.innerHTML += `<div class="chat-msg msg-ai">${formatText(aiScripts[chatTurn])}</div>`; chatTurn++; box.scrollTop = box.scrollHeight; }
+                box.innerHTML += `<div class="chat-msg msg-ai">Perfect! Let's review your chat.</div>`;
+                document.getElementById('chat-ui-area').style.display = 'none'; document.getElementById('chat-feedback').style.display = 'block';
+                const usedArr = Array.from(chatUsedWords); document.getElementById('used-words-list').innerText = usedArr.length > 0 ? usedArr.join(', ') : "なし";
+                document.getElementById('grammar-advice').innerHTML = grammarNote || "完璧な文法です！"; addXP(30); box.scrollTop = box.scrollHeight;
+            } else { box.innerHTML += `<div class="chat-msg msg-ai">${aiScripts[chatTurn]}</div>`; chatTurn++; box.scrollTop = box.scrollHeight; }
         }, 800);
     }
 
-    // --- 設定・バックアップ管理 ---
-    let qCount = 0;
-    function initStoryQuizFields() { document.getElementById('st-quiz-container').innerHTML = ''; qCount = 0; addQuizField(); }
-    function addQuizField() {
-        if(qCount >= 5) return; qCount++; const div = document.createElement('div'); div.className = 'quiz-input-group';
-        div.innerHTML = `<p style="margin:0 0 5px 0; font-size:0.9rem;">問題 ${qCount}</p><input type="text" id="st-q${qCount}" placeholder="問題文"><input type="text" id="st-o${qCount}" placeholder="選択肢(カンマ区切り)"><input type="number" id="st-a${qCount}" placeholder="正解の番号(1〜3)" min="1" max="5">`;
-        document.getElementById('st-quiz-container').appendChild(div);
-    }
-    function saveCustomStory() {
-        const title = document.getElementById('st-title').value.trim(); const grade = document.getElementById('st-grade').value; const text = document.getElementById('st-text').value.trim();
-        if(!title || !text) { alert("タイトルと本文は必須です！"); return; }
-        let quizzes = [];
-        for(let i=1; i<=qCount; i++) {
-            const q = document.getElementById(`st-q${i}`).value.trim(); const optsStr = document.getElementById(`st-o${i}`).value.trim(); const aNum = parseInt(document.getElementById(`st-a${i}`).value);
-            if(q && optsStr && !isNaN(aNum)) { quizzes.push({ q: q, o: optsStr.split(',').map(s=>s.trim()), a: aNum - 1 }); }
+    // ==========================================
+    // 🎧 通勤モード ＆ インポート
+    // ==========================================
+    let comActive = false; let wakeLock = null;
+    async function startCommute() {
+        if(isMuted) { alert("ミュートされています。右上の🔊をタップしてください。"); return; }
+        comActive = true; document.getElementById('pocket-overlay').style.display = 'flex';
+        try { if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
+        const filter = document.getElementById('hub-grade-filter').value; const now = Date.now();
+        let queue = words.filter(w => (filter === 'all' || w.grade === filter) && (!w.nextReview || w.nextReview <= now));
+        if(queue.length === 0) queue = words.filter(w => filter === 'all' || w.grade === filter);
+        let cIdx = 0;
+        while(comActive && queue.length > 0) {
+            const w = queue[cIdx % queue.length]; document.getElementById('pocket-word').innerText = w.en;
+            await speakText(w.jp, 'ja-JP', 1.0); if(!comActive) break;
+            await speakText(w.en, 'en-US', 1.0); if(!comActive) break;
+            await speakText(w.en, 'en-US', 0.2); if(!comActive) break;
+            if(w.exJp) await speakText(w.exJp, 'ja-JP', 1.0); if(!comActive) break;
+            if(w.exEn) await speakText(w.exEn, 'en-US', 1.0); if(!comActive) break;
+            if(w.exEn) await speakText(w.exEn, 'en-US', 0.2); if(!comActive) break;
+            await new Promise(r => setTimeout(r, 1500)); cIdx++;
         }
-        customStories.push({ grade: grade, title: title, text: text, quiz: quizzes }); localStorage.setItem(LKEY_STORY, JSON.stringify(customStories));
-        alert("新しいストーリーを登録しました！"); document.getElementById('st-title').value = ''; document.getElementById('st-text').value = ''; initStoryQuizFields();
     }
+    function stopCommute() { comActive = false; synth.cancel(); if(wakeLock) wakeLock.release(); document.getElementById('pocket-overlay').style.display = 'none'; }
+    async function speakText(t, l, r=1.0) { if(isMuted) return; return new Promise(res => { const u = new SpeechSynthesisUtterance(t); u.lang=l; u.rate=r; if(l.startsWith('en')&&bestVoice) u.voice=bestVoice; u.onend=res; u.onerror=res; synth.speak(u); }); }
 
     function importCSV() {
-        const t = document.getElementById('import-csv').value.trim(); if(!t) return;
+        const text = document.getElementById('import-csv').value.trim(); if(!text) return;
         if(words.length <= 3 && words[0].en === 'apple') words = [];
-        let added = 0;
-        t.split('\n').forEach(l => {
-            const c = l.split(/\t|,/);
-            if(c.length>=2 && c[0].trim()!=='') { words.push({id:Date.now()+Math.random(), en:c[0].trim(), jp:c[1].trim(), rubi:c[2]?.trim(), exEn:c[3]?.trim(), exJp:c[4]?.trim(), grade:c[5]?.trim()||"5級", box:0, nextReview:0}); added++; }
+        const lines = text.split('\n'); let added = 0;
+        lines.forEach(line => {
+            const c = line.split(/\t|,/);
+            if(c.length >= 2 && c[0].trim() !== '') { words.push({ id: Date.now()+Math.random(), en: c[0].trim(), jp: c[1].trim(), rubi: c[2]?.trim(), exEn: c[3]?.trim(), exJp: c[4]?.trim(), grade: c[5]?.trim()||"5級", box: 0, nextReview: 0 }); added++; }
         });
-        saveWords(); updateWordCounts(); alert(`${added} 件記録しました！`); document.getElementById('import-csv').value = '';
+        saveWords(); updateWordCounts(); alert(`${added} 件のデータを記録しました！`); document.getElementById('import-csv').value = '';
     }
-
-    // ★追加機能：バックアップと削除分離
-    function exportCSV() {
-        let tsv = words.map(w => `${w.en}\t${w.jp}\t${w.rubi||''}\t${w.exEn||''}\t${w.exJp||''}\t${w.grade}`).join('\n');
-        navigator.clipboard.writeText(tsv).then(() => { alert("📋 単語データをコピーしました！メモ帳などに貼り付けて保存してください。"); }).catch(err => alert("コピー失敗"));
-    }
-    function clearVocabData() { if(confirm("【注意】単語データのみをすべて消去しますか？（ストーリーやXPは残ります）")) { localStorage.removeItem(LKEY_VOCAB); localStorage.removeItem('vocab_srs_duo_v6'); alert("消去しました。"); location.reload(); } }
-    function clearStoryData() { if(confirm("【注意】自作したストーリーをすべて消去しますか？")) { localStorage.removeItem(LKEY_STORY); localStorage.removeItem('vocab_custom_stories_v6'); alert("消去しました。"); location.reload(); } }
-    function clearAllData() { if(confirm("【警告】アプリを初期化し、単語・ストーリー・XPのすべてを消去しますか？")) { localStorage.clear(); location.reload(); } }
+    function clearAllData() { if(confirm("全データを消去しますか？")) { localStorage.clear(); location.reload(); } }
 
     initVoice(); updateWordCounts();
 </script>
